@@ -1,0 +1,153 @@
+<?php //$Id
+
+/**
+ * @file
+ *
+ * a geolocation field.
+ */
+
+
+function geolocation_help($section) {
+}
+
+
+function geolocation_perms() {
+}
+
+
+
+
+function geolocation_field_info() {
+  return array(
+      'geolocation' => array('label' => 'Geolocation'),
+  );    
+}
+
+function geolocation_field_settings($op, $field) {
+  switch($op) {
+    case 'form':
+      break;
+  
+    case 'validate':
+      break;
+    
+    case 'save':
+      break;
+
+    case 'database columns':
+      return array(
+        'longitude' => array(
+          'type' => 'text',
+          'not null' => TRUE,
+          'default' => '\'\'',
+        ),
+        'latitude' => array(
+          'type' => 'text',
+          'not null' => TRUE,
+          'default' => '\'\'',
+        ),
+      );
+  } 
+} 
+
+
+function geolocation_field($op, $node, $field, $items, $teaser, $page) {
+  switch($op) {
+    case 'validate':
+      // @todo: add validation. otherwise content.module handles all
+      // of this fields data functions.
+      break;
+  }
+}
+
+function geolocation_widget_info() {
+  return array(
+    'geolocation_textfields' => array(
+       'label' => 'Long./Lat. text fields',
+       'field types' => array('geolocation'),
+    ),
+  );  
+}
+
+function geolocation_widget_settings() {
+  // This widget really has no settings...
+  // the google widget will probably require a gmap api key here.
+}
+
+function geolocation_widget($op, $node, $field, &$items) {
+  $fieldname = $field['field_name'];
+  switch($op) {
+    case 'form':
+      $form[$fieldname] = array(
+        '#type' => 'fieldset',
+        '#title' => $field['widget']['label'],
+        '#weight' => $field['widget']['weight'],
+        '#collapsible' => TRUE,
+        '#collapsed' => FALSE,
+        '#tree' => TRUE,
+      );
+
+      // if we got items, add em.
+      if (count($items)) {
+        foreach($items as $delta => $item) {
+          $form[$fieldname][$delta] = geolocation_widget_geolocation_textfields_form($item);
+        }   
+      }
+      // if we're a multiple field add a few extra elements, if we're a single value add a new form.
+      if ($field['multiple'] || count($items) == 0) {
+        $form[$fieldname][0] = geolocation_widget_gelocation_textfields_form();
+      }   
+      return $form;
+
+    case 'process form values':
+      // Don't save empty values, beyond the first value.
+      foreach ($items as $delta => $item) {
+        if ($item['value'] == '' && $delta > 0) {
+          unset($items[$delta]);
+        }
+      }
+      break;
+  }
+}
+    
+
+function geolocation_widget_geolocation_textfields_form($item = array()) {
+  $form = array();
+  $form['latitude'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Latitude'),
+    '#default_value' => $item['latitude'],
+    '#required' => TRUE,
+  );
+  $form['longitude'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Longitude'),
+    '#default_value' => $item['longitude'],
+    '#required' => TRUE,
+  );
+  return $form;
+}
+
+
+function geolocation_field_formatter_info() {
+  $formatters = array(
+    'geolocation_plain' => array(
+      'label' => 'Plain',
+      'field types' => array('geolocation'),
+    ),
+  );
+  return $formatters;
+}
+
+function geolocation_field_formatter($field, $item, $formatter) {
+  switch($formatter) {
+    case 'geolocation_plain':
+      return theme('geolocation_plain', $item);
+  }
+}
+
+function theme_geolocation_plain($item) {
+  $output = '<span class="latitude"><span class="label">'. t('Latitude') .':&nbsp;</span><span class="value">'. check_plain($item['latitude']) .'</span>&nbsp;';
+  $output .= '<span class="longitude"><span class="label">'. t('Longitude').':&nbsp;</span><span class="value">'. check_plain($item['longitude']) .'</span>';
+  return '<div class="geolocation">'. $output .'<div>';
+}
