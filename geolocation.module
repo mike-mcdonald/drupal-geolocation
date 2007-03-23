@@ -46,6 +46,10 @@ function geolocation_field_settings($op, $field) {
           'not null' => TRUE,
           'default' => '\'\'',
         ),
+        'source' => array(
+          'type' => 'text',
+          'default' => '\'\'',
+        ),
       );
   } 
 } 
@@ -54,8 +58,15 @@ function geolocation_field_settings($op, $field) {
 function geolocation_field($op, $node, $field, $items, $teaser, $page) {
   switch($op) {
     case 'validate':
-      // @todo: add validation. otherwise content.module handles all
-      // of this fields data functions.
+      foreach($items as $delta => $item) {
+        //drupal_set_message('field_validate: <pre>'. print_r($items, TRUE) .'</pre>');
+        if ( (-90 >= $item['latitude']) && ($item['latitude'] <= 90) ) {
+          form_set_error($field['field_name'], t('Latitude is out of Range.'));
+        }
+        if ( (-180 >= $item['longitude']) && ($item['latitude'] <= 180) ) {
+          form_set_error($field['field_name'], t('Latitude is out of Range'));
+        }
+      }
       break;
   }
 }
@@ -95,7 +106,7 @@ function geolocation_widget($op, $node, $field, &$items) {
       }
       // if we're a multiple field add a few extra elements, if we're a single value add a new form.
       if ($field['multiple'] || count($items) == 0) {
-        $form[$fieldname][0] = geolocation_widget_gelocation_textfields_form();
+        $form[$fieldname][0] = geolocation_widget_geolocation_textfields_form();
       }   
       return $form;
 

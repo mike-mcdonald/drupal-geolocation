@@ -1,0 +1,203 @@
+<?php //$Id
+$yahoo_appID = 'P0X_MvPV34G1GH8DRzmzcUq_JFGz90muOAtqQYCSj2VFwBOwPoJylo_V2XUw69_2PA--';
+
+/**
+ * @file
+ *
+ * a extras widgets and formatters for geolocation field.
+ */
+
+
+function geolocation_extras_help($section) {
+}
+
+
+
+function geolocation_extras_widget_info() {
+  return array(
+    'geolocation_yahoo_addressfield' => array(
+       'label' => 'Yahoo Address Field.',
+       'field types' => array('geolocation'),
+    ),
+/*
+    'geolocation_yahoo_map' => array(
+       'label' => 'Yahoo Map Field',
+       'field types' => array('geolocation'),
+    ),
+*/
+  );  
+}
+
+function geolocation_extras_widget_settings($op, $widget) {
+  switch($op) {
+    case 'callback':
+      return array('default value' => CONTENT_CALLBACK_CUSTOM);
+
+    case 'form':
+      $form = array();
+      $form['appID'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Yahoo Application ID'),
+        '#description' => t('You can apply for a Yahoo Application ID at %url', array('%url' => l('http://developer.yahoo.com/', 'Yahoo\'s Developer Site'))),
+        '#default_value' => $widget['appID'],
+      );
+      return $form;
+
+    case 'validate':
+      // test yahoo application ID.
+      if (!$widget['appID']) {
+        form_set_error('appID', 'You need to enter a proper appID.' );
+      }
+      break;
+  
+    case 'save': 
+      return array('appID');
+  }
+}
+
+function geolocation_extras_widget($op, $node, $field, &$items) {
+  $fieldname = $field['field_name'];
+  $op = $field['widget']['type'] .'/'. $op;
+  switch($op) {
+    case 'geolocation_yahoo_addressfield/form':
+      $form[$fieldname] = array(
+        '#type' => 'fieldset',
+        '#title' => $field['widget']['label'],
+        '#weight' => $field['widget']['weight'],
+        '#collapsible' => TRUE,
+        '#collapsed' => FALSE,
+        '#tree' => TRUE,
+      );
+
+      // if we got items, put em in the form.
+      if (count($items)) {
+        foreach($items as $delta => $item) {
+          //drupal_set_message('form: <pre>'. print_r($item, TRUE) .'</pre>');
+          // store the location field data in the source column.
+          $form[$fieldname][$delta] = geolocation_extras_widget_geolocation_yahoo_addressfield_form($item);
+          //drupal_set_message('form: <pre>'. print_r($item, TRUE) .'</pre>');
+        }   
+      }
+      // if we're a multiple field add a few extra elements, if we're a single value add a new form.
+      if ($field['multiple'] || !isset($form[$fieldname][0])) {
+        $form[$fieldname][0] = geolocation_extras_widget_geolocation_yahoo_addressfield_form();
+        // for later when we support both yahoo & google.
+        // $form[$fieldname][0] = $form_function();
+      }   
+      //drupal_set_message('form out: <pre>'. print_r($form, TRUE) .'</pre>');
+      return $form;
+
+    case 'geolocation_yahoo_addressfield/prepare form values':
+      // I would unserialize $item['source'] here if I were storing complex
+      // data types in it.
+      break;
+
+    case 'geolocation_yahoo_addressfield/process form values':
+      foreach ($items as $delta => $item) {
+        if ($item['source']) {
+          $url = 'http://api.local.yahoo.com/MapsService/V1/geocode?appid='. urlencode($field['widget']['appID']) .'&location='. urlencode($item['source']) .'&output=php';
+          $geoinfo = unserialize(file_get_contents($url));
+          $items[$delta]['latitude'] = $geoinfo['ResultSet']['Result']['Latitude'];
+          $items[$delta]['longitude'] = $geoinfo['ResultSet']['Result']['Longitude'];
+        }
+        // Don't save empty values, beyond the first value.
+        if ($item['source'] == '' && $item['longitude'] == '' && $item['latitude'] == '' && $delta > 0) {
+          unset($items[$delta]);
+        }
+      }
+      break;
+  }
+}
+
+function geolocation_extras_widget_geolocation_yahoo_addressfield_form($item = array()) {
+  $form = array();
+  $form['source'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Location'),
+    '#description' => t('A free-form address input.'),
+    '#default_value' => $item['source'],
+  );
+
+  if (isset($item['latitude'])) {
+    $form['latitude'] = array(
+      '#type' => 'value',
+      '#value' => $item['latitude'],
+    );
+  }
+  if (isset($item['longitude'])) {
+    $form['longitude'] = array(
+      '#type' => 'value',
+      '#value' => $item['longitude'],
+    );
+  }
+  return $form;
+}
+
+function geolocation_extras_field_formatter_info() {
+  $formatters = array(
+    'geolocation_extras_static_yahoo_map' => array(
+      'label' => 'Static Yahoo Map',
+      'field types' => array('geolocation'),
+    ),
+    'geolocation_extras_ajax_yahoo_map' => array(
+      'label' => 'Interactive Yahoo Map',
+      'field types' => array('geolocation'),
+    ),
+  );
+  return $formatters;
+}
+
+function geolocation_extras_field_formatter($field, $item, $formatter) {
+  switch($formatter) {
+    case 'geolocation_extras_static_yahoo_map':
+      $result = file_get_contents('http://api.local.yahoo.com/MapsService/V1/mapImage?appid='. urlencode($field['widget']['appID']) .'&longitude='. urlencode($item['longitude']) .'&latitude='. urlencode($item['latitude']) .'&output=php');
+      $result = unserialize($result);
+      return theme('geolocation_extras_static_yahoo_map',  $result['Result'], $item, $field);
+
+    case 'geolocation_extras_ajax_yahoo_map':
+      drupal_set_html_head('<script type="text/javascript" src="http://api.maps.yahoo.com/ajaxymap?v=3.0&appid='. urlencode($field['widget']['appID']) .'"></script>');
+      return theme('geolocation_extras_ajax_yahoo_map',  $item);
+  }
+}
+
+function theme_geolocation_extras_static_yahoo_map($url, $item) {
+  $output = '';
+  //$output = '<pre>'. print_r($item, TRUE) .'</pre>';
+  return $output . '<img src="'. $url .'" />';
+}
+
+function theme_geolocation_extras_ajax_yahoo_map($item = array(), $field = array()) {
+  $output = '<div id="mapContainer"></div>';
+  $output .= '
+    <script type="text/javascript">
+    // Create a lat/lon object
+    var myPoint = new YGeoPoint('. check_plain($item['latitude']) .','. check_plain($item['longitude']) .');
+
+    // Create a marker for our location.
+    var marker = new YMarker(myPoint);
+    marker.addLabel("*");
+    var _txt = \'<div style="width:160px;height:50px;"><b>'. check_plain($item['source']) .'</b></div>\';
+    //marker.addAutoExpand("'. check_plain($item['source']) .'");
+    marker.addAutoExpand(_txt);
+
+
+    // Create a map object 
+    var map = new YMap(document.getElementById(\'mapContainer\'));
+    // Display the map centered on a latitude and longitude 
+    map.drawZoomAndCenter(myPoint, 3);
+
+    // Add map type control
+    map.addTypeControl();
+    map.addZoomLong();
+
+    // Set map type to either of: YAHOO_MAP_SAT YAHOO_MAP_HYB YAHOO_MAP_REG
+    map.setMapType(YAHOO_MAP_HYB);
+
+    //Get valid map types, returns array [YAHOO_MAP_REG, YAHOO_MAP_SAT, YAHOO_MAP_HYB]
+    var myMapTypes = map.getMapTypes(); 
+
+    map.addOverlay(marker);
+    </script> 
+  ';
+  return $output;
+}
