@@ -4,6 +4,38 @@
  * @file
  *
  * a geolocation field.
+ *
+ * @todo: add mysql spatial extension support and distance mapping.
+ *
+ * High Performance Proximity Detection Methodology?
+
+ * 1) limit result set using mysql spatial extensions for rough bounding boxes.
+ *     and limit the result set that we use to compute greater circle...
+ *    ex) WHERE MBRwithin()
+ * 2) Store long in radians
+ * 3) precompute sin/cos for lats.
+ *
+ * table {
+      longitude varchar
+      latitude varchar
+      longrads float
+      latsin  float
+      latcos  float
+      latlong_pt POINT(longitude, latitude)
+   }
+  
+   given $max_distance FROM (ptlat, ptlong)
+   $radius = 0.5 * $max_distance;
+   $poly = ($ptlong + $radius) .' '. ($ptlat + $radius).','. ($ptlong + $radius) .' '. ($ptlat - $radius).','. 
+             ($ptlong - $radius) .' '. ($ptlat - $radius).','. ($ptlong - $radius).' '. ($ptlat + $radius).','.
+             ($ptlong + $radius).' '. ($ptlat + $radius)
+
+   $ptlatsin = sin(deg2rad($ptlat));
+   $ptlatcos = cos(deg2rad($ptlat));
+   $ptlongrads = deg2rad($ptlong);
+   SELECT nid, delta,  acos( ($ptlatsin * latsin) +  (ptlatcos*latcos * cos(longrads - ptlongrads) )) as distance
+   from geolocation WHERE MRBContains(POLYGON($poly), latlong_pt) AND distance < $max_distance.
+ *
  */
 
 
@@ -37,15 +69,30 @@ function geolocation_field_settings($op, $field) {
     case 'database columns':
       return array(
         'longitude' => array(
-          'type' => 'text',
+          'type' => 'float',
           'not null' => TRUE,
           'default' => '\'\'',
         ),
         'latitude' => array(
-          'type' => 'text',
+          'type' => 'float',
           'not null' => TRUE,
           'default' => '\'\'',
         ),
+        'longrads' => array(
+          'type' => 'float',
+          'not null' => TRUE,
+          'default' => '\'\'',
+        );
+        'latsin' => array(
+          'type' => 'float',
+          'not null' => TRUE,
+          'default' => '\'\'',
+        );
+        'latcos' => array(
+          'type' => 'float',
+          'not null' => TRUE,
+          'default' => '\'\'',
+        );
         'source' => array(
           'type' => 'text',
           'default' => '\'\'',
@@ -68,6 +115,16 @@ function geolocation_field($op, $node, $field, $items, $teaser, $page) {
         }
       }
       break;
+
+    case 'insert':
+      foreach ($items as $delta => $item) {
+        // precalculate some goodness.
+        $item['latsin'] = sin(deg2rad($item['latitude']));
+        $item['latcos'] = cos(deg2rad($item['latitude']));
+        $item['longrads'] = deg2rad($item['longitude']);
+        $items[$delta] = $item;
+      }   
+      $items = array_values($items); // compact deltas
   }
 }
 
