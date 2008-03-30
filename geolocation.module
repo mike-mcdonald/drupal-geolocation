@@ -5,6 +5,7 @@
  *
  * a geolocation field.
  *
+ * @todo: views integration - proximity filter, expose latitude and longitude independently to views.
  * @todo: add mysql spatial extension support and distance mapping.
  *
  * High Performance Proximity Detection Methodology?
@@ -38,16 +39,30 @@
  *
  */
 
+/**
+ * @defgoup geolocation_core_hooks
+ * @{
+ * 
+ * Core Drupal hooks for geolocation.
+ */
 
 function geolocation_help($section) {
 }
 
-
 function geolocation_perms() {
 }
 
+/**
+ * @} End "defgoup geolocation_core_hooks"
+ */
 
 
+/**
+ * @defgoup geolocation_field_hooks
+ * @{
+ * 
+ * CCK field hooks for geolocation.
+ */
 
 function geolocation_field_info() {
   return array(
@@ -71,42 +86,40 @@ function geolocation_field_settings($op, $field) {
         'longitude' => array(
           'type' => 'float',
           'not null' => TRUE,
-          'default' => '\'\'',
+          'default' => 0,
         ),
         'latitude' => array(
           'type' => 'float',
           'not null' => TRUE,
-          'default' => '\'\'',
+          'default' => 0,
         ),
         'longrads' => array(
           'type' => 'float',
           'not null' => TRUE,
-          'default' => '\'\'',
-        );
+          'default' => 0,
+        ),
         'latsin' => array(
           'type' => 'float',
           'not null' => TRUE,
-          'default' => '\'\'',
-        );
+          'default' => 0,
+        ),
         'latcos' => array(
           'type' => 'float',
           'not null' => TRUE,
-          'default' => '\'\'',
-        );
+          'default' => 0,
+        ),
         'source' => array(
           'type' => 'text',
-          'default' => '\'\'',
+          'default' => '',
         ),
       );
   } 
 } 
 
-
-function geolocation_field($op, $node, $field, $items, $teaser, $page) {
+function geolocation_field($op, $node, $field, &$items, $teaser, $page) {
   switch($op) {
     case 'validate':
       foreach($items as $delta => $item) {
-        //drupal_set_message('field_validate: <pre>'. print_r($items, TRUE) .'</pre>');
         if ( (-90 >= $item['latitude']) && ($item['latitude'] <= 90) ) {
           form_set_error($field['field_name'], t('Latitude is out of Range.'));
         }
@@ -117,6 +130,7 @@ function geolocation_field($op, $node, $field, $items, $teaser, $page) {
       break;
 
     case 'insert':
+    case 'update':
       foreach ($items as $delta => $item) {
         // precalculate some goodness.
         $item['latsin'] = sin(deg2rad($item['latitude']));
@@ -127,6 +141,18 @@ function geolocation_field($op, $node, $field, $items, $teaser, $page) {
       $items = array_values($items); // compact deltas
   }
 }
+
+/**
+ * @}
+ */
+
+
+/**
+ * @defgoup geolocation_widget_hooks
+ * @{
+ * 
+ * Plain widget for geolocation.
+ */
 
 function geolocation_widget_info() {
   return array(
@@ -177,7 +203,6 @@ function geolocation_widget($op, $node, $field, &$items) {
       break;
   }
 }
-    
 
 function geolocation_widget_geolocation_textfields_form($item = array()) {
   $form = array();
@@ -196,6 +221,17 @@ function geolocation_widget_geolocation_textfields_form($item = array()) {
   return $form;
 }
 
+/**
+ * @}
+ */
+
+
+/**
+ * @defgoup geolocation_formatter_hooks
+ * @{
+ * 
+ * Plain formatter for geolocation.
+ */
 
 function geolocation_field_formatter_info() {
   $formatters = array(
@@ -219,3 +255,7 @@ function theme_geolocation_plain($item) {
   $output .= '<span class="longitude"><span class="label">'. t('Longitude').':&nbsp;</span><span class="value">'. check_plain($item['longitude']) .'</span>';
   return '<div class="geolocation">'. $output .'<div>';
 }
+
+/**
+ * @}
+ */
