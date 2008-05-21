@@ -1,0 +1,5 @@
+; $Id$
+name = geolocation gmap   
+description = Gmap Integration for Geolocation field.
+dependencies = content geolocation gmap
+package = CCK

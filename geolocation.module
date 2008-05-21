@@ -72,15 +72,6 @@ function geolocation_field_info() {
 
 function geolocation_field_settings($op, $field) {
   switch($op) {
-    case 'form':
-      break;
-  
-    case 'validate':
-      break;
-    
-    case 'save':
-      break;
-
     case 'database columns':
       return array(
         'longitude' => array(
