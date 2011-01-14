@@ -1,5 +1,6 @@
 ; $Id$
-name = geolocation
-description = Defines a geolocation field type.
-dependencies = content
-package = CCK
+
+name = Geolocation
+description = Provides a geolocation field.
+package = Geolocation
+core = 7.x

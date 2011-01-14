@@ -1,5 +1,0 @@
-; $Id$
-name = geolocation extras   
-description = Widgets and formatters for the geolocation field type.
-dependencies = content geolocation
-package = CCK

@@ -1,252 +1,156 @@
-<?php //$Id
+<?php
+// $Id$
 
 /**
  * @file
- *
- * a geolocation field.
- *
- * @todo: views integration - proximity filter, expose latitude and longitude independently to views.
- * @todo: add mysql spatial extension support and distance mapping.
- *
- * High Performance Proximity Detection Methodology?
-
- * 1) limit result set using mysql spatial extensions for rough bounding boxes.
- *     and limit the result set that we use to compute greater circle...
- *    ex) WHERE MBRwithin()
- * 2) Store long in radians
- * 3) precompute sin/cos for lats.
- *
- * table {
-      longitude varchar
-      latitude varchar
-      longrads float
-      latsin  float
-      latcos  float
-      latlong_pt POINT(longitude, latitude)
-   }
-  
-   given $max_distance FROM (ptlat, ptlong)
-   $radius = 0.5 * $max_distance;
-   $poly = ($ptlong + $radius) .' '. ($ptlat + $radius).','. ($ptlong + $radius) .' '. ($ptlat - $radius).','. 
-             ($ptlong - $radius) .' '. ($ptlat - $radius).','. ($ptlong - $radius).' '. ($ptlat + $radius).','.
-             ($ptlong + $radius).' '. ($ptlat + $radius)
-
-   $ptlatsin = sin(deg2rad($ptlat));
-   $ptlatcos = cos(deg2rad($ptlat));
-   $ptlongrads = deg2rad($ptlong);
-   SELECT nid, delta,  acos( ($ptlatsin * latsin) +  (ptlatcos*latcos * cos(longrads - ptlongrads) )) as distance
-   from geolocation WHERE MRBContains(POLYGON($poly), latlong_pt) AND distance < $max_distance.
- *
+ * A geolocation field using the Field API.
  */
 
 /**
- * @defgoup geolocation_core_hooks
- * @{
- * 
- * Core Drupal hooks for geolocation.
+ * Implements hook_field_info().
  */
-
-function geolocation_help($section) {
-}
-
-function geolocation_perms() {
-}
-
-/**
- * @} End "defgoup geolocation_core_hooks"
- */
-
-
-/**
- * @defgoup geolocation_field_hooks
- * @{
- * 
- * CCK field hooks for geolocation.
- */
-
 function geolocation_field_info() {
   return array(
-      'geolocation' => array('label' => 'Geolocation'),
-  );    
-}
-
-function geolocation_field_settings($op, $field) {
-  switch($op) {
-    case 'database columns':
-      return array(
-        'longitude' => array(
-          'type' => 'float',
-          'not null' => TRUE,
-          'default' => 0,
-        ),
-        'latitude' => array(
-          'type' => 'float',
-          'not null' => TRUE,
-          'default' => 0,
-        ),
-        'longrads' => array(
-          'type' => 'float',
-          'not null' => TRUE,
-          'default' => 0,
-        ),
-        'latsin' => array(
-          'type' => 'float',
-          'not null' => TRUE,
-          'default' => 0,
-        ),
-        'latcos' => array(
-          'type' => 'float',
-          'not null' => TRUE,
-          'default' => 0,
-        ),
-        'source' => array(
-          'type' => 'text',
-          'default' => '',
-        ),
-      );
-  } 
-} 
-
-function geolocation_field($op, $node, $field, &$items, $teaser, $page) {
-  switch($op) {
-    case 'validate':
-      foreach($items as $delta => $item) {
-        if ( (-90 >= $item['latitude']) && ($item['latitude'] <= 90) ) {
-          form_set_error($field['field_name'], t('Latitude is out of Range.'));
-        }
-        if ( (-180 >= $item['longitude']) && ($item['latitude'] <= 180) ) {
-          form_set_error($field['field_name'], t('Latitude is out of Range'));
-        }
-      }
-      break;
-
-    case 'insert':
-    case 'update':
-      foreach ($items as $delta => $item) {
-        // precalculate some goodness.
-        $item['latsin'] = sin(deg2rad($item['latitude']));
-        $item['latcos'] = cos(deg2rad($item['latitude']));
-        $item['longrads'] = deg2rad($item['longitude']);
-        $items[$delta] = $item;
-      }   
-      $items = array_values($items); // compact deltas
-  }
-}
-
-/**
- * @}
- */
-
-
-/**
- * @defgoup geolocation_widget_hooks
- * @{
- * 
- * Plain widget for geolocation.
- */
-
-function geolocation_widget_info() {
-  return array(
-    'geolocation_textfields' => array(
-       'label' => 'Long./Lat. text fields',
-       'field types' => array('geolocation'),
+    'geolocation_latlng' => array(
+      'label' => t('Gelocation'),
+      'description' => t('Gelocation input.'),
+      'default_widget' => 'geolocation_latlng',
+      'default_formatter' => 'geolocation_text',
     ),
-  );  
+  );
 }
 
-function geolocation_widget_settings() {
-  // This widget really has no settings...
-  // the google widget will probably require a gmap api key here.
-}
-
-function geolocation_widget($op, $node, $field, &$items) {
-  $fieldname = $field['field_name'];
-  switch($op) {
-    case 'form':
-      $form[$fieldname] = array(
-        '#type' => 'fieldset',
-        '#title' => $field['widget']['label'],
-        '#weight' => $field['widget']['weight'],
-        '#collapsible' => TRUE,
-        '#collapsed' => FALSE,
-        '#tree' => TRUE,
-      );
-
-      // if we got items, add em.
-      if (count($items)) {
-        foreach($items as $delta => $item) {
-          $form[$fieldname][$delta] = geolocation_widget_geolocation_textfields_form($item);
-        }   
+/**
+ * Implements hook_field_validate().
+ */
+function geolocation_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
+  foreach ($items as $delta => $item) {
+    if (!empty($item['lat'])) {
+      if ( !is_numeric($item['lat']) ) {
+        $errors[$field['field_name']][$langcode][$delta][] = array(
+          'error' => 'geolocation_invalid',
+          'message' => t('Invalid Latitude.'),
+        );
       }
-      // if we're a multiple field add a few extra elements, if we're a single value add a new form.
-      if ($field['multiple'] || count($items) == 0) {
-        $form[$fieldname][0] = geolocation_widget_geolocation_textfields_form();
-      }   
-      return $form;
-
-    case 'process form values':
-      // Don't save empty values, beyond the first value.
-      foreach ($items as $delta => $item) {
-        if ($item['value'] == '' && $delta > 0) {
-          unset($items[$delta]);
-        }
+      if ( !is_numeric($item['lng']) ) {
+        $errors[$field['field_name']][$langcode][$delta][] = array(
+          'error' => 'geolocation_invalid',
+          'message' => t('Invalid Longitude.'),
+        );
       }
-      break;
+    }
   }
 }
 
-function geolocation_widget_geolocation_textfields_form($item = array()) {
-  $form = array();
-  $form['latitude'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Latitude'),
-    '#default_value' => $item['latitude'],
-    '#required' => TRUE,
-  );
-  $form['longitude'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Longitude'),
-    '#default_value' => $item['longitude'],
-    '#required' => TRUE,
-  );
-  return $form;
+/**
+ * Implements hook_field_presave().
+ */
+function geolocation_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  foreach ($items AS $delta => $item) {
+    // Precalculate some goodness.
+    $item['lat_sin'] = sin(deg2rad($item['lat']));
+    $item['lat_cos'] = cos(deg2rad($item['lat']));
+    $item['lng_rad'] = deg2rad($item['lng']);
+    $items[$delta] = $item;
+  }
 }
 
 /**
- * @}
+ * Implements hook_field_is_empty().
  */
-
+function geolocation_field_is_empty($item, $field) {
+  if ( empty($item['lat']) ) {
+    return TRUE;
+  }
+  if ( empty($item['lng']) ) {
+    return TRUE;
+  }
+}
 
 /**
- * @defgoup geolocation_formatter_hooks
- * @{
- * 
- * Plain formatter for geolocation.
+ * Implements hook_field_formatter_info().
  */
-
 function geolocation_field_formatter_info() {
-  $formatters = array(
-    'geolocation_plain' => array(
-      'label' => 'Plain',
-      'field types' => array('geolocation'),
+  return array(
+    'geolocation_text' => array(
+      'label' => t('Simple text-based formatter'),
+      'field types' => array('geolocation_latlng'),
     ),
   );
-  return $formatters;
-}
-
-function geolocation_field_formatter($field, $item, $formatter) {
-  switch($formatter) {
-    case 'geolocation_plain':
-      return theme('geolocation_plain', $item);
-  }
-}
-
-function theme_geolocation_plain($item) {
-  $output = '<span class="latitude"><span class="label">'. t('Latitude') .':&nbsp;</span><span class="value">'. check_plain($item['latitude']) .'</span>&nbsp;';
-  $output .= '<span class="longitude"><span class="label">'. t('Longitude').':&nbsp;</span><span class="value">'. check_plain($item['longitude']) .'</span>';
-  return '<div class="geolocation">'. $output .'<div>';
 }
 
 /**
- * @}
+ * Implements hook_field_formatter_view().
  */
+function geolocation_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+
+  switch ($display['type']) {
+
+    case 'geolocation_text':
+      foreach ($items as $delta => $item) {
+        $element[$delta]['#markup'] = '<p>' . t('Geolocation is @lat, @lng', array('@lat' => $item['lat'], '@lng' => $item['lng'])) . '</p>';
+      }
+      break;
+
+  }
+  return $element;
+}
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function geolocation_field_widget_info() {
+  return array(
+    'geolocation_text' => array(
+      'label' => t('Latitude/Longitude'),
+      'field types' => array('geolocation_latlng'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function geolocation_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  $lat_value = isset($items[$delta]['lat']) ? $items[$delta]['lat'] : '';
+  $lng_value = isset($items[$delta]['lng']) ? $items[$delta]['lng'] : '';
+  $element += array(
+    '#delta' => $delta,
+  );
+  $element['lat'] = array();
+  $element['lng'] = array();
+
+  switch ($instance['widget']['type']) {
+
+    case 'geolocation_text':
+      $element['lat'] += array(
+        '#title' => t('Latitude'),
+        '#type' => 'textfield',
+        '#default_value' => $lat_value,
+        '#size' => 30,
+        '#maxlength' => 30,
+      );
+      $element['lng'] += array(
+        '#title' => t('Longitude'),
+        '#type' => 'textfield',
+        '#default_value' => $lng_value,
+        '#size' => 30,
+        '#maxlength' => 30,
+      );
+      break;
+
+  }
+  return $element;
+}
+
+/**
+ * Implements hook_field_widget_error().
+ */
+function geolocation_field_widget_error($element, $error, $form, &$form_state) {
+  switch ($error['error']) {
+    case 'geolocation_invalid':
+      form_error($element, $error['message']);
+      break;
+  }
+}
