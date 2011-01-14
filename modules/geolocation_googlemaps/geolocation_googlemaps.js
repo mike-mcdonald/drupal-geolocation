@@ -5,13 +5,13 @@
  * Javascript for Goole Map widget of Geolocation field.
  */
 
+// This is pretty messy DEV-Code.
+// TODO: cleanup.
 (function ($) {
-  $(document).ready(function() {
-    var geocoder;
-    var map;
-    var marker;
-  });
-  
+  var geocoder;
+  var map;
+  var marker;
+
   function codeLatLng(latlng, op) {
     if (geocoder) {
       geocoder.geocode({'latLng': latlng}, function(results, status) {
@@ -21,6 +21,8 @@
           if (op == 'mapclick') {
             $("#edit-field-geolocation-und-0-address").val(results[0].formatted_address);
           }
+          /*
+          // Hide Debug output, cleanup later.
           $("#lat").html("<strong>Lat:</strong> "+latlng.lat());
           $("#lng").html("<strong>Lng:</strong> "+latlng.lng());
           var str = "";
@@ -34,6 +36,7 @@
             str +="</ul>";
           });
           $("#geocode_info").html(str);
+          */
         } else {
           alert(Drupal.t('Geocoder failed due to: ') + status);
         }

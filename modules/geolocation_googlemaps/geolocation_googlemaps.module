@@ -100,6 +100,11 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
       $element['googlemap'] = array(
         '#type' => 'markup',
         '#markup' => '
+          <div id="map" style="width:100%;height:400px;"></div>
+        ',
+        /*
+        // Hide debug output, cleanup later. 
+        '#markup' => '
             <div id="map" style="width:100%;height:400px;"></div>
             <div>
               <span id ="lat"></span><br />
@@ -107,6 +112,7 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
               <div id="geocode_info"></div>
             </div>
         ',
+        */
       );
 
       // Attach CSS and JS files via FAPI '#attached'.
