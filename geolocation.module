@@ -12,8 +12,8 @@
 function geolocation_field_info() {
   return array(
     'geolocation_latlng' => array(
-      'label' => t('Gelocation'),
-      'description' => t('Gelocation input.'),
+      'label' => t('Geolocation'),
+      'description' => t('Geolocation input.'),
       'default_widget' => 'geolocation_latlng',
       'default_formatter' => 'geolocation_text',
     ),
