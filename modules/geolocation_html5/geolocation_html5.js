@@ -61,7 +61,10 @@
         plot();
         $busy.hide();
       }, function () { // getCurrentPosition error callback
+        $busy.hide();
+        $('#geolocation-html5-messages .not-supported').show();
         $('#edit-field-geolocation-und-0-save').attr('checked', false).change();
+        $('#edit-field-geolocation-und-0-save').attr('disabled', true);
       },
       {
         maximumAge: Infinity
