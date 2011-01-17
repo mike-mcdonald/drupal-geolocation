@@ -50,6 +50,7 @@
     if ($('#edit-field-geolocation-und-0-save').attr('checked')) {
       var $busy = $('#geolocation-html5-messages .geolocating');
       $('#geolocation-html5-map').slideDown('fast');
+      $('#geolocation-html5-map .dot').hide();
 
       // Get position
       $busy.show();
