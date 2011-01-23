@@ -72,15 +72,13 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
     case 'geolocation_googlemap':
       $element['lat'] += array(
         '#type' => 'hidden',
-        '#prefix' => '<div id="geolat">',
-        '#suffix' => '</div>',
+        '#attributes' => array('class' => 'geolocation-lat'),
         '#default_value' => $lat_value,
         '#maxlength' => 30,
       );
       $element['lng'] += array(
         '#type' => 'hidden',
-        '#prefix' => '<div id="geolng">',
-        '#suffix' => '</div>',
+        '#attributes' => array('class' => 'geolocation-lng'),
         '#default_value' => $lng_value,
         '#maxlength' => 30,
       );

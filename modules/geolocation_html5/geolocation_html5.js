@@ -19,8 +19,8 @@
 
   function plot() {
     var $map = $('#geolocation-html5-map'),
-      latitude = $('#geolat input').attr('value'),
-      longitude = $('#geolng input').attr('value');
+      latitude = $('input.geolocation-lat').attr('value'),
+      longitude = $('input.geolocation-lng').attr('value');
 
     if (latitude == 0 && longitude == 0) {
       return;
@@ -31,19 +31,6 @@
       left: '' + Drupal.html5UserGeolocationLongitudeToPx(longitude, -168, $map.width()) + 'px',
       bottom: '' + Drupal.html5UserGeolocationLatitudeToPx(latitude, 78, -58, $map.height()) + 'px'
     }).show();
-
-    /*
-    // Show precision
-    $map.siblings('.description').find('span').html(
-      (Math.acos(
-        Math.sin(latitude * Math.PI / 180)
-          * Math.sin((latitude) * Math.PI / 180)
-        + Math.cos(latitude * Math.PI / 180)
-          * Math.cos((latitude) * Math.PI / 180)
-          * Math.cos(Math.pow(10, -1 * Drupal.settings.html5UserGeolocationPrecision) * Math.PI / 180)
-      ) * 6371).toPrecision(3)
-    );
-    */
   }
 
   function getLocation() {
@@ -56,8 +43,8 @@
       $busy.show();
       navigator.geolocation.getCurrentPosition(function (position) {
         // Save coords
-        $('#geolat input').attr('value', position.coords.latitude);
-        $('#geolng input').attr('value', position.coords.longitude);
+        $('input.geolocation-lat').attr('value', position.coords.latitude);
+        $('input.geolocation-lng').attr('value', position.coords.longitude);
 
         plot();
         $busy.hide();
@@ -72,8 +59,8 @@
       });
     }
     else { // Location not checked
-      $('#geolat input').val('');
-      $('#geolng input').val('');
+      $('input.geolocation-lat').attr('value', '');
+      $('input.geolocation-lng').attr('value', '');
       $('#geolocation-html5-map').slideUp('fast');
     }
   }

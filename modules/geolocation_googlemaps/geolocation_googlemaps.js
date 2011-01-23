@@ -16,8 +16,8 @@
     if (geocoder) {
       geocoder.geocode({'latLng': latlng}, function(results, status) {
         if (status == google.maps.GeocoderStatus.OK) {
-          $("#geolat input").val(latlng.lat());
-          $("#geolng input").val(latlng.lng());
+          $("input.geolocation-lat").attr('value', latlng.lat());
+          $("input.geolocation-lng").attr('value', latlng.lng());
           if (op == 'mapclick') {
             $("#edit-field-geolocation-und-0-address").val(results[0].formatted_address);
           }
@@ -50,8 +50,8 @@
       if (status == google.maps.GeocoderStatus.OK) {
         map.setCenter(results[0].geometry.location);
         setMapMarker(results[0].geometry.location);
-        $("#geolat input").val(results[0].geometry.location.lat());
-        $("#geolng input").val(results[0].geometry.location.lng());
+        $("input.geolocation-lat").attr('value', results[0].geometry.location.lat());
+        $("input.geolocation-lng").attr('value', results[0].geometry.location.lng());
         codeLatLng(results[0].geometry.location, 'textinput');
       } else {
         alert(Drupal.t('Geocode was not successful for the following reason: ') + status);
@@ -69,8 +69,8 @@
       animation: google.maps.Animation.DROP,
       position: position
     });
-    $("#geolat input").val(position.lat());
-    $("#geolng input").val(position.lng());
+    $("input.geolocation-lat").attr('value', position.lat());
+    $("input.geolocation-lng").attr('value', position.lng());
     codeLatLng(position, 'textinput');
     return false; // if called from <a>-Tag
   }
@@ -111,8 +111,8 @@
         }
       });
 
-      var lat = $('#geolat input').val() == '' ? Drupal.settings.map_defaults.lat : $('#geolat input').val();
-      var lng = $('#geolng input').val() == '' ? Drupal.settings.map_defaults.lng : $('#geolng input').val();
+      var lat = $('input.geolocation-lat').attr('value') == '' ? Drupal.settings.map_defaults.lat : $('input.geolocation-lat').attr('value');
+      var lng = $('input.geolocation-lng').attr('value') == '' ? Drupal.settings.map_defaults.lng : $('input.geolocation-lng').attr('value');
 
       var latlng = new google.maps.LatLng(lat, lng);
       var myOptions = {

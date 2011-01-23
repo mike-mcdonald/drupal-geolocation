@@ -79,15 +79,13 @@ function geolocation_html5_field_widget_form(&$form, &$form_state, $field, $inst
     case 'geolocation_html5_widget':
       $element['lat'] = array(
         '#type' => 'hidden',
-        '#prefix' => '<div id="geolat">',
-        '#suffix' => '</div>',
+        '#attributes' => array('class' => 'geolocation-lat'),
         '#default_value' => $lat_value,
         '#maxlength' => 30,
       );
       $element['lng'] = array(
         '#type' => 'hidden',
-        '#prefix' => '<div id="geolng">',
-        '#suffix' => '</div>',
+        '#attributes' => array('class' => 'geolocation-lng'),
         '#default_value' => $lng_value,
         '#maxlength' => 30,
       );
