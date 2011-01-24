@@ -5,7 +5,7 @@
  * Javascript for Goole Map widget of Geolocation field.
  */
 
-// This is pretty messy DEV-Code.
+// This is still pretty messy DEV-Code.
 // TODO: cleanup.
 (function ($) {
   var geocoder;
@@ -19,7 +19,7 @@
           $("input.geolocation-lat").attr('value', latlng.lat());
           $("input.geolocation-lng").attr('value', latlng.lng());
           if (op == 'mapclick') {
-            $("#edit-field-geolocation-und-0-address").val(results[0].formatted_address);
+            $(".geolocation-input").val(results[0].formatted_address);
           }
           /*
           // Hide Debug output, cleanup later.
@@ -45,7 +45,7 @@
   }
 
   function codeAddress() {
-    var address = document.getElementById("edit-field-geolocation-und-0-address").value;
+    var address = $(".geolocation-input").val();
     geocoder.geocode( { 'address': address }, function(results, status) {
       if (status == google.maps.GeocoderStatus.OK) {
         map.setCenter(results[0].geometry.location);
@@ -105,7 +105,7 @@
       $("#use-client-location").click(function() {
         if (google.loader.ClientLocation) {
           latlng = new google.maps.LatLng(google.loader.ClientLocation.latitude, google.loader.ClientLocation.longitude);
-          $("#edit-field-geolocation-und-0-address").val(getFormattedLocation());
+          $(".geolocation-input").val(getFormattedLocation());
           map.setCenter(latlng);
           setMapMarker(latlng);
         }
