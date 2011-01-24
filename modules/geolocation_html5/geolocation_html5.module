@@ -37,13 +37,8 @@ function geolocation_html5_field_formatter_view($entity_type, $entity, $field, $
         $dot_style = ' style="display:block; left:'. $left .'px; bottom:'. $bottom .'px;"';
 
         $element[$delta]['mapimage'] = array(
-          '#type' => 'item',
-          '#id' => 'geolocation-html5-map',
-          '#markup' => '<div id="geolocation-html5-map"><div class="dot"'. $dot_style .'></div></div>',
-          // DEBUG:
-          // '#description' => "$latitude, $longitude",
-          // TODO: port precision settings from html5_user_geolocation module.
-          // '#description' => t('Saved location is rounded to <span>…</span>km units.'),
+          '#type' => 'markup',
+          '#markup' => '<div class="geolocation-html5-map" style="display:block;"><div class="dot"'. $dot_style .'></div></div>',
         );
       }
       break;
@@ -92,53 +87,38 @@ function geolocation_html5_field_widget_form(&$form, &$form_state, $field, $inst
       $element['save'] = array(
         '#type' => 'checkbox',
         '#title' => t('Save my location'),
-        '#description' => t('Your location will be saved and may be shared.'),
-        '#default_value' => $lat_value !== FALSE,
+        '#description' => t('Your web browser does not support geolocation (<a href="http://en.wikipedia.org/wiki/W3C_Geolocation_API">W3C Geolocation API</a>).'),
+        '#default_value' => $lat_value !== '',
       );
-      
-      /*
+
       $dot_style = '';
       // If we have a lat/lng pair, calculate dot position.
-      if (isset($lat_value) && isset($lng_value)) {
+      if ($lat_value != '' && $lng_value != '') {
         $latitude = $lat_value;
         $longitude = $lng_value;
         $left = _geolocation_html5_lng2px($longitude, -168, 450);
         $bottom = _geolocation_html5_lat2px($latitude, 78, -58, 250);
         $dot_style = ' style="display:block; left:'. $left .'px; bottom:'. $bottom .'px;"';
       }
-      */
-      $dot_style = '';
-      $element['html5map'] = array(
-        '#type' => 'item',
-        '#id' => 'geolocation-html5-map',
-        '#markup' => '<div id="geolocation-html5-map"><div class="dot"'. $dot_style .'></div></div>',
-        // TODO: port precision settings from html5_user_geolocation module.
-        // '#description' => t('Saved location is rounded to <span>…</span>km units.'),
+      $element['map'] = array(
+        '#type' => 'markup',
+        '#markup' => '<div class="geolocation-html5-map"><div class="dot"'. $dot_style .'></div></div>',
       );
       $element['messages'] = array(
-        '#type' => 'item',
-        '#id' => 'geolocation-html5-messages',
-        '#markup' => '<div class="not-supported">' . t('Your web browser does not support this feature.') . '</div>'
-          . '<div class="geolocating">Your browser is looking for your location, you may need to approve this…</div>',
+        '#type' => 'markup',
+        '#markup' => '
+          <div class="geolocation-html5-messages">
+            <div class="geolocating">' . t('Your browser is looking for your location, you may need to approve this…') . '</div>
+          </div>',
       );
 
       // Attach CSS and JS files via FAPI '#attached'.
-      $element['html5map']['#attached']['css'][] = drupal_get_path('module', 'geolocation_html5') . '/geolocation_html5.css';
-      $element['html5map']['#attached']['js'][] = array(
+      $element['map']['#attached']['css'][] = drupal_get_path('module', 'geolocation_html5') . '/geolocation_html5.css';
+      $element['map']['#attached']['js'][] = array(
         'data' => drupal_get_path('module', 'geolocation_html5') . '/geolocation_html5.js',
         'type' => 'file'
       );
      break;
-
-
-      /*
-      We may need this modified for html5UserGeolocationPrecision ?
-      $map_defaults = array(
-        'lat' => $map_defaults_lat,
-        'lng' => $map_defaults_lng
-      );
-      $element['html5map']['#attached']['js'][] = array('data' => array('map_defaults' => $map_defaults), 'type' => 'setting');
-      */
 
   }
   return $element;
@@ -177,24 +157,3 @@ function _geolocation_html5_lat2px($latitude, $topLatitude, $bottomLatitude, $he
   return (_lat2mercator($latitude) - _lat2mercator($bottomLatitude)) / (_lat2mercator($topLatitude) - _lat2mercator($bottomLatitude)) * $height;
 }
 
-
-
-
-
-
-
-/*
-We need this somewhere
-function html5_user_geolocation_settings_form() {
-
-  $form['html5_user_geolocation_why'] = array(
-    '#title' => t('How will user locations be used'),
-    '#type' => 'textarea',
-    '#description' => t('Users should know why and how their location will be used; see <a href="http://www.w3.org/TR/geolocation-API/#privacy_for_recipients">privacy considerations for recipients of location information</a>.'),
-    '#rows' => 2,
-    '#default_value' => variable_get('html5_user_geolocation_why', t('Your location will be saved and may be shared.')),
-  );
-  return system_settings_form($form);
-}
-
-*/
