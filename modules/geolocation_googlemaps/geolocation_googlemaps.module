@@ -14,14 +14,111 @@ function geolocation_googlemaps_field_formatter_info() {
     'geolocation_googlemaps_static' => array(
       'label' => t('Static Google Map'),
       'field types' => array('geolocation_latlng'),
+      'settings' => array(
+        'map_dimensions' => '300x300',
+        'map_zoomlevel' => '7',
+        'map_imageformat' => 'png8',
+        'map_maptype' => 'roadmap',
+      ),
     ),
   );
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function geolocation_googlemaps_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $element = array();
+
+  // Implement some configuration optins.
+  // http://code.google.com/intl/en/apis/maps/documentation/staticmaps/
+
+  $element['map_dimensions'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Map dimensions'),
+    '#description' => t('Enter custom map dimensions, default is 300x300.'),
+    '#default_value' => $settings['map_dimensions'],
+  );
+
+  $element['map_imageformat'] = array(
+    '#type' => 'select',
+    '#title' => t('Image format'),
+    '#options' => array(
+      'png8' => '8-bit PNG (default)',
+      'png32' => '32-bit PNG',
+      'gif' => 'GIF',
+      'jpg' => 'JPEG',
+      'jpg-baseline' => 'JPEG (non-progressive)',
+    ),
+    '#description' => t('Choose an Image Format. jpg and jpg-baseline typically provide the smallest image size, though they do so through "lossy" compression which may degrade the image. gif, png8 and png32 provide lossless compression.'),
+    '#default_value' => $settings['map_imageformat'],
+  );
+
+  $element['map_maptype'] = array(
+    '#type' => 'select',
+    '#title' => t('Map Type'),
+    '#options' => array(
+      'roadmap' => 'Roadmap (default)',
+      'satellite' => 'Satellite',
+      'terrain' => 'Terrain',
+      'hybrid' => 'Hybrid',
+    ),
+    '#description' => t('Choose map type. <em>roadmap</em> (default) specifies a standard roadmap image, as is normally shown on the Google Maps website. <em>satellite</em> specifies a satellite image. <em>terrain</em> specifies a physical relief map image, showing terrain and vegetation. <em>hybrid</em> specifies a hybrid of the satellite and roadmap image, showing a transparent layer of major streets and place names on the satellite image.'),
+    '#default_value' => $settings['map_maptype'],
+  );
+
+  $element['map_zoomlevel'] = array(
+    '#type' => 'select',
+    '#title' => t('Zoom level'),
+    '#options' => array(
+      '1' => '1',
+      '2' => '2',
+      '3' => '3',
+      '4' => '4',
+      '5' => '5',
+      '6' => '6',
+      '7' => '7 (default)',
+      '8' => '8',
+      '9' => '9',
+      '10' => '10',
+      '11' => '11',
+      '12' => '12',
+      '13' => '13',
+      '14' => '14',
+      '15' => '15',
+      '16' => '16',
+      '17' => '17',
+      '18' => '18',
+      '19' => '19',
+    ),
+    '#description' => t('Choose a custom zoom level - the higher the number the closer. <em>High zoom warning:</em> Google might not return images for any combination of Map Type and Zoom Level.'),
+    '#default_value' => $settings['map_zoomlevel'],
+  );
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function geolocation_googlemaps_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $summary = '<strong>Map:</strong> '. $settings['map_dimensions'] .' ('. $settings['map_imageformat'] .')<br />';
+  $summary .= '<strong>Type:</strong> '. $settings['map_maptype'] .'<br />';
+  $summary .= '<strong>Zoom:</strong> '. $settings['map_zoomlevel'];
+  return $summary;
 }
 
 /**
  * Implements hook_field_formatter_view().
  */
 function geolocation_googlemaps_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $settings = $display['settings'];
   $element = array();
 
   switch ($display['type']) {
@@ -29,7 +126,7 @@ function geolocation_googlemaps_field_formatter_view($entity_type, $entity, $fie
     case 'geolocation_googlemaps_static':
       foreach ($items as $delta => $item) {
         $variables = array(
-            'path' => 'http://maps.google.com/maps/api/staticmap?zoom=7&size=300x300&maptype=roadmap&markers=size:mid|color:red|' . $item['lat'] . ',' . $item['lng'] . '&sensor=false',
+            'path' => 'http://maps.google.com/maps/api/staticmap?zoom='. $settings['map_zoomlevel'] .'&size='. $settings['map_dimensions'] .'&format='. $settings['map_imageformat'] .'&maptype='. $settings['map_maptype'] .'&markers=size:mid|color:red|' . $item['lat'] . ',' . $item['lng'] . '&sensor=false',
             'alt' => 'Geolocation',
             'attributes' => array('class' => 'geolocation-googlemaps-static'),
             );
@@ -83,12 +180,13 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
         '#maxlength' => 30,
       );
       // TODO: check input alternatives. TODO: Use delta!
+      // TODO: don't use CSS IDs (multiple)!
       $element['address'] = array(
         '#type' => 'textfield',
         '#title' => 'Geolocation',
         '#prefix' => '<div id="address">',
         '#suffix' => '</div>',
-        '#attributes' => array('class' => array('geolocation-input')),
+        '#attributes' => array('class' => array('geolocation-input', 'address')),
         '#maxlength' => 120,
         '#weight' => -5,
         '#description' => t('Enter an address / location in the textfield above. You can also click on the map to set a marker'),
