@@ -76,6 +76,14 @@ function geolocation_field_formatter_info() {
       'label' => t('Simple text-based formatter'),
       'field types' => array('geolocation_latlng'),
     ),
+    'geolocation_latitude' => array(
+      'label' => t('Latitude text-based formatter'),
+      'field types' => array('geolocation_latlng'),
+    ),
+    'geolocation_longitude' => array(
+      'label' => t('Longitude text-based formatter'),
+      'field types' => array('geolocation_latlng'),
+    ),
   );
 }
 
@@ -92,7 +100,16 @@ function geolocation_field_formatter_view($entity_type, $entity, $field, $instan
         $element[$delta]['#markup'] = '<p>' . t('Geolocation is @lat, @lng', array('@lat' => $item['lat'], '@lng' => $item['lng'])) . '</p>';
       }
       break;
-
+    case 'geolocation_latitude':
+      foreach ($items as $delta => $item) {
+        $element[$delta]['#markup'] = $item['lat'];
+      }
+      break;
+    case 'geolocation_longitude':
+      foreach ($items as $delta => $item) {
+        $element[$delta]['#markup'] = $item['lng'];
+      }
+      break;
   }
   return $element;
 }
