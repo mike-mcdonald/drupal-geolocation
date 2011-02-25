@@ -1,4 +1,3 @@
-; $Id$
 
 name = Geolocation Google Maps
 description = Provides Google Maps widgets and formaters for geolocation field.

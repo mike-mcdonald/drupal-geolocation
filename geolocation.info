@@ -1,4 +1,3 @@
-; $Id$
 
 name = Geolocation
 description = Provides a geolocation field.
