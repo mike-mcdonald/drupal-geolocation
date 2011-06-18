@@ -1,4 +1,4 @@
 /**
  * @file
- * Javascript code  for Geolocation Field.
+ * Javascript for Geolocation Field.
  */
