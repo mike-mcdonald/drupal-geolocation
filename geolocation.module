@@ -24,18 +24,36 @@ function geolocation_field_info() {
  */
 function geolocation_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
   foreach ($items as $delta => $item) {
-    if (!empty($item['lat'])) {
-      if ( !is_numeric($item['lat']) ) {
-        $errors[$field['field_name']][$langcode][$delta][] = array(
-          'error' => 'geolocation_invalid',
-          'message' => t('Invalid Latitude.'),
-        );
+    if (!geolocation_field_is_empty($item, $field)) {
+      switch (TRUE) {
+        case !is_numeric($item['lat']):
+          $errors[$field['field_name']][$langcode][$delta][] = array(
+            'error' => 'geolocation_invalid_lat',
+            'message' => t('Invalid Latitude. Value must be numeric.'),
+          );
+          break;
+        case $item['lat'] > 90:
+        case $item['lat'] < -90:
+          $errors[$field['field_name']][$langcode][$delta][] = array(
+            'error' => 'geolocation_invalid_lat',
+            'message' => t('Invalid Latitude. Value must be between 90 and -90.'),
+          );
+          break;
       }
-      if ( !is_numeric($item['lng']) ) {
-        $errors[$field['field_name']][$langcode][$delta][] = array(
-          'error' => 'geolocation_invalid',
-          'message' => t('Invalid Longitude.'),
-        );
+
+      switch (TRUE) {
+        case !is_numeric($item['lng']):
+          $errors[$field['field_name']][$langcode][$delta][] = array(
+            'error' => 'geolocation_invalid_lng',
+            'message' => t('Invalid Longitude. Value must be numeric.'),
+          );
+        case $item['lng'] > 180:
+        case $item['lng'] < -180:
+          $errors[$field['field_name']][$langcode][$delta][] = array(
+            'error' => 'geolocation_invalid_lng',
+            'message' => t('Invalid Longitude. Value must be between 180 and -180'),
+          );
+          break;
       }
     }
   }
@@ -45,7 +63,7 @@ function geolocation_field_validate($entity_type, $entity, $field, $instance, $l
  * Implements hook_field_presave().
  */
 function geolocation_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
-  foreach ($items AS $delta => $item) {
+  foreach ($items as $delta => $item) {
     // Precalculate some goodness.
     $item['lat_sin'] = sin(deg2rad($item['lat']));
     $item['lat_cos'] = cos(deg2rad($item['lat']));
@@ -58,10 +76,8 @@ function geolocation_field_presave($entity_type, $entity, $field, $instance, $la
  * Implements hook_field_is_empty().
  */
 function geolocation_field_is_empty($item, $field) {
-  if ( empty($item['lat']) ) {
-    return TRUE;
-  }
-  if ( empty($item['lng']) ) {
+  if (empty($item['lat']) && (string) $item['lat'] !== '0'
+   && empty($item['lng']) && (string) $item['lng'] !== '0') {
     return TRUE;
   }
 }
@@ -165,8 +181,11 @@ function geolocation_field_widget_form(&$form, &$form_state, $field, $instance, 
  */
 function geolocation_field_widget_error($element, $error, $form, &$form_state) {
   switch ($error['error']) {
-    case 'geolocation_invalid':
-      form_error($element, $error['message']);
+    case 'geolocation_invalid_lat':
+      form_error($element['lat'], $error['message']);
+      break;
+    case 'geolocation_invalid_lng':
+      form_error($element['lng'], $error['message']);
       break;
   }
 }
