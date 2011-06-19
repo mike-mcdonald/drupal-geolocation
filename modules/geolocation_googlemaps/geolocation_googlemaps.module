@@ -154,8 +154,8 @@ function geolocation_googlemaps_field_widget_info() {
  * Implements hook_field_widget_form().
  */
 function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
-  $lat_value = isset($items[$delta]['lat']) ? $items[$delta]['lat'] : '';
-  $lng_value = isset($items[$delta]['lng']) ? $items[$delta]['lng'] : '';
+  $lat_value = isset($items[$delta]['lat']) ? $items[$delta]['lat'] : FALSE;
+  $lng_value = isset($items[$delta]['lng']) ? $items[$delta]['lng'] : FALSE;
   $element += array(
     '#delta' => $delta,
   );
@@ -166,48 +166,48 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
   switch ($instance['widget']['type']) {
 
     case 'geolocation_googlemap':
+      $element['googlemap'] = array(
+        '#prefix' => '<div id="geolocation-map-' . $delta . '" class="geolocation-map" style="width:100%;height:400px;">',
+        '#suffix' => '</div>',
+        '#markup' => '',
+      );
+      $element['help'] = array(
+        '#prefix' => '<div id="geolocation-help-' . $delta . '" class="geolocation-help">',
+        '#suffix' => '</div>',
+        '#markup' => t('Enter an address / location in the textfield or you can also click on the map to set a marker'),
+      );
+      $element['address'] = array(
+        '#type' => 'textfield',
+        '#title' => 'Geolocation',
+        '#prefix' => '<div id="geolocation-address-' . $delta . '" class="geolocation-address">',
+        '#suffix' => '</div>',
+        '#maxlength' => 120,
+      );
+      $element['geocode'] = array(
+        '#prefix' => '<span id="geolocation-geocode-' . $delta . '" class="geolocation-geocode">',
+        '#suffix' => '</span>',
+        '#markup' => t('Get location'),
+      );
+      $element['remove'] = array(
+        '#prefix' => '<div id="geolocation-remove-' . $delta . '" class="geolocation-remove">',
+        '#suffix' => '</div>',
+        '#markup' => t('Remove'),
+      );
       $element['lat'] += array(
-        '#type' => 'hidden',
-        '#attributes' => array('class' => 'geolocation-lat'),
+        '#type' => 'textfield',
+        '#title' => t('Latitude'),
+        '#prefix' => '<div id="geolocation-lat-' . $delta . '" class="geolocation-lat">',
+        '#suffix' => '</div>',
         '#default_value' => $lat_value,
         '#maxlength' => 30,
       );
       $element['lng'] += array(
-        '#type' => 'hidden',
-        '#attributes' => array('class' => 'geolocation-lng'),
+        '#type' => 'textfield',
+        '#title' => t('Longitud'),
+        '#prefix' => '<div id="geolocation-lng-' . $delta . '" class="geolocation-lng">',
+        '#suffix' => '</div>',
         '#default_value' => $lng_value,
         '#maxlength' => 30,
-      );
-      // TODO: check input alternatives. TODO: Use delta!
-      // TODO: don't use CSS IDs (multiple)!
-      $element['address'] = array(
-        '#type' => 'textfield',
-        '#title' => 'Geolocation',
-        '#prefix' => '<div id="address">',
-        '#suffix' => '</div>',
-        '#attributes' => array('class' => array('geolocation-input', 'address')),
-        '#maxlength' => 120,
-        '#weight' => -5,
-        '#description' => t('Enter an address / location in the textfield above. You can also click on the map to set a marker'),
-      );
-      // Copied from Google examples:
-      // http://demos.projectx.co.nz/gmaps3/reverse_geocoder.html
-      $element['googlemap'] = array(
-        '#type' => 'markup',
-        '#markup' => '
-          <div id="map" style="width:100%;height:400px;"></div>
-        ',
-        /*
-        // Hide debug output, cleanup later. 
-        '#markup' => '
-            <div id="map" style="width:100%;height:400px;"></div>
-            <div>
-              <span id ="lat"></span><br />
-              <span id ="lng"></span><br />
-              <div id="geocode_info"></div>
-            </div>
-        ',
-        */
       );
 
       // Attach CSS and JS files via FAPI '#attached'.
@@ -222,12 +222,13 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
 
       // Make defaults available as javascript settings. In JS files use:
       // Drupal.settings.map_defaults.lat
-      // TODO: better defaults.
-      $map_defaults_lat = ($lat_value == '') ? 49.9148115245017 : $lat_value;
-      $map_defaults_lng = ($lng_value == '') ? 10.8783125877381 : $lng_value;
+      $map_defaults_lat = ($lat_value) ? $lat_value : '';
+      $map_defaults_lng = ($lng_value) ? $lng_value : '';
       $map_defaults = array(
-        'lat' => $map_defaults_lat,
-        'lng' => $map_defaults_lng
+        $delta => array(
+          'lat' => $map_defaults_lat,
+          'lng' => $map_defaults_lng,
+        ),
       );
       $element['googlemap']['#attached']['js'][] = array('data' => array('map_defaults' => $map_defaults), 'type' => 'setting');
 
@@ -242,7 +243,8 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
  */
 function geolocation_googlemaps_field_widget_error($element, $error, $form, &$form_state) {
   switch ($error['error']) {
-    case 'geolocation_invalid':
+    case 'geolocation_invalid_lat':
+    case 'geolocation_invalid_lng':
       form_error($element, $error['message']);
       break;
   }
