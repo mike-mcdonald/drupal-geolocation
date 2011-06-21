@@ -178,7 +178,6 @@
           // Set current user location, if available
           $('#geolocation-client-location-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').click(function() {
             navigator.geolocation.getCurrentPosition(function(position) {
-              console.log(position);
               latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
               Drupal.Geolocation.maps[i].setCenter(latLng);
               setMapMarker(latLng, i);
@@ -191,17 +190,14 @@
         // If browser geolication is not supoprted, try ip location
         else if (google.loader.ClientLocation) {
           latLng = new google.maps.LatLng(google.loader.ClientLocation.latitude, google.loader.ClientLocation.longitude);
-          $('#geolocation-help-' + i + ' .description:not(.geolocation-processed)').addClass('geolocation-processed').append(Drupal.t(', or use the IP-based location by clicking this link') +': <b><span id="geolocation-client-location-' + i + '" class="geolocation-client-location">' + getFormattedLocation() + '</span></b>');
+          $('#geolocation-help-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').append(Drupal.t(', or use the IP-based location by clicking this link') +': <b><span id="geolocation-client-location-' + i + '" class="geolocation-client-location">' + getFormattedLocation() + '</span></b>');
 
           // Set current user location, if available
           $('#geolocation-client-location-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').click(function() {
-            if (google.loader.ClientLocation) {
-              latLng = new google.maps.LatLng(google.loader.ClientLocation.latitude, google.loader.ClientLocation.longitude);
-              $('#geolocation-address-' + i + ' input').val(getFormattedLocation());
-              Drupal.Geolocation.maps[i].setCenter(latLng);
-              setMapMarker(latLng, i);
-              codeLatLng(latLng, i, 'geocoder');
-            }
+            latLng = new google.maps.LatLng(google.loader.ClientLocation.latitude, google.loader.ClientLocation.longitude);
+            Drupal.Geolocation.maps[i].setCenter(latLng);
+            setMapMarker(latLng, i);
+            codeLatLng(latLng, i, 'geocoder');
           });
         }
         // END: Autodetect clientlocation.
