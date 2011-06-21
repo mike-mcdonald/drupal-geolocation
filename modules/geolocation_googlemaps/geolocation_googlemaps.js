@@ -95,13 +95,17 @@
    *   the index from the maps array we are working on
    */
   function setMapMarker(latLng, i) {
+    // remove old marker
     if (Drupal.Geolocation.markers[i]) {
       Drupal.Geolocation.markers[i].setMap(null);
     }
     Drupal.Geolocation.markers[i] = new google.maps.Marker({
       map: Drupal.Geolocation.maps[i],
       draggable: false,
-      animation: google.maps.Animation.DROP,
+      // I dont like this much, rather have no effect
+      // Will leave it to see if someone notice and shouts at me!
+      // If so, will see consider enabling it again
+      // animation: google.maps.Animation.DROP,
       position: latLng
     });
     return false; // if called from <a>-Tag
