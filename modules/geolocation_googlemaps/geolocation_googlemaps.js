@@ -11,7 +11,7 @@
   Drupal.Geolocation = new Object();
   Drupal.Geolocation.maps = new Array();
   Drupal.Geolocation.markers = new Array();
- 
+
   /**
    * Set the latitude and longitud values to the input fields
    * And optionaly update the address field
@@ -28,7 +28,7 @@
     $('#geolocation-lat-' + i + ' input').attr('value', latLng.lat());
     $('#geolocation-lng-' + i + ' input').attr('value', latLng.lng());
  
-    // When the map was clicked, update the address field
+    // Update the address field
     if ((op == 'mapclick' || op == 'geocoder') && geocoder) {
       geocoder.geocode({'latLng': latLng}, function(results, status) {
         if (status == google.maps.GeocoderStatus.OK) {
@@ -36,23 +36,8 @@
           if (op == 'geocoder') {
             setZoom(i, results[0].geometry.location_type);
           }
-          /*
-          // Hide Debug output, cleanup later.
-          $("#lat").html("<strong>Lat:</strong> "+latLng.lat());
-          $("#lng").html("<strong>Lng:</strong> "+latLng.lng());
-          var str = "";
-          $.each(results, function(){
-            str += "<h4>"+this.formatted_address+"</h4>";
-            str += "types: "+this.types.join(", ")+"<br />";
-            str += "address components: <ul>"
-            $.each(this.address_components, function(){
-              str +="<li>"+this.types.join(", ")+": "+this.long_name+"</li>";
-            });
-            str +="</ul>";
-          });
-          $("#geocode_info").html(str);
-          */
-        } else {
+        }
+        else {
           $('#geolocation-address-' + i + ' input').val('');
           if (status != google.maps.GeocoderStatus.ZERO_RESULTS) {
             alert(Drupal.t('Geocoder failed due to: ') + status);
@@ -168,6 +153,7 @@
       var latLng;
       var myOptions;
       var browserSupportFlag =  new Boolean();
+      var singleClick;
 
       $.each(Drupal.settings.map_defaults, function(i, e){
 
@@ -241,12 +227,19 @@
         setMapMarker(latLng, i);
 
         // Listener to set marker
-        google.maps.event.addListener(Drupal.Geolocation.maps[i], 'rightclick', function(me){
-          codeLatLng(me.latLng, i, 'mapclick');
-          setMapMarker(me.latLng, i);
+        google.maps.event.addListener(Drupal.Geolocation.maps[i], 'click', function(me){
+          // Set a timeOut so that it doesn't execute if dbclick is detected
+          singleClick = setTimeout(function(){
+            codeLatLng(me.latLng, i, 'mapclick');
+            setMapMarker(me.latLng, i);
+          }, 500);
+        });
+
+        // Detect double click to avoid setting marker
+        google.maps.event.addListener(Drupal.Geolocation.maps[i], 'dblclick', function(me){
+          clearTimeout(singleClick);
         });
       });
-
     }
   };
 })(jQuery);
