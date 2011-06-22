@@ -154,60 +154,69 @@ function geolocation_googlemaps_field_widget_info() {
  * Implements hook_field_widget_form().
  */
 function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
-  $lat_value = isset($items[$delta]['lat']) ? $items[$delta]['lat'] : FALSE;
-  $lng_value = isset($items[$delta]['lng']) ? $items[$delta]['lng'] : FALSE;
+  $lat_value = isset($items[$delta]['lat']) ? $items[$delta]['lat'] : NULL;
+  $lng_value = isset($items[$delta]['lng']) ? $items[$delta]['lng'] : NULL;
   $element += array(
     '#delta' => $delta,
   );
-  $element['lat'] = array();
-  $element['lng'] = array();
-  $element['googlemap'] = array();
 
   switch ($instance['widget']['type']) {
 
     case 'geolocation_googlemap':
-      $element['googlemap'] = array(
-        '#prefix' => '<div id="geolocation-map-' . $delta . '" class="geolocation-map" style="width:100%;height:400px;">',
+      $element['address'] = array(
+        '#type' => 'item',
+        '#title' => 'Geolocation',
+        '#prefix' => '<div id="geolocation-address-' . $delta . '" class="geolocation-address">',
         '#suffix' => '</div>',
-        '#markup' => '',
+      );
+      $element['address']['field'] = array(
+        '#type' => 'textfield',
+        '#maxlength' => 120,
+      );
+      $element['address']['geocode'] = array(
+        '#prefix' => '<span id="geolocation-address-geocode-' . $delta . '" class="geolocation-address-geocode">',
+        '#suffix' => '</span>',
+        '#markup' => t('Get location'),
       );
       $element['help'] = array(
         '#prefix' => '<div id="geolocation-help-' . $delta . '" class="geolocation-help">',
         '#suffix' => '</div>',
         '#markup' => t('Enter an address / location in the textfield or you can also click on the map to set a marker'),
       );
-      $element['address'] = array(
-        '#type' => 'textfield',
-        '#title' => 'Geolocation',
-        '#prefix' => '<div id="geolocation-address-' . $delta . '" class="geolocation-address">',
+      $element['googlemap'] = array(
+        '#prefix' => '<div id="geolocation-map-' . $delta . '" class="geolocation-map" style="width:100%;height:400px;">',
         '#suffix' => '</div>',
-        '#maxlength' => 120,
       );
-      $element['geocode'] = array(
-        '#prefix' => '<span id="geolocation-geocode-' . $delta . '" class="geolocation-geocode">',
-        '#suffix' => '</span>',
-        '#markup' => t('Get location'),
-      );
-      $element['remove'] = array(
-        '#prefix' => '<div id="geolocation-remove-' . $delta . '" class="geolocation-remove">',
+      $element['latitem'] = array(
+        '#type' => 'item',
+        '#title' => t('Latitude:'),
+        '#prefix' => '<div id="geolocation-lat-item-' . $delta . '" class="geolocation-lat-item">',
         '#suffix' => '</div>',
-        '#markup' => t('Remove'),
+        '#markup' => '<span class="geolocation-lat-item-value">' . $lat_value . '</span>',
       );
-      $element['lat'] += array(
-        '#type' => 'textfield',
-        '#title' => t('Latitude'),
+      $element['lat'] = array(
+        '#type' => 'hidden',
         '#prefix' => '<div id="geolocation-lat-' . $delta . '" class="geolocation-lat">',
         '#suffix' => '</div>',
         '#default_value' => $lat_value,
-        '#maxlength' => 30,
       );
-      $element['lng'] += array(
-        '#type' => 'textfield',
-        '#title' => t('Longitud'),
+      $element['lngitem'] = array(
+        '#type' => 'item',
+        '#title' => t('Longitud:'),
+        '#prefix' => '<div id="geolocation-lng-item-' . $delta . '" class="geolocation-lng-item">',
+        '#suffix' => '</div>',
+        '#markup' => '<span class="geolocation-lat-item-value">' . $lat_value . '</span>',
+      );
+      $element['lng'] = array(
+        '#type' => 'hidden',
         '#prefix' => '<div id="geolocation-lng-' . $delta . '" class="geolocation-lng">',
         '#suffix' => '</div>',
         '#default_value' => $lng_value,
-        '#maxlength' => 30,
+      );
+      $element['remove'] = array(
+        '#prefix' => '<div id="geolocation-remove-' . $delta . '" class="geolocation-remove"><span>',
+        '#suffix' => '</span></div>',
+        '#markup' => t('Remove'),
       );
 
       // Attach CSS and JS files via FAPI '#attached'.

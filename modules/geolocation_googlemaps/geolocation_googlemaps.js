@@ -26,7 +26,9 @@
   function codeLatLng(latLng, i, op) {
     // Update the lat and lng input fields
     $('#geolocation-lat-' + i + ' input').attr('value', latLng.lat());
+    $('#geolocation-lat-item-' + i + ' .geolocation-lat-item-value').html(latLng.lat());
     $('#geolocation-lng-' + i + ' input').attr('value', latLng.lng());
+    $('#geolocation-lng-item-' + i + ' .geolocation-lat-item-value').html(latLng.lng());
  
     // Update the address field
     if ((op == 'mapclick' || op == 'geocoder') && geocoder) {
@@ -128,8 +130,11 @@
   }
  
   function clearLocation(i) {
+
     $('#geolocation-lat-' + i + ' input').attr('value', '');
+    $('#geolocation-lat-item-' + i + ' .geolocation-lat-item-value').html('');
     $('#geolocation-lng-' + i + ' input').attr('value', '');
+    $('#geolocation-lng-item-' + i + ' .geolocation-lat-item-value').html('');
     $('#geolocation-address-' + i + ' input').attr('value', '');
     Drupal.Geolocation.markers[i].setMap();
   }
@@ -159,15 +164,15 @@
       var browserSupportFlag =  new Boolean();
       var singleClick;
 
-      $.each(Drupal.settings.map_defaults, function(i, e){
+      $.each(Drupal.settings.map_defaults, function(i, el){
 
-        $('#geolocation-address-' + i + ' input').keypress(function(e){
-          if(e.which == 13){
-            e.preventDefault();
+        $('#geolocation-address-' + i + ' input').keypress(function(ev){
+          if(ev.which == 13){
+            ev.preventDefault();
             codeAddress(i);
           }
         });
-        $('#geolocation-geocode-' + i).click(function(e) {
+        $('#geolocation-address-geocode-' + i).click(function(e) {
           codeAddress(i);
         });
 
@@ -178,7 +183,7 @@
         // First use browser geolocation
         if(navigator.geolocation) {
           browserSupportFlag = true;
-          $('#geolocation-help-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').append(Drupal.t(', or use your browser geolocation system by clicking this link') +': <b><span id="geolocation-client-location-' + i + '" class="geolocation-client-location">My Location</span></b>');
+          $('#geolocation-help-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').append(Drupal.t(', or use your browser geolocation system by clicking this link') +': <span id="geolocation-client-location-' + i + '" class="geolocation-client-location">My Location</span>');
           // Set current user location, if available
           $('#geolocation-client-location-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').click(function() {
             navigator.geolocation.getCurrentPosition(function(position) {
@@ -194,7 +199,7 @@
         // If browser geolication is not supoprted, try ip location
         else if (google.loader.ClientLocation) {
           latLng = new google.maps.LatLng(google.loader.ClientLocation.latitude, google.loader.ClientLocation.longitude);
-          $('#geolocation-help-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').append(Drupal.t(', or use the IP-based location by clicking this link') +': <b><span id="geolocation-client-location-' + i + '" class="geolocation-client-location">' + getFormattedLocation() + '</span></b>');
+          $('#geolocation-help-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').append(Drupal.t(', or use the IP-based location by clicking this link') +': <span id="geolocation-client-location-' + i + '" class="geolocation-client-location">' + getFormattedLocation() + '</span>');
 
           // Set current user location, if available
           $('#geolocation-client-location-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').click(function() {
@@ -207,8 +212,11 @@
         // END: Autodetect clientlocation.
         // Get current/default values
 
-        lat = $('#geolocation-lat-' + i + ' input').attr('value') == '' ? e.lat : $('#geolocation-lat-' + i + ' input').attr('value');
-        lng = $('#geolocation-lng-' + i + ' input').attr('value') == '' ? e.lng : $('#geolocation-lng-' + i + ' input').attr('value');
+        // Get default values
+        // This might not be necesarry
+        // It can always come from e
+        lat = $('#geolocation-lat-' + i + ' input').attr('value') == false ? el.lat : $('#geolocation-lat-' + i + ' input').attr('value');
+        lng = $('#geolocation-lng-' + i + ' input').attr('value') == false ? el.lng : $('#geolocation-lng-' + i + ' input').attr('value');
         latLng = new google.maps.LatLng(lat, lng);
 
         // Set map options
@@ -222,9 +230,11 @@
         // Create map
         Drupal.Geolocation.maps[i] = new google.maps.Map(document.getElementById("geolocation-map-" + i), myOptions);
 
-        // Set initial marker
-        codeLatLng(latLng, i, 'mapclick');
-        setMapMarker(latLng, i);
+        if (lat && lng) {
+          // Set initial marker
+          codeLatLng(latLng, i, 'mapclick');
+          setMapMarker(latLng, i);
+        }
 
         // Listener to set marker
         google.maps.event.addListener(Drupal.Geolocation.maps[i], 'click', function(me){
