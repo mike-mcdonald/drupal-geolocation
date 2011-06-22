@@ -13,6 +13,11 @@
   margin:2px 0 0 4px;
 }
 
+.field-geolication-add-more-wrapper {
+  /* Clear floated elements */
+  overflow: auto;
+}
+
 .geolocation-address-geocode:hover,
 .geolocation-client-location:hover {
   background-color:#999;
