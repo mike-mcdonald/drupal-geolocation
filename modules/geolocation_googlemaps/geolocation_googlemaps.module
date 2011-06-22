@@ -230,7 +230,7 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
       );
 
       // Make defaults available as javascript settings. In JS files use:
-      // Drupal.settings.map_defaults.lat
+      // Drupal.settings.mapDefaults.lat
       $map_defaults_lat = ($lat_value) ? $lat_value : '';
       $map_defaults_lng = ($lng_value) ? $lng_value : '';
       $map_defaults = array(
@@ -239,7 +239,7 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
           'lng' => $map_defaults_lng,
         ),
       );
-      $element['googlemap']['#attached']['js'][] = array('data' => array('map_defaults' => $map_defaults), 'type' => 'setting');
+      $element['googlemap']['#attached']['js'][] = array('data' => array('mapDefaults' => $map_defaults), 'type' => 'setting');
 
       break;
   }
