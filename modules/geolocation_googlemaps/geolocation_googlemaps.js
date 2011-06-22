@@ -31,7 +31,7 @@
     $('#geolocation-lng-item-' + i + ' .geolocation-lat-item-value').html(latLng.lng());
  
     // Update the address field
-    if ((op == 'mapclick' || op == 'geocoder') && geocoder) {
+    if ((op == 'marker' || op == 'geocoder') && geocoder) {
       geocoder.geocode({'latLng': latLng}, function(results, status) {
         if (status == google.maps.GeocoderStatus.OK) {
           $('#geolocation-address-' + i + ' input').val(results[0].formatted_address);
@@ -221,7 +221,7 @@
 
         // Set map options
         myOptions = {
-          zoom: 7,
+          zoom: 2,
           center: latLng,
           mapTypeId: google.maps.MapTypeId.ROADMAP,
           scrollwheel: false
@@ -232,7 +232,7 @@
 
         if (lat && lng) {
           // Set initial marker
-          codeLatLng(latLng, i, 'mapclick');
+          codeLatLng(latLng, i, 'geocoder');
           setMapMarker(latLng, i);
         }
 
@@ -240,7 +240,7 @@
         google.maps.event.addListener(Drupal.Geolocation.maps[i], 'click', function(me){
           // Set a timeOut so that it doesn't execute if dbclick is detected
           singleClick = setTimeout(function(){
-            codeLatLng(me.latLng, i, 'mapclick');
+            codeLatLng(me.latLng, i, 'marker');
             setMapMarker(me.latLng, i);
           }, 500);
         });
