@@ -88,6 +88,7 @@ function geolocation_html5_field_widget_form(&$form, &$form_state, $field, $inst
         '#title' => t('Save my location'),
         '#description' => t('Your web browser does not support geolocation (<a href="http://en.wikipedia.org/wiki/W3C_Geolocation_API">W3C Geolocation API</a>).'),
         '#default_value' => $lat_value !== '',
+        '#required' => $instance['required'],
       );
 
       $dot_style = '';
@@ -117,10 +118,24 @@ function geolocation_html5_field_widget_form(&$form, &$form_state, $field, $inst
         'data' => drupal_get_path('module', 'geolocation_html5') . '/geolocation_html5.js',
         'type' => 'file'
       );
+
+    $element['#element_validate'] = array('geolocation_html5_field_widget_validate');
+
      break;
 
   }
   return $element;
+}
+
+/**
+ * Validation handler for geolocation_html5_field_widget_form().
+ */
+function geolocation_html5_field_widget_validate($element, &$form_state, $form) {
+  if ($element['#required']) {
+    if ($element['save']['#value'] && (!$element['lat']['#value'] || !$element['lng']['#value'])) {
+      form_error($element, t('!name field is required. You may need to allow your browser detect your location.', array('!name' => $element['#title'])));
+    }
+  }
 }
 
 /**

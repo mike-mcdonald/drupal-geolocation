@@ -165,9 +165,10 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
     case 'geolocation_googlemap':
       $element['address'] = array(
         '#type' => 'item',
-        '#title' => 'Geolocation',
+        '#title' => $element['#title'],
         '#prefix' => '<div id="geolocation-address-' . $delta . '" class="geolocation-address">',
         '#suffix' => '</div>',
+        '#required' => $instance['required'],
       );
       $element['address']['field'] = array(
         '#type' => 'textfield',
@@ -187,12 +188,14 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
         '#prefix' => '<div id="geolocation-map-' . $delta . '" class="geolocation-map" style="width:100%;height:400px;">',
         '#suffix' => '</div>',
       );
+      // Presentational item
       $element['latitem'] = array(
         '#type' => 'item',
         '#title' => t('Latitude:'),
         '#prefix' => '<div id="geolocation-lat-item-' . $delta . '" class="geolocation-lat-item">',
         '#suffix' => '</div>',
         '#markup' => '<span class="geolocation-lat-item-value">' . $lat_value . '</span>',
+        '#required' => $instance['required'],
       );
       $element['lat'] = array(
         '#type' => 'hidden',
@@ -200,12 +203,14 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
         '#suffix' => '</div>',
         '#default_value' => $lat_value,
       );
+      // Presentational item
       $element['lngitem'] = array(
         '#type' => 'item',
         '#title' => t('Longitud:'),
         '#prefix' => '<div id="geolocation-lng-item-' . $delta . '" class="geolocation-lng-item">',
         '#suffix' => '</div>',
         '#markup' => '<span class="geolocation-lat-item-value">' . $lat_value . '</span>',
+        '#required' => $instance['required'],
       );
       $element['lng'] = array(
         '#type' => 'hidden',
@@ -241,11 +246,23 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
       );
       $element['googlemap']['#attached']['js'][] = array('data' => array('mapDefaults' => $map_defaults), 'type' => 'setting');
 
+      $element['#element_validate'] = array('geolocation_googlemaps_field_widget_validate');
+
       break;
   }
   return $element;
 }
 
+/**
+ * Validation handler for geolocation_googlemaps_field_widget_form().
+ */
+function geolocation_googlemaps_field_widget_validate($element, &$form_state, $form) {
+  if ($element['#required']) {
+    if (!$element['lat']['#value'] || !$element['lng']['#value']) {
+      form_error($element, t('!name field is required.', array('!name' => $element['#title'])));
+    }
+  }
+}
 
 /**
  * Implements hook_field_widget_error().
