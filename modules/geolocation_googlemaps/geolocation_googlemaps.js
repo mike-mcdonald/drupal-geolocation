@@ -130,8 +130,13 @@
     }
   }
  
+  /**
+   * Clear/Remove the values and the marker
+   *
+   * @param i
+   *   the index from the maps array we are working on
+   */
   Drupal.Geolocation.clearLocation = function(i) {
-
     $('#geolocation-lat-' + i + ' input').attr('value', '');
     $('#geolocation-lat-item-' + i + ' .geolocation-lat-item-value').html('');
     $('#geolocation-lng-' + i + ' input').attr('value', '');
@@ -140,13 +145,22 @@
     Drupal.Geolocation.markers[i].setMap();
   }
  
-  Drupal.Geolocation.handleNoGeolocation = function(errorFlag, i) {
+  /**
+   * Do something when no location can be found
+   *
+   * @param supportFlag
+   *   Whether the browser supports geolocation or not
+   * @param i
+   *   the index from the maps array we are working on
+   */
+  Drupal.Geolocation.handleNoGeolocation = function(supportFlag, i) {
     var siberia = new google.maps.LatLng(60, 105);
     var newyork = new google.maps.LatLng(40.69847032728747, -73.9514422416687);
-    if (errorFlag == true) {
+    if (supportFlag == true) {
       alert("Geolocation service failed. We've placed you in NewYork.");
       initialLocation = newyork;
-    } else {
+    } 
+    else {
       alert("Your browser doesn't support geolocation. We've placed you in Siberia.");
       initialLocation = siberia;
     }
@@ -166,10 +180,11 @@
       var singleClick;
 
       // Work on each map
-      $.each(Drupal.settings.mapDefaults, function(i, mapDefaults) {
+      $.each(Drupal.settings.geolocation.defaults, function(i, mapDefaults) {
         // Only make this once ;)
         $("#geolocation-map-" + i).once('procesadooooo', function(){
 
+          // Attach listeners
           $('#geolocation-address-' + i + ' input').keypress(function(ev){
             if(ev.which == 13){
               ev.preventDefault();
@@ -179,13 +194,13 @@
           $('#geolocation-address-geocode-' + i).click(function(e) {
             Drupal.Geolocation.codeAddress(i);
           });
-
           $('#geolocation-remove-' + i).click(function(e) {
             Drupal.Geolocation.clearLocation(i);
           });
+
           // START: Autodetect clientlocation.
           // First use browser geolocation
-          if(navigator.geolocation) {
+          if (navigator.geolocation) {
             browserSupportFlag = true;
             $('#geolocation-help-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').append(Drupal.t(', or use your browser geolocation system by clicking this link') +': <span id="geolocation-client-location-' + i + '" class="geolocation-client-location">My Location</span>');
             // Set current user location, if available
@@ -228,7 +243,7 @@
             zoom: 2,
             center: latLng,
             mapTypeId: google.maps.MapTypeId.ROADMAP,
-            scrollwheel: false
+            scrollwheel: (Drupal.settings.geolocation.settings.scrollwheel != undefined) ? Drupal.settings.geolocation.settings.scrollwheel : false
           }
 
           // Create map

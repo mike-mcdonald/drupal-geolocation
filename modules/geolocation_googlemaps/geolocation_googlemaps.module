@@ -151,6 +151,25 @@ function geolocation_googlemaps_field_widget_info() {
 }
 
 /**
+ * Implements hook_field_widget_settings_form().
+ */
+function geolocation_googlemaps_field_widget_settings_form($field, $instance) {
+  $widget = $instance['widget'];
+  $settings = $widget['settings'];
+
+  $form['scrollwheel'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Scroll Zoom'),
+    '#description' => t('By default zooming is done with double click and/or using the map controls to avoid interrupting the normal window scroll. It can optionally be enabled here.'),
+    '#default_value' => isset($settings['scrollwheel']) ? $settings['scrollwheel'] : FALSE,
+  );
+
+  return $form;
+}
+
+
+
+/**
  * Implements hook_field_widget_form().
  */
 function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
@@ -244,7 +263,11 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
           'lng' => $map_defaults_lng,
         ),
       );
-      $element['googlemap']['#attached']['js'][] = array('data' => array('mapDefaults' => $map_defaults), 'type' => 'setting');
+      $data = array(
+        'defaults' => $map_defaults,
+        'settings' => $instance['widget']['settings'],
+      );
+      $element['googlemap']['#attached']['js'][] = array('data' => array('geolocation' => $data), 'type' => 'setting');
 
       $element['#element_validate'] = array('geolocation_googlemaps_field_widget_validate');
 
