@@ -173,6 +173,9 @@ function geolocation_googlemaps_field_widget_settings_form($field, $instance) {
  * Implements hook_field_widget_form().
  */
 function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+
+  $id = $instance['id'] . '-' . $delta;
+
   $lat_value = isset($items[$delta]['lat']) ? $items[$delta]['lat'] : NULL;
   $lng_value = isset($items[$delta]['lng']) ? $items[$delta]['lng'] : NULL;
   $element += array(
@@ -185,7 +188,7 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
       $element['address'] = array(
         '#type' => 'item',
         '#title' => $element['#title'],
-        '#prefix' => '<div id="geolocation-address-' . $delta . '" class="geolocation-address">',
+        '#prefix' => '<div id="geolocation-address-' . $id . '" class="geolocation-address">',
         '#suffix' => '</div>',
         '#required' => $instance['required'],
       );
@@ -194,31 +197,31 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
         '#maxlength' => 120,
       );
       $element['address']['geocode'] = array(
-        '#prefix' => '<span id="geolocation-address-geocode-' . $delta . '" class="geolocation-address-geocode">',
+        '#prefix' => '<span id="geolocation-address-geocode-' . $id . '" class="geolocation-address-geocode">',
         '#suffix' => '</span>',
         '#markup' => t('Get location'),
       );
       $element['help'] = array(
-        '#prefix' => '<div id="geolocation-help-' . $delta . '" class="geolocation-help">',
+        '#prefix' => '<div id="geolocation-help-' . $id . '" class="geolocation-help">',
         '#suffix' => '</div>',
         '#markup' => t('Enter an address / location in the textfield or you can also click on the map to set a marker'),
       );
       $element['googlemap'] = array(
-        '#prefix' => '<div id="geolocation-map-' . $delta . '" class="geolocation-map" style="width:100%;height:400px;">',
+        '#prefix' => '<div id="geolocation-map-' . $id . '" class="geolocation-map" style="width:100%;height:400px;">',
         '#suffix' => '</div>',
       );
       // Presentational item
       $element['latitem'] = array(
         '#type' => 'item',
         '#title' => t('Latitude:'),
-        '#prefix' => '<div id="geolocation-lat-item-' . $delta . '" class="geolocation-lat-item">',
+        '#prefix' => '<div id="geolocation-lat-item-' . $id . '" class="geolocation-lat-item">',
         '#suffix' => '</div>',
         '#markup' => '<span class="geolocation-lat-item-value">' . $lat_value . '</span>',
         '#required' => $instance['required'],
       );
       $element['lat'] = array(
         '#type' => 'hidden',
-        '#prefix' => '<div id="geolocation-lat-' . $delta . '" class="geolocation-lat">',
+        '#prefix' => '<div id="geolocation-lat-' . $id . '" class="geolocation-lat">',
         '#suffix' => '</div>',
         '#default_value' => $lat_value,
       );
@@ -226,19 +229,19 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
       $element['lngitem'] = array(
         '#type' => 'item',
         '#title' => t('Longitud:'),
-        '#prefix' => '<div id="geolocation-lng-item-' . $delta . '" class="geolocation-lng-item">',
+        '#prefix' => '<div id="geolocation-lng-item-' . $id . '" class="geolocation-lng-item">',
         '#suffix' => '</div>',
         '#markup' => '<span class="geolocation-lat-item-value">' . $lat_value . '</span>',
         '#required' => $instance['required'],
       );
       $element['lng'] = array(
         '#type' => 'hidden',
-        '#prefix' => '<div id="geolocation-lng-' . $delta . '" class="geolocation-lng">',
+        '#prefix' => '<div id="geolocation-lng-' . $id . '" class="geolocation-lng">',
         '#suffix' => '</div>',
         '#default_value' => $lng_value,
       );
       $element['remove'] = array(
-        '#prefix' => '<div id="geolocation-remove-' . $delta . '" class="geolocation-remove"><span>',
+        '#prefix' => '<div id="geolocation-remove-' . $id . '" class="geolocation-remove"><span>',
         '#suffix' => '</span></div>',
         '#markup' => t('Remove'),
       );
@@ -258,7 +261,7 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
       $map_defaults_lat = ($lat_value) ? $lat_value : '';
       $map_defaults_lng = ($lng_value) ? $lng_value : '';
       $map_defaults = array(
-        $delta => array(
+        $id => array(
           'lat' => $map_defaults_lat,
           'lng' => $map_defaults_lng,
         ),
