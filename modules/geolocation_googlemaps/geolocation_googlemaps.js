@@ -157,11 +157,11 @@
     var siberia = new google.maps.LatLng(60, 105);
     var newyork = new google.maps.LatLng(40.69847032728747, -73.9514422416687);
     if (supportFlag == true) {
-      alert("Geolocation service failed. We've placed you in NewYork.");
+      alert(Drupal.t("Geolocation service failed. We've placed you in NewYork."));
       initialLocation = newyork;
     } 
     else {
-      alert("Your browser doesn't support geolocation. We've placed you in Siberia.");
+      alert(Drupal.t("Your browser doesn't support geolocation. We've placed you in Siberia."));
       initialLocation = siberia;
     }
     Drupal.Geolocation.maps[i].setCenter(initialLocation);
@@ -202,7 +202,7 @@
           // First use browser geolocation
           if (navigator.geolocation) {
             browserSupportFlag = true;
-            $('#geolocation-help-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').append(Drupal.t(', or use your browser geolocation system by clicking this link') +': <span id="geolocation-client-location-' + i + '" class="geolocation-client-location">My Location</span>');
+            $('#geolocation-help-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').append(Drupal.t(', or use your browser geolocation system by clicking this link') +': <span id="geolocation-client-location-' + i + '" class="geolocation-client-location">' + Drupal.t('My Location') + '</span>');
             // Set current user location, if available
             $('#geolocation-client-location-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').click(function() {
               navigator.geolocation.getCurrentPosition(function(position) {
