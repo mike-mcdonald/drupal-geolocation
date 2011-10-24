@@ -194,6 +194,7 @@
           $('#geolocation-address-geocode-' + i).click(function(e) {
             Drupal.Geolocation.codeAddress(i);
           });
+
           $('#geolocation-remove-' + i).click(function(e) {
             Drupal.Geolocation.clearLocation(i);
           });
@@ -218,7 +219,7 @@
           // If browser geolication is not supoprted, try ip location
           else if (google.loader.ClientLocation) {
             latLng = new google.maps.LatLng(google.loader.ClientLocation.latitude, google.loader.ClientLocation.longitude);
-            $('#geolocation-help-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').append(Drupal.t(', or use the IP-based location by clicking this link') +': <span id="geolocation-client-location-' + i + '" class="geolocation-client-location">' + getFormattedLocation() + '</span>');
+            $('#geolocation-help-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').append(Drupal.t(', or use the IP-based location by clicking this link') +': <span id="geolocation-client-location-' + i + '" class="geolocation-client-location">' + Drupal.Geolocation.getFormattedLocation() + '</span>');
 
             // Set current user location, if available
             $('#geolocation-client-location-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').click(function() {
