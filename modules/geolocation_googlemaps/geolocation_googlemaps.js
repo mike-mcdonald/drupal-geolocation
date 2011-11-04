@@ -13,7 +13,7 @@
   Drupal.Geolocation.markers = new Array();
 
   /**
-   * Set the latitude and longitud values to the input fields
+   * Set the latitude and longitude values to the input fields
    * And optionaly update the address field
    *
    * @param latLng

@@ -254,7 +254,7 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
       // Presentational item
       $element['lngitem'] = array(
         '#type' => 'item',
-        '#title' => t('Longitud:'),
+        '#title' => t('Longitude:'),
         '#prefix' => '<div id="geolocation-lng-item-' . $id . '" class="geolocation-lng-item">',
         '#suffix' => '</div>',
         '#markup' => '<span class="geolocation-lat-item-value">' . $lat_value . '</span>',
