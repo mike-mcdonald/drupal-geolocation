@@ -374,7 +374,7 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
         'type' => 'external',
       );
       $element['googlemap']['#attached']['js'][] = array(
-        'data' => drupal_get_path('module', 'geolocation_googlemaps') . '/geolocation_googlemaps.js',
+        'data' => drupal_get_path('module', 'geolocation_googlemaps') . '/geolocation_googlemaps_widget.js',
         'type' => 'file',
         'scope' => 'footer',
       );
