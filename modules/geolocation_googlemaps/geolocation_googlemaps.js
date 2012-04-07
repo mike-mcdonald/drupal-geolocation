@@ -2,6 +2,7 @@
  * @file
  * Javascript for Goole Map widget of Geolocation field.
  */
+
 (function ($) {
   var geocoder;
   Drupal.geolocation = Drupal.geolocation || {};

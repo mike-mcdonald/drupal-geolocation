@@ -2,8 +2,9 @@
  * @file
  * Javascript for Goole Map Dynamic API Formatter javascript code.
  * 
- * @author Lukasz Klimek http://www.klimek.ws
+ * Many thanks to Lukasz Klimek http://www.klimek.ws for the help
  */
+
 (function($) {
 
   Drupal.geolocationGooglemaps = Drupal.geolocationGooglemaps || {};
@@ -71,8 +72,6 @@
           });
         });
       });
-
-
     }
   };
 }(jQuery));
