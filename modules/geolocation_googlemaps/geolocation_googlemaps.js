@@ -1,16 +1,12 @@
-
 /**
  * @file
  * Javascript for Goole Map widget of Geolocation field.
  */
-
-// This is still pretty messy DEV-Code.
-// TODO: cleanup.
 (function ($) {
   var geocoder;
-  Drupal.Geolocation = new Object();
-  Drupal.Geolocation.maps = new Array();
-  Drupal.Geolocation.markers = new Array();
+  Drupal.geolocation = new Object();
+  Drupal.geolocation.maps = new Array();
+  Drupal.geolocation.markers = new Array();
 
   /**
    * Set the latitude and longitude values to the input fields
@@ -23,7 +19,7 @@
    * @param op
    *   the op that was performed
    */
-  Drupal.Geolocation.codeLatLng = function(latLng, i, op) {
+  Drupal.geolocation.codeLatLng = function(latLng, i, op) {
     // Update the lat and lng input fields
     $('#geolocation-lat-' + i + ' input').attr('value', latLng.lat());
     $('#geolocation-lat-item-' + i + ' .geolocation-lat-item-value').html(latLng.lat());
@@ -36,7 +32,7 @@
         if (status == google.maps.GeocoderStatus.OK) {
           $('#geolocation-address-' + i + ' input').val(results[0].formatted_address);
           if (op == 'geocoder') {
-            Drupal.Geolocation.setZoom(i, results[0].geometry.location_type);
+            Drupal.geolocation.setZoom(i, results[0].geometry.location_type);
           }
         }
         else {
@@ -55,15 +51,16 @@
    * @param i
    *   the index from the maps array we are working on
    */
-  Drupal.Geolocation.codeAddress = function(i) {
+  Drupal.geolocation.codeAddress = function(i) {
     var address = $('#geolocation-address-' + i + ' input').val();
     geocoder.geocode( { 'address': address }, function(results, status) {
       if (status == google.maps.GeocoderStatus.OK) {
-        Drupal.Geolocation.maps[i].setCenter(results[0].geometry.location);
-        Drupal.Geolocation.setMapMarker(results[0].geometry.location, i);
-        Drupal.Geolocation.codeLatLng(results[0].geometry.location, i, 'textinput');
-        Drupal.Geolocation.setZoom(i, results[0].geometry.location_type);
-      } else {
+        Drupal.geolocation.maps[i].setCenter(results[0].geometry.location);
+        Drupal.geolocation.setMapMarker(results[0].geometry.location, i);
+        Drupal.geolocation.codeLatLng(results[0].geometry.location, i, 'textinput');
+        Drupal.geolocation.setZoom(i, results[0].geometry.location_type);
+      }
+      else {
         alert(Drupal.t('Geocode was not successful for the following reason: ') + status);
       }
     });
@@ -75,15 +72,15 @@
    * @param location_type
    *   location type as provided by google maps after geocoding a location
    */
-   Drupal.Geolocation.setZoom = function(i, location_type) {
+   Drupal.geolocation.setZoom = function(i, location_type) {
      if (location_type == 'APPROXIMATE') {
-       Drupal.Geolocation.maps[i].setZoom(10);
+       Drupal.geolocation.maps[i].setZoom(10);
      }
      else if (location_type == 'GEOMETRIC_CENTER') {
-       Drupal.Geolocation.maps[i].setZoom(12);
+       Drupal.geolocation.maps[i].setZoom(12);
      }
      else if (location_type == 'RANGE_INTERPOLATED' || location_type == 'ROOFTOP') {
-       Drupal.Geolocation.maps[i].setZoom(16);
+       Drupal.geolocation.maps[i].setZoom(16);
      }
    }
 
@@ -96,13 +93,13 @@
    * @param i
    *   the index from the maps array we are working on
    */
-  Drupal.Geolocation.setMapMarker = function(latLng, i) {
+  Drupal.geolocation.setMapMarker = function(latLng, i) {
     // remove old marker
-    if (Drupal.Geolocation.markers[i]) {
-      Drupal.Geolocation.markers[i].setMap(null);
+    if (Drupal.geolocation.markers[i]) {
+      Drupal.geolocation.markers[i].setMap(null);
     }
-    Drupal.Geolocation.markers[i] = new google.maps.Marker({
-      map: Drupal.Geolocation.maps[i],
+    Drupal.geolocation.markers[i] = new google.maps.Marker({
+      map: Drupal.geolocation.maps[i],
       draggable: false,
       // I dont like this much, rather have no effect
       // Will leave it to see if someone notice and shouts at me!
@@ -118,7 +115,7 @@
    * @return
    *   Formatted location
    */
-  Drupal.Geolocation.getFormattedLocation = function() {
+  Drupal.geolocation.getFormattedLocation = function() {
     if (google.loader.ClientLocation.address.country_code == "US" &&
       google.loader.ClientLocation.address.region) {
       return google.loader.ClientLocation.address.city + ", " 
@@ -136,13 +133,13 @@
    * @param i
    *   the index from the maps array we are working on
    */
-  Drupal.Geolocation.clearLocation = function(i) {
+  Drupal.geolocation.clearLocation = function(i) {
     $('#geolocation-lat-' + i + ' input').attr('value', '');
     $('#geolocation-lat-item-' + i + ' .geolocation-lat-item-value').html('');
     $('#geolocation-lng-' + i + ' input').attr('value', '');
     $('#geolocation-lng-item-' + i + ' .geolocation-lat-item-value').html('');
     $('#geolocation-address-' + i + ' input').attr('value', '');
-    Drupal.Geolocation.markers[i].setMap();
+    Drupal.geolocation.markers[i].setMap();
   }
  
   /**
@@ -153,7 +150,7 @@
    * @param i
    *   the index from the maps array we are working on
    */
-  Drupal.Geolocation.handleNoGeolocation = function(supportFlag, i) {
+  Drupal.geolocation.handleNoGeolocation = function(supportFlag, i) {
     var siberia = new google.maps.LatLng(60, 105);
     var newyork = new google.maps.LatLng(40.69847032728747, -73.9514422416687);
     if (supportFlag == true) {
@@ -164,8 +161,8 @@
       alert(Drupal.t("Your browser doesn't support geolocation. We've placed you in Siberia."));
       initialLocation = siberia;
     }
-    Drupal.Geolocation.maps[i].setCenter(initialLocation);
-    Drupal.Geolocation.setMapMarker(initialLocation, i);
+    Drupal.geolocation.maps[i].setCenter(initialLocation);
+    Drupal.geolocation.setMapMarker(initialLocation, i);
   }
 
   Drupal.behaviors.GoogleMap = {
@@ -175,7 +172,7 @@
       var lat;
       var lng;
       var latLng;
-      var myOptions;
+      var mapOptions;
       var browserSupportFlag =  new Boolean();
       var singleClick;
 
@@ -188,15 +185,15 @@
           $('#geolocation-address-' + i + ' input').keypress(function(ev){
             if(ev.which == 13){
               ev.preventDefault();
-              Drupal.Geolocation.codeAddress(i);
+              Drupal.geolocation.codeAddress(i);
             }
           });
           $('#geolocation-address-geocode-' + i).click(function(e) {
-            Drupal.Geolocation.codeAddress(i);
+            Drupal.geolocation.codeAddress(i);
           });
 
           $('#geolocation-remove-' + i).click(function(e) {
-            Drupal.Geolocation.clearLocation(i);
+            Drupal.geolocation.clearLocation(i);
           });
 
           // START: Autodetect clientlocation.
@@ -208,25 +205,25 @@
             $('#geolocation-client-location-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').click(function() {
               navigator.geolocation.getCurrentPosition(function(position) {
                 latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-                Drupal.Geolocation.maps[i].setCenter(latLng);
-                Drupal.Geolocation.setMapMarker(latLng, i);
-                Drupal.Geolocation.codeLatLng(latLng, i, 'geocoder');
+                Drupal.geolocation.maps[i].setCenter(latLng);
+                Drupal.geolocation.setMapMarker(latLng, i);
+                Drupal.geolocation.codeLatLng(latLng, i, 'geocoder');
               }, function() {
-                Drupal.Geolocation.handleNoGeolocation(browserSupportFlag, i);
+                Drupal.geolocation.handleNoGeolocation(browserSupportFlag, i);
               });
             });
           }
           // If browser geolication is not supoprted, try ip location
           else if (google.loader.ClientLocation) {
             latLng = new google.maps.LatLng(google.loader.ClientLocation.latitude, google.loader.ClientLocation.longitude);
-            $('#geolocation-help-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').append(Drupal.t(', or use the IP-based location by clicking this link') +': <span id="geolocation-client-location-' + i + '" class="geolocation-client-location">' + Drupal.Geolocation.getFormattedLocation() + '</span>');
+            $('#geolocation-help-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').append(Drupal.t(', or use the IP-based location by clicking this link') +': <span id="geolocation-client-location-' + i + '" class="geolocation-client-location">' + Drupal.geolocation.getFormattedLocation() + '</span>');
 
             // Set current user location, if available
             $('#geolocation-client-location-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').click(function() {
               latLng = new google.maps.LatLng(google.loader.ClientLocation.latitude, google.loader.ClientLocation.longitude);
-              Drupal.Geolocation.maps[i].setCenter(latLng);
-              Drupal.Geolocation.setMapMarker(latLng, i);
-              Drupal.Geolocation.codeLatLng(latLng, i, 'geocoder');
+              Drupal.geolocation.maps[i].setCenter(latLng);
+              Drupal.geolocation.setMapMarker(latLng, i);
+              Drupal.geolocation.codeLatLng(latLng, i, 'geocoder');
             });
           }
           // END: Autodetect clientlocation.
@@ -240,7 +237,7 @@
           latLng = new google.maps.LatLng(lat, lng);
 
           // Set map options
-          myOptions = {
+          mapOptions = {
             zoom: 2,
             center: latLng,
             mapTypeId: google.maps.MapTypeId.ROADMAP,
@@ -248,25 +245,25 @@
           }
 
           // Create map
-          Drupal.Geolocation.maps[i] = new google.maps.Map(document.getElementById("geolocation-map-" + i), myOptions);
+          Drupal.geolocation.maps[i] = new google.maps.Map(document.getElementById("geolocation-map-" + i), mapOptions);
 
           if (lat && lng) {
             // Set initial marker
-            Drupal.Geolocation.codeLatLng(latLng, i, 'geocoder');
-            Drupal.Geolocation.setMapMarker(latLng, i);
+            Drupal.geolocation.codeLatLng(latLng, i, 'geocoder');
+            Drupal.geolocation.setMapMarker(latLng, i);
           }
 
           // Listener to set marker
-          google.maps.event.addListener(Drupal.Geolocation.maps[i], 'click', function(me){
+          google.maps.event.addListener(Drupal.geolocation.maps[i], 'click', function(me){
             // Set a timeOut so that it doesn't execute if dbclick is detected
             singleClick = setTimeout(function(){
-              Drupal.Geolocation.codeLatLng(me.latLng, i, 'marker');
-              Drupal.Geolocation.setMapMarker(me.latLng, i);
+              Drupal.geolocation.codeLatLng(me.latLng, i, 'marker');
+              Drupal.geolocation.setMapMarker(me.latLng, i);
             }, 500);
           });
 
           // Detect double click to avoid setting marker
-          google.maps.event.addListener(Drupal.Geolocation.maps[i], 'dblclick', function(me){
+          google.maps.event.addListener(Drupal.geolocation.maps[i], 'dblclick', function(me){
             clearTimeout(singleClick);
           });
         })

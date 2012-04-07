@@ -16,9 +16,9 @@ function geolocation_googlemaps_field_formatter_info() {
       'settings' => array(
         'map_dimensions' => '300x300',
         'map_zoomlevel' => '7',
-        'marker_icon' => '',
         'map_imageformat' => 'png8',
         'map_maptype' => 'roadmap',
+        'marker_icon' => '',
       ),
     ),
   );
@@ -28,6 +28,7 @@ function geolocation_googlemaps_field_formatter_info() {
  * Implements hook_field_formatter_settings_form().
  */
 function geolocation_googlemaps_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+
   $display = $instance['display'][$view_mode];
   $settings = $display['settings'];
 
@@ -42,7 +43,7 @@ function geolocation_googlemaps_field_formatter_settings_form($field, $instance,
     '#description' => t('Enter custom map dimensions, default is 300x300.'),
     '#default_value' => $settings['map_dimensions'],
   );
-  
+
   $element['marker_icon'] = array(
     '#type' => 'textfield',
     '#title' => t('Marker icon'),
@@ -112,6 +113,7 @@ function geolocation_googlemaps_field_formatter_settings_form($field, $instance,
  * Implements hook_field_formatter_settings_summary().
  */
 function geolocation_googlemaps_field_formatter_settings_summary($field, $instance, $view_mode) {
+
   $display = $instance['display'][$view_mode];
   $settings = $display['settings'];
 
@@ -192,8 +194,6 @@ function geolocation_googlemaps_field_widget_settings_form($field, $instance) {
 
   return $form;
 }
-
-
 
 /**
  * Implements hook_field_widget_form().
@@ -279,7 +279,7 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
       $element['googlemap']['#attached']['js'][] = array(
         'data' => drupal_get_path('module', 'geolocation_googlemaps') . '/geolocation_googlemaps.js',
         'type' => 'file',
-        'scope' => 'footer'
+        'scope' => 'footer',
       );
 
       // Make defaults available as javascript settings. In JS files use:
