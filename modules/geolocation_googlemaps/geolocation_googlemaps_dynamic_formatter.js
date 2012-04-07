@@ -56,7 +56,7 @@
               zoom : parseInt(instanceSettings.map_zoomlevel),
               center : latLng,
               mapTypeId : map_type,
-              scrollwheel : instanceSettings.map_scrollable
+              scrollwheel : instanceSettings.map_scrollwheel
             };
 
             // Create map

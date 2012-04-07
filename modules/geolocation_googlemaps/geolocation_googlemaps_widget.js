@@ -101,13 +101,20 @@
     }
     Drupal.geolocation.markers[i] = new google.maps.Marker({
       map: Drupal.geolocation.maps[i],
-      draggable: false,
+      draggable: Drupal.settings.geolocation.settings.marker_draggable ? true : false,
       // I dont like this much, rather have no effect
       // Will leave it to see if someone notice and shouts at me!
       // If so, will see consider enabling it again
       // animation: google.maps.Animation.DROP,
       position: latLng
     });
+
+    google.maps.event.addListener(Drupal.geolocation.markers[i], 'dragend', function(me) {
+      console.log(me);
+      Drupal.geolocation.codeLatLng(me.latLng, i, 'marker');
+      Drupal.geolocation.setMapMarker(me.latLng, i);
+    });
+
     return false; // if called from <a>-Tag
   }
  
@@ -255,16 +262,16 @@
           }
 
           // Listener to set marker
-          google.maps.event.addListener(Drupal.geolocation.maps[i], 'click', function(me){
+          google.maps.event.addListener(Drupal.geolocation.maps[i], 'click', function(me) {
             // Set a timeOut so that it doesn't execute if dbclick is detected
-            singleClick = setTimeout(function(){
+            singleClick = setTimeout(function() {
               Drupal.geolocation.codeLatLng(me.latLng, i, 'marker');
               Drupal.geolocation.setMapMarker(me.latLng, i);
             }, 500);
           });
 
           // Detect double click to avoid setting marker
-          google.maps.event.addListener(Drupal.geolocation.maps[i], 'dblclick', function(me){
+          google.maps.event.addListener(Drupal.geolocation.maps[i], 'dblclick', function(me) {
             clearTimeout(singleClick);
           });
         })

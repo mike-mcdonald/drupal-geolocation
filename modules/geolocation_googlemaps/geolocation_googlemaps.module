@@ -30,7 +30,7 @@ function geolocation_googlemaps_field_formatter_info() {
         'map_imageformat' => 'png8',
         'map_maptype' => 'roadmap',
         'marker_icon' => '',
-        'map_scrollable' => FALSE,
+        'map_scrollwheel' => FALSE,
       ),
     ),
   );
@@ -81,11 +81,11 @@ function geolocation_googlemaps_field_formatter_settings_form($field, $instance,
       break;
 
     case 'geolocation_googlemaps_dynamic':
-      $element['map_scrollable'] = array(
+      $element['map_scrollwheel'] = array(
         '#type' => 'checkbox',
-        '#title' => t('Scrollable'),
-        '#description' => t('If checked, the map will zoom-in/out with the mouse scroll.'),
-        '#default_value' => $settings['map_scrollable'],
+        '#title' => t('Scroll Zoom'),
+        '#description' => t('By default zooming is done with double click and/or using the map controls to avoid interrupting the normal window scroll. It can optionally be enabled here.'),
+        '#default_value' => $settings['map_scrollwheel'],
       );
       break;
   }
@@ -152,7 +152,7 @@ function geolocation_googlemaps_field_formatter_settings_summary($field, $instan
 
     case 'geolocation_googlemaps_dynamic':
       $summary .= '<br />';
-      $scrl = $settings['map_scrollable'] ? t('Yes') : t('No');
+      $scrl = $settings['map_scrollwheel'] ? t('Yes') : t('No');
       $summary .= '<strong>Scrollable:</strong> ' . $scrl . '<br />';
       break;
   }
@@ -281,6 +281,12 @@ function geolocation_googlemaps_field_widget_settings_form($field, $instance) {
     '#title' => t('Scroll Zoom'),
     '#description' => t('By default zooming is done with double click and/or using the map controls to avoid interrupting the normal window scroll. It can optionally be enabled here.'),
     '#default_value' => isset($settings['scrollwheel']) ? $settings['scrollwheel'] : FALSE,
+  );
+  $form['marker_draggable'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Draggable Marker'),
+    '#description' => t('Enabling this will allow the user to darg/drop the marker to select a location.'),
+    '#default_value' => isset($settings['marker_draggable']) ? $settings['marker_draggable'] : FALSE,
   );
 
   return $form;
