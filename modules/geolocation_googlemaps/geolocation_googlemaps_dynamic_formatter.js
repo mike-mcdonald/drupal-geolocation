@@ -1,68 +1,78 @@
 /**
- * @file Javascript for Goole Map Dynamic API Formatter javascript code.
+ * @file
+ * Javascript for Goole Map Dynamic API Formatter javascript code.
  * 
  * @author Lukasz Klimek http://www.klimek.ws
  */
 (function($) {
 
-  Drupal.geolocation = new Object();
-  Drupal.geolocation.maps = new Array();
-  Drupal.geolocation.markers = new Array();
+  Drupal.geolocationGooglemaps = Drupal.geolocationGooglemaps || {};
+  Drupal.geolocationGooglemaps.maps = Drupal.geolocationGooglemaps.maps || {};
+  Drupal.geolocationGooglemaps.markers = Drupal.geolocationGooglemaps.markers || {};
 
-  Drupal.behaviors.geolocationDynamicMapFormatter = {
+  Drupal.behaviors.geolocationGooglemapsFormatter = {
 
     attach : function(context, settings) {
 
+      var fields = settings.geolocationGooglemaps.formatters;
+
       // Work on each map
-      $.each(settings.geolocation, function(i, mapDefaults) {
+      $.each(fields, function(instance, data) {
+        var instanceSettings = data.settings;
+        $.each(data.deltas, function(d, delta) {
 
-        // Only make this once ;)
-        $("#geolocation-googlemaps-dynamic-" + i).once('geolocationDynamicMapFormatter', function() {
+          id = instance + "-" + d;
 
-          var map_type;
-          var mapOptions;
+          // Only make this once ;)
+          $("#geolocation-googlemaps-dynamic-" + id).once('geolocationDynamicMapFormatter', function() {
 
-          var lat = mapDefaults.position.lat;
-          var lng = mapDefaults.position.lng;
-          var latLng = new google.maps.LatLng(lat, lng);
+            var map_type;
+            var mapOptions;
 
-          switch (mapDefaults.settings.map_maptype) {
-            case 'satellite':
-              map_type = google.maps.MapTypeId.SATELLITE;
-              break;
+            var lat = delta.lat;
+            var lng = delta.lng;
+            var latLng = new google.maps.LatLng(lat, lng);
 
-            case 'terrain':
-              map_type = google.maps.MapTypeId.TERRAIN;
-              break;
+            switch (instanceSettings.map_maptype) {
+              case 'satellite':
+                map_type = google.maps.MapTypeId.SATELLITE;
+                break;
 
-            case 'hybrid':
-              map_type = google.maps.MapTypeId.HYBRID;
-              break;
+              case 'terrain':
+                map_type = google.maps.MapTypeId.TERRAIN;
+                break;
 
-            default:
-              map_type = google.maps.MapTypeId.ROADMAP;
-              break;
-          }
+              case 'hybrid':
+                map_type = google.maps.MapTypeId.HYBRID;
+                break;
 
-          mapOptions = {
-            zoom : parseInt(mapDefaults.settings.map_zoomlevel) + 0,
-            center : latLng,
-            mapTypeId : map_type,
-            scrollwheel : true
-          };
+              default:
+                map_type = google.maps.MapTypeId.ROADMAP;
+                break;
+            }
 
-          // Create map
-          Drupal.geolocation.maps[i] = new google.maps.Map(document.getElementById("geolocation-googlemaps-dynamic-" + i), mapOptions);
+            mapOptions = {
+              zoom : parseInt(instanceSettings.map_zoomlevel),
+              center : latLng,
+              mapTypeId : map_type,
+              scrollwheel : instanceSettings.map_scrollable
+            };
 
-          // Create and place marker
-          Drupal.geolocation.markers[i] = new google.maps.Marker({
-            map : Drupal.geolocation.maps[i],
-            draggable : false,
-            icon : mapDefaults.settings.marker_icon,
-            position : latLng
+            // Create map
+            Drupal.geolocationGooglemaps.maps[id] = new google.maps.Map(this, mapOptions);
+
+            // Create and place marker
+            Drupal.geolocationGooglemaps.markers[id] = new google.maps.Marker({
+              map : Drupal.geolocationGooglemaps.maps[id],
+              draggable : false,
+              icon : instanceSettings.marker_icon,
+              position : latLng
+            });
           });
         });
       });
+
+
     }
   };
 }(jQuery));

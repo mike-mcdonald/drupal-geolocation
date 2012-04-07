@@ -20,16 +20,17 @@ function geolocation_googlemaps_field_formatter_info() {
         'map_maptype' => 'roadmap',
         'marker_icon' => '',
       ),
-      'geolocation_googlemaps_dynamic' => array(
-        'label' => t('Dynamic Google Map'),
-        'field types' => array('geolocation_latlng'),
-        'settings' => array(
-          'map_dimensions' => '300x300',
-          'map_zoomlevel' => '7',
-          'map_imageformat' => 'png8',
-          'map_maptype' => 'roadmap',
-          'marker_icon' => '',
-        ),
+    ),
+    'geolocation_googlemaps_dynamic' => array(
+      'label' => t('Dynamic Google Map'),
+      'field types' => array('geolocation_latlng'),
+      'settings' => array(
+        'map_dimensions' => '300x300',
+        'map_zoomlevel' => '7',
+        'map_imageformat' => 'png8',
+        'map_maptype' => 'roadmap',
+        'marker_icon' => '',
+        'map_scrollable' => FALSE,
       ),
     ),
   );
@@ -48,14 +49,12 @@ function geolocation_googlemaps_field_formatter_settings_form($field, $instance,
 
   // Implement some configuration options.
   // http://code.google.com/intl/en/apis/maps/documentation/staticmaps/
-
   $element['map_dimensions'] = array(
     '#type' => 'textfield',
     '#title' => t('Map dimensions'),
     '#description' => t('Enter custom map dimensions, default is 300x300.'),
     '#default_value' => $settings['map_dimensions'],
   );
-
   $element['marker_icon'] = array(
     '#type' => 'textfield',
     '#title' => t('Marker icon'),
@@ -63,21 +62,32 @@ function geolocation_googlemaps_field_formatter_settings_form($field, $instance,
     '#default_value' => $settings['marker_icon'],
   );
 
-  // image format is used only for static maps
-  if ($type == 'geolocation_googlemaps_static') {
-    $element['map_imageformat'] = array(
-      '#type' => 'select',
-      '#title' => t('Image format'),
-      '#options' => array(
-        'png8' => '8-bit PNG (default)',
-        'png32' => '32-bit PNG',
-        'gif' => 'GIF',
-        'jpg' => 'JPEG',
-        'jpg-baseline' => 'JPEG (non-progressive)',
-      ),
-      '#description' => t('Choose an Image Format. jpg and jpg-baseline typically provide the smallest image size, though they do so through "lossy" compression which may degrade the image. gif, png8 and png32 provide lossless compression.'),
-      '#default_value' => $settings['map_imageformat'],
-    );
+  // Image format is used only for static maps.
+  switch ($type) {
+    case 'geolocation_googlemaps_static':
+      $element['map_imageformat'] = array(
+        '#type' => 'select',
+        '#title' => t('Image format'),
+        '#options' => array(
+          'png8' => '8-bit PNG (default)',
+          'png32' => '32-bit PNG',
+          'gif' => 'GIF',
+          'jpg' => 'JPEG',
+          'jpg-baseline' => 'JPEG (non-progressive)',
+        ),
+        '#description' => t('Choose an Image Format. jpg and jpg-baseline typically provide the smallest image size, though they do so through "lossy" compression which may degrade the image. gif, png8 and png32 provide lossless compression.'),
+        '#default_value' => $settings['map_imageformat'],
+      );
+      break;
+
+    case 'geolocation_googlemaps_dynamic':
+      $element['map_scrollable'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Scrollable'),
+        '#description' => t('If checked, the map will zoom-in/out with the mouse scroll.'),
+        '#default_value' => $settings['map_scrollable'],
+      );
+      break;
   }
 
   $element['map_maptype'] = array(
@@ -134,10 +144,18 @@ function geolocation_googlemaps_field_formatter_settings_summary($field, $instan
   $settings = $display['settings'];
 
   $summary = '<strong>Map:</strong> ' . $settings['map_dimensions'];
-  if ($type == 'geolocation_googlemaps_static') {
-    $summary .= ' (' . $settings['map_imageformat'] . ')';
+  switch ($type) {
+    case 'geolocation_googlemaps_static':
+      $summary .= ' (' . $settings['map_imageformat'] . ')';
+      $summary .= '<br />';
+      break;
+
+    case 'geolocation_googlemaps_dynamic':
+      $summary .= '<br />';
+      $scrl = $settings['map_scrollable'] ? t('Yes') : t('No');
+      $summary .= '<strong>Scrollable:</strong> ' . $scrl . '<br />';
+      break;
   }
-  $summary .= '<br />';
   $summary .= '<strong>Type:</strong> ' . $settings['map_maptype'] . '<br />';
   $summary .= '<strong>Zoom:</strong> ' . $settings['map_zoomlevel'];
   if (!empty($settings['marker_icon'])) {
@@ -183,16 +201,15 @@ function geolocation_googlemaps_field_formatter_view($entity_type, $entity, $fie
       break;
 
     case 'geolocation_googlemaps_dynamic':
+      $eid = entity_id($entity_type, $entity);
       foreach ($items as $delta => $item) {
 
         $width = strtok($settings['map_dimensions'], 'x') . "px";
         $height = strtok('') . "px";
 
+        $id = 'geolocation-googlemaps-dynamic-' . 'e_' . $eid . 'i_' . $instance['id'] . '-d_' . $delta;
         $map_element['googlemap'] = array(
-          '#prefix' => '<div id="geolocation-googlemaps-dynamic-'
-            . $delta . '-' . $instance['field_name'] . '" class="geolocation-map geolocation-googlemaps-dynamic" '
-            . ' style="width:' . htmlentities($width)
-            . ';height:' . htmlentities($height) . ';">',
+          '#prefix' => '<div id="' . $id . '" class="geolocation-map geolocation-googlemaps-dynamic" ' . ' style="width:' . htmlentities($width) . ';height:' . htmlentities($height) . ';">',
           '#suffix' => '</div>',
         );
 
@@ -212,23 +229,23 @@ function geolocation_googlemaps_field_formatter_view($entity_type, $entity, $fie
           'scope' => 'footer',
         );
 
-        // Make defaults available as javascript settings. In JS files use:
-        // Drupal.settings.mapDefaults.lat
-        $position = array(
-          'lat' => $item['lat'],
-          'lng' => $item['lng'],
-        );
+        // Add each delta to the settings array.
         $data = array(
-          $instance['field_name'] = array(
-            $delta => array(
+          'formatters' => array(
+            'e_' . $eid . 'i_' . $instance['id'] => array(
               "settings" => $settings,
-              "position" => $position,
+              "deltas" => array(
+                'd_' . $delta => array(
+                  'lat' => $item['lat'],
+                  'lng' => $item['lng'],
+                ),
+              ),
             ),
-          )
+          ),
         );
 
         $map_element['googlemap']['#attached']['js'][] = array(
-          'data' => array('geolocation' => $data),
+          'data' => array('geolocationGooglemaps' => $data),
           'type' => 'setting',
         );
 
@@ -310,7 +327,7 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
         '#prefix' => '<div id="geolocation-map-' . $id . '" class="geolocation-map" style="width:100%;height:400px;">',
         '#suffix' => '</div>',
       );
-      // Presentational item
+      // Presentational item.
       $element['latitem'] = array(
         '#type' => 'item',
         '#title' => t('Latitude:'),
@@ -325,7 +342,7 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
         '#suffix' => '</div>',
         '#default_value' => $lat_value,
       );
-      // Presentational item
+      // Presentational item.
       $element['lngitem'] = array(
         '#type' => 'item',
         '#title' => t('Longitude:'),
@@ -402,6 +419,7 @@ function geolocation_googlemaps_field_widget_validate($element, &$form_state, $f
       case $element['lng']['#value'] && !$element['lat']['#value']:
         form_error($element, t('!name field is incomplete, latitude value is missing.', array('!name' => $element['#title'])));
         break;
+
       case !$element['lng']['#value'] && $element['lat']['#value']:
         form_error($element, t('!name field is incomplete, longitude value is missing.', array('!name' => $element['#title'])));
         break;
