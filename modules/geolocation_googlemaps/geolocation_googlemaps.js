@@ -4,9 +4,9 @@
  */
 (function ($) {
   var geocoder;
-  Drupal.geolocation = new Object();
-  Drupal.geolocation.maps = new Array();
-  Drupal.geolocation.markers = new Array();
+  Drupal.geolocation = Drupal.geolocation || {};
+  Drupal.geolocation.maps = Drupal.geolocation.maps || {};
+  Drupal.geolocation.markers = Drupal.geolocation.markers || {};
 
   /**
    * Set the latitude and longitude values to the input fields
