@@ -11,7 +11,7 @@
   Drupal.geolocationGooglemaps.maps = Drupal.geolocationGooglemaps.maps || {};
   Drupal.geolocationGooglemaps.markers = Drupal.geolocationGooglemaps.markers || {};
 
-  Drupal.behaviors.geolocationGooglemapsFormatter = {
+  Drupal.behaviors.geolocationGooglemapsDynamicFormatter = {
 
     attach : function(context, settings) {
 
@@ -25,7 +25,7 @@
           id = instance + "-" + d;
 
           // Only make this once ;)
-          $("#geolocation-googlemaps-dynamic-" + id).once('geolocationDynamicMapFormatter', function() {
+          $("#geolocation-googlemaps-dynamic-" + id).once('geolocation-googlemaps-dynamic-formatter', function() {
 
             var map_type;
             var mapOptions;

@@ -173,7 +173,7 @@
     Drupal.geolocation.setMapMarker(initialLocation, i);
   }
 
-  Drupal.behaviors.GoogleMap = {
+  Drupal.behaviors.geolocationGooglemaps = {
     attach: function(context, settings) {
       geocoder = new google.maps.Geocoder();
 
@@ -187,7 +187,7 @@
       // Work on each map
       $.each(Drupal.settings.geolocation.defaults, function(i, mapDefaults) {
         // Only make this once ;)
-        $("#geolocation-map-" + i).once('procesadooooo', function(){
+        $("#geolocation-map-" + i).once('geolocation-googlemaps', function(){
 
           // Attach listeners
           $('#geolocation-address-' + i + ' input').keypress(function(ev){
@@ -208,9 +208,9 @@
           // First use browser geolocation
           if (navigator.geolocation) {
             browserSupportFlag = true;
-            $('#geolocation-help-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').append(Drupal.t(', or use your browser geolocation system by clicking this link') +': <span id="geolocation-client-location-' + i + '" class="geolocation-client-location">' + Drupal.t('My Location') + '</span>');
+            $('#geolocation-help-' + i + ':not(.geolocation-googlemaps-processed)').addClass('geolocation-googlemaps-processed').append(Drupal.t(', or use your browser geolocation system by clicking this link') +': <span id="geolocation-client-location-' + i + '" class="geolocation-client-location">' + Drupal.t('My Location') + '</span>');
             // Set current user location, if available
-            $('#geolocation-client-location-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').click(function() {
+            $('#geolocation-client-location-' + i + ':not(.geolocation-googlemaps-processed)').addClass('geolocation-googlemaps-processed').click(function() {
               navigator.geolocation.getCurrentPosition(function(position) {
                 latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
                 Drupal.geolocation.maps[i].setCenter(latLng);
@@ -224,10 +224,10 @@
           // If browser geolication is not supoprted, try ip location
           else if (google.loader.ClientLocation) {
             latLng = new google.maps.LatLng(google.loader.ClientLocation.latitude, google.loader.ClientLocation.longitude);
-            $('#geolocation-help-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').append(Drupal.t(', or use the IP-based location by clicking this link') +': <span id="geolocation-client-location-' + i + '" class="geolocation-client-location">' + Drupal.geolocation.getFormattedLocation() + '</span>');
+            $('#geolocation-help-' + i + ':not(.geolocation-googlemaps-processed)').addClass('geolocation-googlemaps-processed').append(Drupal.t(', or use the IP-based location by clicking this link') +': <span id="geolocation-client-location-' + i + '" class="geolocation-client-location">' + Drupal.geolocation.getFormattedLocation() + '</span>');
 
             // Set current user location, if available
-            $('#geolocation-client-location-' + i + ':not(.geolocation-processed)').addClass('geolocation-processed').click(function() {
+            $('#geolocation-client-location-' + i + ':not(.geolocation-googlemaps-processed)').addClass('geolocation-googlemaps-processed').click(function() {
               latLng = new google.maps.LatLng(google.loader.ClientLocation.latitude, google.loader.ClientLocation.longitude);
               Drupal.geolocation.maps[i].setCenter(latLng);
               Drupal.geolocation.setMapMarker(latLng, i);
