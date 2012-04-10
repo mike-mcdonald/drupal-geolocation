@@ -201,7 +201,10 @@ function geolocation_googlemaps_field_formatter_view($entity_type, $entity, $fie
       break;
 
     case 'geolocation_googlemaps_dynamic':
-      $eid = entity_id($entity_type, $entity);
+      $info = entity_get_info($entity_type);
+      $key = isset($info['entity keys']['name']) ? $info['entity keys']['name'] : $info['entity keys']['id'];
+      $eid = $entity->$key;
+
       foreach ($items as $delta => $item) {
 
         $width = strtok($settings['map_dimensions'], 'x') . "px";
