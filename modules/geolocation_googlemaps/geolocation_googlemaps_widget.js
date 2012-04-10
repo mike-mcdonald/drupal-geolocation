@@ -110,7 +110,6 @@
     });
 
     google.maps.event.addListener(Drupal.geolocation.markers[i], 'dragend', function(me) {
-      console.log(me);
       Drupal.geolocation.codeLatLng(me.latLng, i, 'marker');
       Drupal.geolocation.setMapMarker(me.latLng, i);
     });
