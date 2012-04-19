@@ -232,6 +232,11 @@ function geolocation_googlemaps_field_formatter_view($entity_type, $entity, $fie
           'scope' => 'footer',
         );
 
+        // Create correct url for marker_icon
+        if ($settings['marker_icon']) {
+          $settings['marker_icon'] = file_create_url($settings['marker_icon']);
+        }
+
         // Add each delta to the settings array.
         $data = array(
           'formatters' => array(
