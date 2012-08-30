@@ -198,3 +198,18 @@ function geolocation_field_widget_error($element, $error, $form, &$form_state) {
       break;
   }
 }
+
+/**
+ * Implements hook_modernizr_info().
+ */
+function geolocation_modernizr_info() {
+  $tests = array();
+
+  $tests['geolocation'] = array(
+    'type'   => 'test',
+    'module' => 'Geolocation',
+    'desc'   => 'Tests browser support for Geolocation API',
+  );
+
+  return $tests;
+}
