@@ -12,7 +12,7 @@ function geolocation_googlemaps_field_formatter_info() {
   return array(
     'geolocation_googlemaps_static' => array(
       'label' => t('Static Google Map'),
-      'field types' => array('geolocation_latlng'),
+      'field types' => array('geolocation_latlng', 'geofield'),
       'settings' => array(
         'map_dimensions' => '300x300',
         'map_zoomlevel' => '7',
@@ -23,7 +23,7 @@ function geolocation_googlemaps_field_formatter_info() {
     ),
     'geolocation_googlemaps_dynamic' => array(
       'label' => t('Dynamic Google Map'),
-      'field types' => array('geolocation_latlng'),
+      'field types' => array('geolocation_latlng', 'geofield'),
       'settings' => array(
         'map_dimensions' => '300x300',
         'map_zoomlevel' => '7',
@@ -58,7 +58,7 @@ function geolocation_googlemaps_field_formatter_settings_form($field, $instance,
   $element['marker_icon'] = array(
     '#type' => 'textfield',
     '#title' => t('Marker icon'),
-    '#description' => t('Set the path to the icon marker you wish to use. Path can be absolute (wicth http://) or relative to the Drupal instalation. If left blank, the default will be used'),
+    '#description' => t('Set the path to the icon marker you wish to use. Path can be absolute (with http://) or relative to the Drupal instalation. If left blank, the default will be used'),
     '#default_value' => $settings['marker_icon'],
   );
 
@@ -173,6 +173,10 @@ function geolocation_googlemaps_field_formatter_settings_summary($field, $instan
 function geolocation_googlemaps_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $settings = $display['settings'];
   $element = array();
+  $lat_key = 'lat';
+  // To make this widget compatible with geofiled we need to rename the keys for
+  // longitude. Geofield uses "lon" while Geolocation Field uses "lng".
+  $lng_key = ($field['type'] == 'geofield') ? 'lon' : 'lng';
 
   switch ($display['type']) {
 
@@ -184,7 +188,7 @@ function geolocation_googlemaps_field_formatter_view($entity_type, $entity, $fie
           'size' => $settings['map_dimensions'],
           'format' => $settings['map_imageformat'],
           'maptype' => $settings['map_maptype'],
-          'markers' => 'size:mid|color:red|' . $item['lat'] . ',' . $item['lng'],
+          'markers' => 'size:mid|color:red|' . $item[$lat_key] . ',' . $item[$lng_key],
         );
         if ($settings['marker_icon']) {
           $path = file_create_url($settings['marker_icon']);
@@ -244,8 +248,8 @@ function geolocation_googlemaps_field_formatter_view($entity_type, $entity, $fie
               "settings" => $settings,
               "deltas" => array(
                 'd_' . $delta => array(
-                  'lat' => $item['lat'],
-                  'lng' => $item['lng'],
+                  'lat' => $item[$lat_key],
+                  'lng' => $item[$lng_key],
                 ),
               ),
             ),
