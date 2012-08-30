@@ -272,7 +272,7 @@ function geolocation_googlemaps_field_widget_info() {
   return array(
     'geolocation_googlemap' => array(
       'label' => t('Google Map'),
-      'field types' => array('geolocation_latlng'),
+      'field types' => array('geolocation_latlng', 'geofield'),
     ),
   );
 }
@@ -308,7 +308,13 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
   $id = $instance['id'] . '-' . $delta;
 
   $lat_value = isset($items[$delta]['lat']) ? $items[$delta]['lat'] : NULL;
-  $lng_value = isset($items[$delta]['lng']) ? $items[$delta]['lng'] : NULL;
+  // To make this widget compatible with geofiled we need to rename the keys for
+  // longitude. Geofield uses "lon" while Geolocation Field uses "lng".
+  if ($field['type'] == 'geofield') {
+    $lng_value = isset($items[$delta]['lon']) ? $items[$delta]['lon'] : NULL;
+  } else {
+    $lng_value = isset($items[$delta]['lng']) ? $items[$delta]['lng'] : NULL;
+  }
   $element += array(
     '#delta' => $delta,
   );
@@ -412,7 +418,9 @@ function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, 
         'type' => 'setting',
       );
 
+      $element['field_type'] = array('#type' => 'value', '#value' => $field['type']);
       $element['#element_validate'] = array('geolocation_googlemaps_field_widget_validate');
+      $element['#element_validate'][] = 'geolocation_googlemaps_field_widget_set_value';
 
       break;
   }
@@ -438,6 +446,17 @@ function geolocation_googlemaps_field_widget_validate($element, &$form_state, $f
         form_error($element, t('!name field is incomplete, longitude value is missing.', array('!name' => $element['#title'])));
         break;
     }
+  }
+}
+
+function geolocation_googlemaps_field_widget_set_value($element, &$form_state, $form) {
+  $values = &drupal_array_get_nested_value($form_state['values'], $element['#parents']);
+  if ($values['field_type'] == 'geofield') {
+    // Geofield needs the values in their own format which is exactly what
+    // geofield_compute_values does, but we have to change first the longitude
+    // key because geofield uses a different one.
+    $values['lon'] = $values['lng'];
+    $values = geofield_compute_values($values);
   }
 }
 
