@@ -191,7 +191,7 @@ function geolocation_googlemaps_field_formatter_view($entity_type, $entity, $fie
           $query['markers'] = 'icon:' . $path . '|' . $query['markers'];
         }
         $variables = array(
-          'path' => url('//maps.google.com/maps/api/staticmap', array('query' => $query)),
+          'path' => url('//maps.google.com/maps/api/staticmap', array('query' => $query, 'external' => TRUE)),
           'alt' => 'Geolocation',
           'attributes' => array('class' => 'geolocation-googlemaps-static'),
         );
