@@ -305,7 +305,14 @@ function geolocation_googlemaps_field_widget_settings_form($field, $instance) {
  */
 function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
 
-  $id = $instance['id'] . '-' . $delta;
+  if ($instance['entity_type'] == 'field_collection_item') {
+    $depth = count($element['#field_parents']) - 1;
+    $parent_delta = $element['#field_parents'][$depth];
+    $id = $instance['id'] . '-' . $parent_delta . '-' . $delta;
+  }
+  else {
+    $id = $instance['id'] . '-' . $delta;
+  }
 
   $lat_value = isset($items[$delta]['lat']) ? $items[$delta]['lat'] : NULL;
   $lng_value = isset($items[$delta]['lng']) ? $items[$delta]['lng'] : NULL;
