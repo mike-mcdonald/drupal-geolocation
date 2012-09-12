@@ -305,12 +305,9 @@ function geolocation_googlemaps_field_widget_settings_form($field, $instance) {
  */
 function geolocation_googlemaps_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
 
-<<<<<<< HEAD
   // In order to make Geolocation field work with the popular Field collection module
   // we check if our map widget is part of a Field collection and add the 
   // #field_parents delta.
-=======
->>>>>>> 4f0d5652d7867bc740c15cd728e26af6611db29b
   if ($instance['entity_type'] == 'field_collection_item') {
     $depth = count($element['#field_parents']) - 1;
     $parent_delta = $element['#field_parents'][$depth];
