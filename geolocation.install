@@ -116,3 +116,39 @@ function geolocation_get_geolocation_fields() {
   }
   return $fields;
 }
+
+/**
+ * Update map dimensions to allow responsive settings.
+ */
+function geolocation_update_7102() {
+  $result = db_query("SELECT id, field_name, data FROM {field_config} WHERE module = 'geolocation' AND type = 'geolocation_latlng'");
+  foreach ($result as $field) {
+
+    $field_id = $field->id;
+    $name = $field->field_name;
+    $field_data = unserialize($field->data);
+
+    $instances = db_query("SELECT id, data FROM {field_config_instance} WHERE field_id = :field_id", array(':field_id' => $field_id));
+    foreach ($instances as $instance) {
+
+      // If this field has been updated already, we want to skip it.
+      $instance_data = unserialize($instance->data);
+      foreach ($instance_data['display'] as $key => $display) {
+
+        if (isset($display['settings']['map_dimensions'])) {
+          $map_diemensions = explode('x', $display['settings']['map_dimensions']);
+          unset($instance_data['display'][$key]['settings']['map_dimensions']);
+          $instance_data['display'][$key]['settings']['map_width'] = $map_diemensions['0'] . 'px';
+          $instance_data['display'][$key]['settings']['map_height'] = $map_diemensions['1'] . 'px';
+
+          // update the database.
+          $num_updated = db_update('field_config_instance')
+            ->fields(array('data' => serialize($instance_data)))
+            ->condition('id', $instance->id)
+            ->execute();
+        }
+      }
+    }
+  }
+  return t('Updated Geolocation Field map dimensions to allow responsive settings.');
+}
