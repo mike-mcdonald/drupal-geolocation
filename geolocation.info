@@ -2,4 +2,4 @@
 name = Geolocation
 description = Provides a geolocation field.
 package = Geolocation
-core = 7.x
+core = 8.x

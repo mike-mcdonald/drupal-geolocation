@@ -1,5 +1,5 @@
 name = Geolocation Google Maps
 description = Provides Google Maps widgets and formaters for geolocation field.
 package = Geolocation
-core = 7.x
+core = 8.x
 dependencies[] = geolocation
