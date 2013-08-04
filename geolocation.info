@@ -1,5 +1,0 @@
-
-name = Geolocation
-description = Provides a geolocation field.
-package = Geolocation
-core = 8.x
