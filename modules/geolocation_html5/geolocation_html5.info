@@ -1,5 +1,0 @@
-name = Geolocation HTML5
-description = Provides a widget and formater for geolocation field based on <a href="http://www.w3.org/TR/geolocation-API/">HTML5’s geolocation API</a>.
-package = Geolocation
-core = 8.x
-dependencies[] = geolocation
