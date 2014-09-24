@@ -1,7 +1,0 @@
-core: 8.x
-type: module
-name: Geolocation Google Maps
-description: Provides Google Maps widgets and formaters for geolocation field.
-package: Geolocation
-dependencies: 
- - geolocation
