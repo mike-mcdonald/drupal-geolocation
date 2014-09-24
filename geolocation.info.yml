@@ -1,0 +1,8 @@
+name: Geolocation
+type: module
+description: 'Provides a simple geolocation field type to store and display location data (lat, lng).'
+package: Geolocation
+core: 8.x
+version: VERSION
+dependencies:
+  - field
