@@ -30,7 +30,7 @@ class GeolocationItem extends FieldItemBase {
    */
   public static function schema(FieldStorageDefinitionInterface $field_definition) {
     return array(
-      'columns' = array(
+      'columns' => array(
         'lat' => array(
           'description' => 'Stores the latitude value',
           'type' => 'float',
@@ -62,7 +62,7 @@ class GeolocationItem extends FieldItemBase {
           'not null' => TRUE,
         ),
       ),
-      'indexes' = array(
+      'indexes' => array(
         'lat' => array('lat'),
         'lng' => array('lng'),
       ),
