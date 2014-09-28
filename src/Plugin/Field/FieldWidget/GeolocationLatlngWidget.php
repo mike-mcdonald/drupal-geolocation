@@ -24,16 +24,7 @@ use Drupal\Core\Form\FormStateInterface;
  * )
  */
 class GeolocationLatlngWidget extends WidgetBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function defaultSettings() {
-    return array(
-      'placeholder' => '',
-    ) + parent::defaultSettings();
-  }
-
+  
   /**
    * {@inheritdoc}
    */
@@ -41,15 +32,19 @@ class GeolocationLatlngWidget extends WidgetBase {
 
     $element['lat'] = array(
       '#type' => 'textfield',
+      '#title' => $this->t('Latitude'),
       '#empty_value' => '',
-      '#default_value' => (isset($items[$delta]->value)) ? $items[$delta]->value : NULL,
+      '#default_value' => (isset($items[$delta]->lat)) ? $items[$delta]->lat : NULL,
+      '#maxlength' => 255,
       '#description' => t('Latitude'),
     );
 
     $element['lng'] = array(
       '#type' => 'textfield',
+      '#title' => $this->t('Longitude'),
       '#empty_value' => '',
-      '#default_value' => (isset($items[$delta]->value)) ? $items[$delta]->value : NULL,
+      '#default_value' => (isset($items[$delta]->lng)) ? $items[$delta]->lng : NULL,
+      '#maxlength' => 255,
       '#description' => t('Longitude'),
     );
 
