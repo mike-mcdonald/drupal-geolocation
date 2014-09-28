@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains Drupal\geoloaction\Plugin\Field\FieldType\GeolocationItem.
+ * Contains Drupal\geolocation\Plugin\Field\FieldType\GeolocationItem.
  */
 
-namespace Drupal\geoloaction\Plugin\Field\FieldType;
+namespace Drupal\geolocation\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -13,14 +13,14 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinition;
 
 /**
- * Plugin implementation of the 'geoloaction' field type.
+ * Plugin implementation of the 'geolocation' field type.
  *
  * @FieldType(
- *   id = "geoloaction",
+ *   id = "geolocation",
  *   label = @Translation("Geolocation"),
  *   description = @Translation("This field stores location data (lat, lng)."),
- *   default_widget = "geoloaction_latlng",
- *   default_formatter = "geoloaction_latlng"
+ *   default_widget = "geolocation_latlng",
+ *   default_formatter = "geolocation_latlng"
  * )
  */
 class GeolocationItem extends FieldItemBase {
@@ -74,10 +74,21 @@ class GeolocationItem extends FieldItemBase {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['lat'] = DataDefinition::create('float')
-      ->setLabel(t('URL'));
+      ->setLabel(t('Latitude'));
 
     $properties['lng'] = DataDefinition::create('float')
-      ->setLabel(t('Link text'));
+      ->setLabel(t('Longitude'));
+
+    /*
+    $properties['lat_sin'] = DataDefinition::create('float')
+      ->setLabel(t('Calculated lat_sin'));
+
+    $properties['lat_cos'] = DataDefinition::create('float')
+      ->setLabel(t('Calculated lat_cos'));
+
+    $properties['lng_rad'] = DataDefinition::create('float')
+      ->setLabel(t('Calculated lng_rad'));
+    */
 
     return $properties;
   }
@@ -91,5 +102,15 @@ class GeolocationItem extends FieldItemBase {
     return $lat === NULL || $lat === '' || $lng === '' || $lng === '';
   }
 
-}
+  /**
+   * {@inheritdoc}
+   */
+  public function preSave() {
+    $this->lat = trim($this->lat);
+    $this->lng = trim($this->lng);
+    $this->lat_sin = sin(deg2rad($this->lat));
+    $this->lat_cos = cos(deg2rad($this->lat));
+    $this->lng_rad = deg2rad($this->lng);
+  }
 
+}
