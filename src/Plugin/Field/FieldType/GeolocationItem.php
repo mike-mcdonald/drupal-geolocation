@@ -72,6 +72,19 @@ class GeolocationItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
+  public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
+    $properties['lat'] = DataDefinition::create('float')
+      ->setLabel(t('URL'));
+
+    $properties['lng'] = DataDefinition::create('float')
+      ->setLabel(t('Link text'));
+
+    return $properties;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isEmpty() {
     $lat = $this->get('lat')->getValue();
     $lng = $this->get('lng')->getValue();
