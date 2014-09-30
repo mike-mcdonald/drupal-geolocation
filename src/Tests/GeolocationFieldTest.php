@@ -73,8 +73,8 @@ class GeolocationFieldTest extends WebTestBase {
 
     // Display creation form.
     $this->drupalGet('node/add/article');
-    $this->assertFieldByName("field_geolocation[0][lat]", '', 'Geolocation lat widget found.');
-    $this->assertFieldByName("field_geolocation[0][lng]", '', 'Geolocation lng widget found.');
+    $this->assertFieldByName("field_geolocation[0][lat]", '', 'Geolocation lat input field found.');
+    $this->assertFieldByName("field_geolocation[0][lng]", '', 'Geolocation lng input field found.');
 
     // Test basic entery of geolocation field.
     $lat = '49.880657';
@@ -86,6 +86,6 @@ class GeolocationFieldTest extends WebTestBase {
     );
 
     $this->drupalPostForm(NULL, $edit, t('Save'));
-    $this->assertRaw("$lat,$lng", 'A geolocation is provided on the article node page.');
+    $this->assertRaw('<span class="geolocation-lat">' . $lat . '</span>,<span class="geolocation-lng">' . $lng . '</span>$lat,$lng', 'The geolocation lat,lng pair was found on the article node page.');
   }
 }
