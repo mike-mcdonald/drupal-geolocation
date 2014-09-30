@@ -29,15 +29,17 @@ class GeolocationLatlngFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items) {
-    $elements = array();
+    $element = array();
 
     foreach ($items as $delta => $item) {
-      $elements[$delta] = array(
-        '#markup' => $item->lat . ',' . $item->lng,
+      $element[$delta] = array(
+        '#theme' => 'geolocation_formatter_geolocation_latlng',
+        '#lat' => $item->lat,
+        '#lng' => $item->lng,
       );
     }
 
-    return $elements;
+    return $element;
   }
 
 }

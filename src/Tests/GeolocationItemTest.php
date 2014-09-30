@@ -47,11 +47,11 @@ class GeolocationItemTest extends FieldUnitTestBase {
   public function testTestItem() {
     // Verify entity creation.
     $entity = entity_create('entity_test');
+    $entity->name->value = $this->randomMachineName();
     $lat = '49.880657';
     $lng = '10.869212';
     $entity->field_test->lat = $lat;
     $entity->field_test->lng = $lng;
-    $entity->name->value = $this->randomMachineName();
     $entity->save();
 
     // Verify entity has been created properly.

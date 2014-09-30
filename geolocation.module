@@ -19,3 +19,15 @@ function geolocation_help($route_name, RouteMatchInterface $route_match) {
       return $output;
   }
 }
+
+/**
+ * Implements hook_theme().
+ */
+function geolocation_theme() {
+  return array(
+    'geolocation_formatter_geolocation_latlng' => array(
+      'variables' => array('lat' => NULL, 'lng' => NULL),
+      'template' => 'geolocation-formatter-geolocation-latlng',
+    ),
+  );
+}
