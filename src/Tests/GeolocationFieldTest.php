@@ -47,7 +47,7 @@ class GeolocationFieldTest extends WebTestBase {
 
     // Add the geolocation field to the article content type.
     entity_create('field_storage_config', array(
-      'name' => 'field_geolocation',
+      'field_name' => 'field_geolocation',
       'entity_type' => 'node',
       'type' => 'geolocation',
     ))->save();
@@ -86,6 +86,6 @@ class GeolocationFieldTest extends WebTestBase {
     );
 
     $this->drupalPostForm(NULL, $edit, t('Save'));
-    $this->assertRaw('<span class="geolocation-lat">' . $lat . '</span>,<span class="geolocation-lng">' . $lng . '</span>$lat,$lng', 'The geolocation lat,lng pair was found on the article node page.');
+    $this->assertRaw('<span class="geolocation-lat">' . $lat . '</span>,<span class="geolocation-lng">' . $lng . '</span>', 'The geolocation lat,lng pair was found on the article node page.');
   }
 }
