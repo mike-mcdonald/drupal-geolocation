@@ -1,7 +1,7 @@
 {#
 /**
  * @file
- * Default theme implementation of a geolocation for latitude, longitude.
+ * Default microdata theme implementation for a geolocation with latitude, longitude.
  *
  * Available variables:
  * - lat: The latitude value.
@@ -13,7 +13,13 @@
  */
 #}
 {% spaceless %}
-    <div class="geolocation-item">
-        <span class="geolocation-lat">{{ lat }}</span>,<span class="geolocation-lng">{{ lng }}</span>
+    <div itemprop="location">
+      <span itemscope itemtype="http://schema.org/Place">
+        <div itemprop="geo">
+          <span itemscope itemtype="http://schema.org/GeoCoordinates">
+            <span property="latitude" content="{{ lat }}">{{ lat }}</span>,<span property="longitude" content="{{ lng }}">{{ lng }}</span>
+          </span>
+        </div>
+      </span>
     </div>
 {% endspaceless %}
