@@ -61,6 +61,13 @@ class GeolocationItem extends FieldItemBase {
           'size' => 'big',
           'not null' => TRUE,
         ),
+        'data' => array(
+          'description' => 'Serialized array of geolocation meta information.',
+          'type' => 'blob',
+          'size' => 'big',
+          'not null' => FALSE,
+          'serialize' => TRUE,
+        ),
       ),
       'indexes' => array(
         'lat' => array('lat'),
@@ -78,17 +85,6 @@ class GeolocationItem extends FieldItemBase {
 
     $properties['lng'] = DataDefinition::create('float')
       ->setLabel(t('Longitude'));
-
-    /*
-    $properties['lat_sin'] = DataDefinition::create('float')
-      ->setLabel(t('Calculated lat_sin'));
-
-    $properties['lat_cos'] = DataDefinition::create('float')
-      ->setLabel(t('Calculated lat_cos'));
-
-    $properties['lng_rad'] = DataDefinition::create('float')
-      ->setLabel(t('Calculated lng_rad'));
-    */
 
     return $properties;
   }

@@ -25,9 +25,9 @@ function geolocation_help($route_name, RouteMatchInterface $route_match) {
  */
 function geolocation_theme() {
   return array(
-    'geolocation_formatter_geolocation_latlng' => array(
+    'geolocation_latlng_formatter' => array(
       'variables' => array('lat' => NULL, 'lng' => NULL),
-      'template' => 'geolocation-formatter-geolocation-latlng',
+      'template' => 'geolocation-latlng-formatter',
     ),
   );
 }

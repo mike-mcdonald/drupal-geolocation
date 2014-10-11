@@ -24,7 +24,7 @@ use Drupal\Core\Form\FormStateInterface;
  * )
  */
 class GeolocationLatlngWidget extends WidgetBase {
-  
+
   /**
    * {@inheritdoc}
    */

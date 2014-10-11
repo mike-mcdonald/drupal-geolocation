@@ -33,7 +33,7 @@ class GeolocationLatlngFormatter extends FormatterBase {
 
     foreach ($items as $delta => $item) {
       $element[$delta] = array(
-        '#theme' => 'geolocation_formatter_geolocation_latlng',
+        '#theme' => 'geolocation_latlng_formatter',
         '#lat' => $item->lat,
         '#lng' => $item->lng,
       );
