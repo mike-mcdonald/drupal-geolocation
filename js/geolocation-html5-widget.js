@@ -10,7 +10,7 @@
   Drupal.behaviors.geolocationHTML5 = {
     attach: function(context, settings) {
 
-      $('.geolocation-html5-activate:not(.disabled)').each( function(index) {
+      $('.geolocation-html5-button:not(.disabled)').each( function(index) {
         // The parent element.
         var $thisButton = $(this);
 
@@ -38,7 +38,7 @@
     }
   };
 
-  $('.geolocation-html5-activate .clear').on('click', function(event) {
+  $('.geolocation-html5-button .clear').on('click', function(event) {
     // The parent element.
     var $thisButton = $(this).parent();
 
@@ -63,7 +63,7 @@
 
   });
 
-  $('.geolocation-html5-activate').on('click', function(event) {
+  $('.geolocation-html5-button').on('click', function(event) {
     // The parent element.
     var $thisButton = $(this);
 
