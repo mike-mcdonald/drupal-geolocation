@@ -21,7 +21,9 @@
       var mapOptions;
       var singleClick;
 
-      // Process drupalSettings for every Google map present on the current page.
+      /**
+       * Process drupalSettings for every Google map present on the current page.
+       */
       $.each(drupalSettings.geolocation.defaults, function(canvasId, mapDefaults) {
 
         // Process every map canvas once. This will also add 'map-canvas-processed' class.
@@ -66,8 +68,8 @@
           Drupal.geolocation.geocodeControls[canvasId].index = 1;
           Drupal.geolocation.maps[canvasId].controls[google.maps.ControlPosition.LEFT_TOP].push(Drupal.geolocation.geocodeControls[canvasId]);
 
+          // Set initial marker
           if (lat && lng) {
-            // Set initial marker
             Drupal.geolocation.codeLatLng(latLng, $mapCanvas, 'initialize');
           }
 
@@ -89,14 +91,18 @@
 
       });
 
-      // Click event handler to the 'Get location' button.
+      /**
+       * Click event handler to the 'Get location' button.
+       */
       $('.geolocation-map-canvas').on('click', '.geocode-controlls-wrapper .submit', function(event) {
         var $mapCanvas = $(this).closest('.geolocation-map-canvas');
         event.preventDefault();
         Drupal.geolocation.codeAddress($mapCanvas);
       });
 
-      // Keypress event handler for the ENTER key to the geocoder input field.
+      /**
+       * Keypress event handler for the ENTER key to the geocoder input field.
+       */
       $('.geolocation-map-canvas').on('keypress', '.geocode-controlls-wrapper .input', function(event){
         if (event.which == 13) {
           var $mapCanvas = $(this).closest('.geolocation-map-canvas');
@@ -105,7 +111,9 @@
         }
       });
 
-      // Click event handler to the 'Get location' button.
+      /**
+       * Click event handler to the 'Get location' button.
+       */
       $('.geolocation-map-canvas').on('click', '.geocode-controlls-wrapper .clear', function(event) {
         var $mapCanvas = $(this).closest('.geolocation-map-canvas');
         event.preventDefault();
@@ -126,6 +134,11 @@
     var $addressInput = $('.geocode-controlls-wrapper .input', $mapCanvas);
     var address = $addressInput.val();
 
+    // Return if the input field is empty.
+    if (address.length < 1) {
+      return;
+    }
+
     Drupal.geolocation.geocoders[canvasId].geocode( { 'address': address }, function(results, status) {
       if (status == google.maps.GeocoderStatus.OK) {
         Drupal.geolocation.maps[canvasId].fitBounds(results[0].geometry.viewport);
@@ -139,7 +152,7 @@
 
   /**
    * Set the latitude and longitude values to the input fields
-   * And optionaly update the address field
+   * And optionally update the address field
    *
    * @param latLng
    *   a location (latLng) object from google maps api
