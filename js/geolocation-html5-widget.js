@@ -43,7 +43,6 @@
     var $thisButton = $(this).parent();
 
     // Prevent form submission.
-    event.preventDefault();
     event.stopPropagation()
 
     // Clear the values of hidden form inputs.
@@ -65,9 +64,6 @@
   });
 
   $('.geolocation-html5-activate').on('click', function(event) {
-    // Prevent form submission.
-    event.preventDefault();
-
     // The parent element.
     var $thisButton = $(this);
 
@@ -103,6 +99,9 @@
 
           // Hide the loading animation.
           $('.spinner', $thisButton).hide();
+
+          // Disable the button.
+          $thisButton.addClass('disabled');
 
           // Show the clear icon.
           $('.clear', $thisButton).show();
