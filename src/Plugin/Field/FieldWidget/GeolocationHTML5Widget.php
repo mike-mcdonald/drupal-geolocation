@@ -38,7 +38,6 @@ class GeolocationHTML5Widget extends WidgetBase {
 
     // The 'Get my location' button.
     $button_html = '<div class="geolocation-html5-activate">';
-    $button_html .= '<div class="spinner"></div>';
     $button_html .= '<span class="default">' . $this->t('Get browser location') . '</span>';
     $button_html .= '<span class="location"></span>';
     $button_html .= '<div class="clear"></div>';

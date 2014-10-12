@@ -71,9 +71,6 @@
       return;
     }
 
-    // Display the loading animation.
-    $('.spinner', $thisButton).show();
-
     // If the browser supports W3C Geolocation API.
     if (navigator.geolocation) {
 
@@ -97,9 +94,6 @@
           var locationString = Drupal.t('Browser location: @lat,@lng Accuracy: @accuracy m', {'@lat': lat, '@lng': lng, '@accuracy': accuracy});
           $('.location', $thisButton).html(locationString);
 
-          // Hide the loading animation.
-          $('.spinner', $thisButton).hide();
-
           // Disable the button.
           $thisButton.addClass('disabled');
 
@@ -109,9 +103,6 @@
 
         // Error handler for getCurrentPosition()
         function(error) {
-
-          // Hide the loading animation.
-          $('.spinner', $thisButton).hide();
 
           // Alert with error message.
           switch(error.code) {
