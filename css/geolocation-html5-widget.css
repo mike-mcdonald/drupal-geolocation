@@ -18,6 +18,10 @@
   box-sizing: border-box;
 }
 
+.geolocation-html5-button.disabled {
+  cursor: default;
+}
+
 /**
  * Location icon by: http://jxnblk.github.io/
  */
@@ -42,6 +46,7 @@
   position: absolute;
   top: 0;
   right: 0;
+  cursor: pointer;
 }
 
 .geolocation-html5-button .clear {
