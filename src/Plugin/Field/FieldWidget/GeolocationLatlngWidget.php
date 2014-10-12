@@ -9,7 +9,6 @@ namespace Drupal\geolocation\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
-use Drupal;
 use Drupal\Core\Form\FormStateInterface;
 
 /**

@@ -9,7 +9,6 @@ namespace Drupal\geolocation\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
-use Drupal;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -56,12 +55,6 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
       '#type' => 'hidden',
       '#default_value' => $lng_default_value,
       '#attributes' => array('class' => array('geolocation-hidden-lng')),
-    );
-
-    $element['data'] = array(
-      '#type' => 'hidden',
-      '#default_value' => $items[$delta]->data,
-      '#attributes' => array('class' => array('geolocation-hidden-data')),
     );
 
     // Attach css

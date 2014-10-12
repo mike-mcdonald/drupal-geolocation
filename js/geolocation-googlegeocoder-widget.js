@@ -132,9 +132,6 @@
         Drupal.geolocation.codeLatLng(results[0].geometry.location, $mapCanvas, 'textinput');
       }
       else {
-        console.log(canvasId);
-        console.log(address);
-        console.log(status);
         alert(Drupal.t('Geocode was not successful for the following reason: ') + status);
       }
     });
