@@ -10,6 +10,7 @@ namespace Drupal\geolocation\Plugin\Field\FieldType;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\Core\TypedData\MapDataDefinition;
 
 /**
  * Plugin implementation of the 'geolocation' field type.
@@ -84,6 +85,18 @@ class GeolocationItem extends FieldItemBase {
 
     $properties['lng'] = DataDefinition::create('float')
       ->setLabel(t('Longitude'));
+
+    $properties['lat_sin'] = DataDefinition::create('float')
+      ->setLabel(t('Latitude sine'));
+
+    $properties['lat_cos'] = DataDefinition::create('float')
+      ->setLabel(t('Latitude cosine'));
+
+    $properties['lng_rad'] = DataDefinition::create('float')
+      ->setLabel(t('Longitude radian'));
+
+    $properties['data'] = MapDataDefinition::create()
+      ->setLabel(t('Meta data'));
 
     return $properties;
   }
