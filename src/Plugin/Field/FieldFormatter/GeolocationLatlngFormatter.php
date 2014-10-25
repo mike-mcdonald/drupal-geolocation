@@ -9,7 +9,6 @@ namespace Drupal\geolocation\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
-use Drupal;
 
 /**
  * Plugin implementation of the 'geolocation_latlng' formatter.
