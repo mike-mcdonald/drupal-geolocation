@@ -8,6 +8,7 @@
 namespace Drupal\geolocation\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\FieldItemBase;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\MapDataDefinition;
@@ -99,6 +100,15 @@ class GeolocationItem extends FieldItemBase {
       ->setLabel(t('Meta data'));
 
     return $properties;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
+    $values['lat'] = rand(-90, 90) - rand(0, 999999)/1000000;
+    $values['lng'] = rand(-180, 180) - rand(0, 999999)/1000000;
+    return $values;
   }
 
   /**
