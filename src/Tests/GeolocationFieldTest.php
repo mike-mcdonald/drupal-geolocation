@@ -85,12 +85,11 @@ class GeolocationFieldTest extends WebTestBase {
       'field_geolocation[0][lng]' => $lng,
     );
 
+    // Test if the raw lat, lng values are found on the page.
     $this->drupalPostForm(NULL, $edit, t('Save'));
-    $expected = '<div itemscope itemtype="http://schema.org/GeoCoordinates">';
-    $expected .= '<meta itemprop="latitude" content="' . $lat . '">' . $lat;
-    $expected .= ',&nbsp;';
-    $expected .= '<meta itemprop="longitude" content="' . $lng . '">' . $lng;
-    $expected .= '</div>';
-    $this->assertRaw($expected, 'Default microdata theme implementation for a geolocation with latitude, longitude was found on the article node page.');
+    $expected_lat = $lat;
+    $this->assertRaw($expected_lat, 'Latitude value found on the article node page.');
+    $expected_lng = $lng;
+    $this->assertRaw($expected_lng, 'Longitude value found on the article node page.');
   }
 }

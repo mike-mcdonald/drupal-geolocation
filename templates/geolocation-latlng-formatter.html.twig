@@ -13,9 +13,9 @@
  */
 #}
 {% spaceless %}
-  <div itemscope itemtype="http://schema.org/GeoCoordinates">
-    <meta itemprop="latitude" content="{{ lat }}">{{ lat }}
-    ,&nbsp;
-    <meta itemprop="longitude" content="{{ lng }}">{{ lng }}
-  </div>
+  <span itemscope itemtype="http://schema.org/GeoCoordinates">
+    <meta itemprop="latitude" content="{{ lat }}">
+    <meta itemprop="longitude" content="{{ lng }}">
+    <span class="geolocation-latlng">{{ lat }}, {{ lng }}</span>
+  </span>
 {% endspaceless %}
