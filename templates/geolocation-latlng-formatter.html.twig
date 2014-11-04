@@ -14,7 +14,8 @@
 #}
 {% spaceless %}
   <div itemscope itemtype="http://schema.org/GeoCoordinates">
-    <span class="gelocation-lat"><meta itemprop="latitude" content="{{ lat }}">{{ lat }}</span>
-    <span class="gelocation-lng"><meta itemprop="longitude" content="{{ lng }}">{{ lng }}</span>
+    <meta itemprop="latitude" content="{{ lat }}">{{ lat }}
+    ,&nbsp;
+    <meta itemprop="longitude" content="{{ lng }}">{{ lng }}
   </div>
 {% endspaceless %}

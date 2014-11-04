@@ -87,8 +87,9 @@ class GeolocationFieldTest extends WebTestBase {
 
     $this->drupalPostForm(NULL, $edit, t('Save'));
     $expected = '<div itemscope itemtype="http://schema.org/GeoCoordinates">';
-    $expected .= '<span class="gelocation-lat"><meta itemprop="latitude" content="' . $lat . '">' . $lat . '</span>';
-    $expected .= '<span class="gelocation-lng"><meta itemprop="longitude" content="' . $lng . '">' . $lng . '</span>';
+    $expected .= '<meta itemprop="latitude" content="' . $lat . '">' . $lat;
+    $expected .= ',&nbsp;';
+    $expected .= '<meta itemprop="longitude" content="' . $lng . '">' . $lng;
     $expected .= '</div>';
     $this->assertRaw($expected, 'Default microdata theme implementation for a geolocation with latitude, longitude was found on the article node page.');
   }
