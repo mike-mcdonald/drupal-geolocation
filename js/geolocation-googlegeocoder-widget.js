@@ -27,7 +27,7 @@
       $.each(drupalSettings.geolocation.defaults, function(canvasId, mapDefaults) {
 
         // Process every map canvas once. This will also add 'map-canvas-processed' class.
-        $("#" + canvasId).once('map-canvas', function() {
+        $("#" + canvasId).once().each(function() {
 
           var $mapCanvas = $(this);
           var $hiddenLat = $mapCanvas.siblings(".geolocation-hidden-lat");

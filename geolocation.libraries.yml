@@ -1,0 +1,24 @@
+geolocation.widgets.googlegeocoder:
+  version: 1.x
+  css:
+    theme:
+      css/geolocation-googlegeocoder-widget.css: {}
+  js:
+    //maps.googleapis.com/maps/api/js?libraries=places: { type: external }
+    js/geolocation-googlegeocoder-widget.js: { scope: footer }
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings
+    - core/jquery.once
+geolocation.widgets.html5:
+  version: 1.x
+  css:
+    theme:
+      css/geolocation-html5-widget.css: {}
+  js:
+    js/geolocation-html5-widget.js: { scope: footer }
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings
