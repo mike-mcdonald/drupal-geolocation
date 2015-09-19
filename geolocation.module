@@ -12,11 +12,20 @@ use Drupal\Core\Routing\RouteMatchInterface;
  */
 function geolocation_help($route_name, RouteMatchInterface $route_match) {
   switch ($route_name) {
-    case 'help.page.geolocation':
-      $output = '';
-      $output .= '<h3>' . t('About') . '</h3>';
-      $output .= '<p>' . t('The Geolocation module allows you to create fields that contain geographical locations. See the <a href="!field">Field module help</a> and the <a href="!field_ui">Field UI help</a> pages for general information on fields and how to create and manage them.', array('!field' => \Drupal::url('help.page', array('name' => 'field')), '!field_ui' => \Drupal::url('help.page', array('name' => 'field_ui')))) . '</p>';
+    case 'help.page.geolocation' :
+      $output = '<h3>' . t('About') . '</h3>';
+      $output .= '<p>'
+        . t('The Geolocation module allows you to create fields that contain geographical locations.
+          See the <a href="!field">Field module help</a> and the <a href="!field_ui">Field UI help</a>
+          pages for general information on fields and how to create and manage them.',
+          [
+            '!field' => \Drupal::url('help.page', ['name' => 'field']),
+            '!field_ui' => \Drupal::url('help.page', ['name' => 'field_ui'])
+          ]
+        )
+        . '</p>';
       return $output;
+      break;
   }
 }
 
@@ -24,10 +33,13 @@ function geolocation_help($route_name, RouteMatchInterface $route_match) {
  * Implements hook_theme().
  */
 function geolocation_theme() {
-  return array(
-    'geolocation_latlng_formatter' => array(
-      'variables' => array('lat' => NULL, 'lng' => NULL),
+  return [
+    'geolocation_latlng_formatter' => [
+      'variables' => [
+        'lat' => NULL,
+        'lng' => NULL
+      ],
       'template' => 'geolocation-latlng-formatter',
-    ),
-  );
+    ]
+  ];
 }

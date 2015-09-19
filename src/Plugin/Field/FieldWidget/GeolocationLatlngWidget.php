@@ -35,7 +35,7 @@ class GeolocationLatlngWidget extends WidgetBase {
       '#empty_value' => '',
       '#default_value' => (isset($items[$delta]->lat)) ? $items[$delta]->lat : NULL,
       '#maxlength' => 255,
-      '#description' => t('Latitude'),
+      '#description' => $this->t('Latitude'),
     );
 
     $element['lng'] = array(
@@ -44,7 +44,7 @@ class GeolocationLatlngWidget extends WidgetBase {
       '#empty_value' => '',
       '#default_value' => (isset($items[$delta]->lng)) ? $items[$delta]->lng : NULL,
       '#maxlength' => 255,
-      '#description' => t('Longitude'),
+      '#description' => $this->t('Longitude'),
     );
 
     return $element;

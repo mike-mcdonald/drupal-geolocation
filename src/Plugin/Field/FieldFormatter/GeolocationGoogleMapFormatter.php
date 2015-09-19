@@ -42,28 +42,28 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
     $settings = $this->getSettings();
     $elements['type'] = array(
       '#type' => 'select',
-      '#title' => t('Default map type'),
+      '#title' => $this->t('Default map type'),
       '#options' => $this->getMapTypes(),
       '#default_value' =>  $settings['type'],
     );
     $elements['zoom'] = array(
       '#type' => 'select',
-      '#title' => t('Zoom level'),
+      '#title' => $this->t('Zoom level'),
       '#options' => range(0, 18),
-      '#description' => t('The initial resolution at which to display the map, where zoom 0 corresponds to a map of the Earth fully zoomed out, and higher zoom levels zoom in at a higher resolution.'),
+      '#description' => $this->t('The initial resolution at which to display the map, where zoom 0 corresponds to a map of the Earth fully zoomed out, and higher zoom levels zoom in at a higher resolution.'),
       '#default_value' => $settings['zoom'],
     );
     $elements['height'] = array(
       '#type' => 'textfield',
-      '#title' => t('Height'),
-      '#description' => t('Enter the dimensions and the measurement units. E.g. 200px or 100%.'),
+      '#title' => $this->t('Height'),
+      '#description' => $this->t('Enter the dimensions and the measurement units. E.g. 200px or 100%.'),
       '#size' => 4,
       '#default_value' => $settings['height'],
     );
     $elements['width'] = array(
       '#type' => 'textfield',
-      '#title' => t('Width'),
-      '#description' => t('Enter the dimensions and the measurement units. E.g. 200px or 100%.'),
+      '#title' => $this->t('Width'),
+      '#description' => $this->t('Enter the dimensions and the measurement units. E.g. 200px or 100%.'),
       '#size' => 4,
       '#default_value' => $settings['width'],
     );
@@ -77,10 +77,10 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
     $settings = $this->getSettings();
     $types = $this->getMapTypes();
     $summary = array();
-    $summary[] = t('Type: @type', array('@type' => $types[$settings['type']]));
-    $summary[] = t('Zoom level: @zoom', array('@zoom' => $settings['zoom']));
-    $summary[] = t('Height: @height', array('@height' => $settings['height']));
-    $summary[] = t('Width: @width', array('@width' => $settings['width']));
+    $summary[] = $this->t('Type: @type', array('@type' => $types[$settings['type']]));
+    $summary[] = $this->t('Zoom level: @zoom', array('@zoom' => $settings['zoom']));
+    $summary[] = $this->t('Height: @height', array('@height' => $settings['height']));
+    $summary[] = $this->t('Width: @width', array('@width' => $settings['width']));
     return $summary;
   }
 
@@ -91,10 +91,10 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
     // Add formatter settings to the drupalSettings array.
     $field_settings = $this->getSettings();
     $elements =  [];
-    foreach ($items as $item) {
+    foreach ($items as $delta => $item) {
       $uniqueue_id = uniqid("map-canvas-");
 
-      $elements[] = [
+      $elements[$delta] = [
         '#type' => 'markup',
         '#markup' => '<div id="' . $uniqueue_id . '" class="geolocation-google-map"></div>',
         '#attached' => [
@@ -124,10 +124,10 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
    */
   private function getMapTypes() {
     return array(
-      'ROADMAP' => t('Road map view'),
-      'SATELLITE' => t('Google Earth satellite images'),
-      'HYBRID' => t('A mixture of normal and satellite views'),
-      'TERRAIN' => t('A physical map based on terrain information'),
+      'ROADMAP' => $this->t('Road map view'),
+      'SATELLITE' => $this->t('Google Earth satellite images'),
+      'HYBRID' => $this->t('A mixture of normal and satellite views'),
+      'TERRAIN' => $this->t('A physical map based on terrain information'),
     );
   }
 }
