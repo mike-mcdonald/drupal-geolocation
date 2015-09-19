@@ -112,7 +112,7 @@
      *   The event from input keypress or the click of the submit button.
      */
     var handleControlEvent = function(e) {
-      if (typeof e.keyCode === 'undefined' || e.keyCode === 13) {
+      if (typeof e.keyCode === 'undefined' || e.keyCode === 13 || e.keyCode === 0) {
         // We don't any forms submitting.
         e.preventDefault();
         // Get the address from the input value.
