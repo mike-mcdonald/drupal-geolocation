@@ -94,7 +94,7 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
 
     // Wrap the whole form in a container.
     $element += [
-      '#type' => 'container',
+      '#type' => 'fieldset',
       '#title' => $element['#title'],
     ];
 
