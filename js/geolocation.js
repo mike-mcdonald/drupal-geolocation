@@ -97,6 +97,12 @@
     if (map.lat != '' && map.lng != '') {
       geolocation.setMapMarker(center, map);
     }
+
+    if (!geolocation.hasOwnProperty('maps')) {
+      geolocation.maps = [];
+    }
+
+    geolocation.maps.push(map);
   };
 
   /**
