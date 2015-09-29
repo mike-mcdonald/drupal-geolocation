@@ -61,7 +61,7 @@ class GeolocationItemTest extends FieldUnitTestBase {
     $this->assertTrue($entity->field_test[0] instanceof FieldItemInterface, 'Field item implements interface.');
     $this->assertEqual($entity->field_test->lat, $lat, "Lat {$entity->field_test->lat} is equal to lat {$lat}.");
     $this->assertEqual($entity->field_test[0]->lat, $lat, "Lat {$entity->field_test[0]->lat} is equal to lat {$lat}.");
-    $this->assertEqual($entity->field_test->lng, $lng, "Lng {$entity->field_test[0]->lng} is equal to lng {$lng}.");
+    $this->assertEqual($entity->field_test->lng, $lng, "Lng {$entity->field_test->lng} is equal to lng {$lng}.");
     $this->assertEqual($entity->field_test[0]->lng, $lng, "Lng {$entity->field_test[0]->lng} is equal to lng {$lng}.");
 
     // Verify changing the field value.
