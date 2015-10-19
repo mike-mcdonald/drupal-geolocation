@@ -131,7 +131,7 @@ class GeolocationCore {
           ],
           'entity_tables' => $table_data[$args['@field_name']]['field']['entity_tables'],
           'element type' => 'div',
-          'is revision' => $table_data[$args['@field_name']]['field']['is revision'],
+          'is revision' => (isset($table_data[$args['@field_name']]['field']['is revision']) && $table_data[$args['@field_name']]['field']['is revision']),
           'click sortable' => TRUE,
         ],
         'sort' => [
