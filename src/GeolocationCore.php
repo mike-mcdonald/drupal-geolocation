@@ -6,8 +6,8 @@
 
 namespace Drupal\geolocation;
 
-use Drupal\Core\Extension\ModuleHandler;
-use Drupal\Core\Entity\EntityManager;
+use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\field\FieldStorageConfigInterface;
 
@@ -38,7 +38,7 @@ class GeolocationCore {
   /**
    * Constructor.
    */
-  public function __construct(ModuleHandler $module_handler, EntityManager $entity_manager) {
+  public function __construct(ModuleHandlerInterface $module_handler, EntityManagerInterface $entity_manager) {
     $this->module_handler = $module_handler;
     $this->entity_manager = $entity_manager;
   }
