@@ -40,6 +40,20 @@ function geolocation_theme() {
         'lng' => NULL
       ],
       'template' => 'geolocation-latlng-formatter',
-    ]
+    ],
+    'geolocation_common_map_display' => [
+      'variables' => [
+        'centre' => NULL,
+        'locations' => NULL,
+        'id' => NULL,
+      ]
+    ],
+    'geolocation_common_map_location' => [
+      'variables' => [
+        'content' => NULL,
+        'title' => NULL,
+        'position' => NULL,
+      ]
+    ],
   ];
 }
