@@ -78,12 +78,15 @@ class GeolocationCore {
 
       $args = ['@field_name' => $field_storage->getName()];
 
+      $target_entity_type = \Drupal::entityManager()->getDefinition($field_storage->getTargetEntityTypeId());
+      $field_coordinates_table_data = $data[$target_entity_type->getBaseTable() . '__' . $field_storage->getName()][$field_storage->getName()];
+
       // Add proximity handlers.
       $data[$table_name][$args['@field_name'] . '_proximity'] = [
         'group' => 'Content',
         'title' => $this->t('Proximity (@field_name)', $args),
-        'title short' => $table_data[$args['@field_name']]['title short'] . t(":proximity"),
-        'help' => $table_data[$args['@field_name']]['help'],
+        'title short' => $field_coordinates_table_data['title short'] . t(":proximity"),
+        'help' => $field_coordinates_table_data['help'],
         'argument' => [
           'id' => 'geolocation_argument_proximity',
           'table' => $table_name,
