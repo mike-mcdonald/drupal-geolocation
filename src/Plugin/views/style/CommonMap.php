@@ -24,6 +24,7 @@ use Drupal\Core\Form\FormStateInterface;
  */
 class CommonMap extends StylePluginBase {
 
+  protected $usesFields = TRUE;
   protected $usesRowPlugin = TRUE;
   protected $usesRowClass = FALSE;
   protected $usesGrouping = FALSE;
@@ -65,17 +66,6 @@ class CommonMap extends StylePluginBase {
       ],
     ];
 
-    if (!empty($this->view->result)) {
-      $firstRow = $this->view->result[0];
-
-      $geo_items = $this->view->field[$geo_field]->getItems($firstRow);
-      $geolocation = $geo_items[0]['raw'];
-      $build['#centre'] = [
-        'lat' => $geolocation->lat,
-        'lng' => $geolocation->lng,
-      ];
-    }
-
     foreach ($this->view->result as $row) {
       $title = empty($title_field) ? '' : $this->view->field[$title_field]->theme($row);
 
@@ -86,7 +76,6 @@ class CommonMap extends StylePluginBase {
           'lat' => $geolocation->lat,
           'lng' => $geolocation->lng,
         ];
-        $this->view->rowPlugin->render($row);
 
         $build['#locations'][] = [
           '#theme' => 'geolocation_common_map_location',
@@ -96,6 +85,27 @@ class CommonMap extends StylePluginBase {
         ];
       }
     }
+
+    $centre = [
+      'lat' => 0,
+      'lng' => 0,
+    ];
+    switch ($this->options['centre']) {
+      case 'fixed_value':
+        $centre = [
+          'lat' => (float)$this->options['centre_fixed_values']['latitude'],
+          'lng' => (float)$this->options['centre_fixed_values']['longitude'],
+        ];
+        break;
+
+      case 'first_row':
+      default:
+        if (!empty($build['#locations'][0]['#position'])) {
+          $centre = $build['#locations'][0]['#position'];
+        }
+        break;
+    }
+    $build['#centre'] = $centre;
 
     return $build;
   }
@@ -108,6 +118,11 @@ class CommonMap extends StylePluginBase {
 
     $options['geolocation_field'] = ['default' => ''];
     $options['title_field'] = ['default' => ''];
+    $options['centre'] = ['default' => 'first_row'];
+    $options['centre_fixed_values'] = ['default' => [
+      'latitude' => 0,
+      'longitude' => 0,
+    ]];
 
     return $options;
   }
@@ -147,7 +162,7 @@ class CommonMap extends StylePluginBase {
       '#title' => $this->t('Geolocation source field'),
       '#type' => 'select',
       '#default_value' => $this->options['geolocation_field'],
-      '#description' => $this->t("The source field of geodata for each row. Formatter must be of type geolocation_latlng."),
+      '#description' => $this->t("The source of geodata for each entity."),
       '#options' => $geo_options,
     ];
 
@@ -155,8 +170,44 @@ class CommonMap extends StylePluginBase {
       '#title' => $this->t('Title source field'),
       '#type' => 'select',
       '#default_value' => $this->options['title_field'],
-      '#description' => $this->t("The source field for the title for each row. Formatter must be of type string."),
+      '#description' => $this->t("The source of the title for each entity. Must be string"),
       '#options' => $title_options,
+    ];
+
+    $form['centre'] = [
+      '#title' => $this->t('Source for centre coordinates'),
+      '#type' => 'radios',
+      '#default_value' => $this->options['centre'],
+      '#description' => $this->t("How to determine the centre of the map."),
+      '#options' => [
+        'first_row' => $this->t('Use first row as centre.'),
+        'none' => $this->t('Solely rely on Google fitBounds function to include all locations.'),
+        'fixed_value' => $this->t('Provide fixed latitude and longitude.'),
+      ],
+    ];
+    $form['centre_fixed_values'] = [
+      '#title' => $this->t('Fixed values for centre'),
+      '#type' => 'container',
+      'latitude' => [
+        '#type' => 'textfield',
+        '#title' => t('Latitude'),
+        '#default_value' => $this->options['centre_fixed_values']['latitude'],
+        '#size' => 60,
+        '#maxlength' => 128,
+      ],
+      'longitude' => [
+        '#type' => 'textfield',
+        '#title' => t('Longitude'),
+        '#default_value' => $this->options['centre_fixed_values']['longitude'],
+        '#size' => 60,
+        '#maxlength' => 128,
+      ],
+      '#description' => $this->t("The source of geodata for each entity. Must be string"),
+      '#states' => [
+        'visible' => [
+          ':input[name="style_options[centre]"]' => ['value' => 'fixed_value'],
+        ],
+      ],
     ];
   }
 }
