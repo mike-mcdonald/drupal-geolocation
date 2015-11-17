@@ -65,13 +65,19 @@
         // Add any missing settings.
         map.settings = $.extend(geolocation.default_settings(), map.settings);
 
+        // Set the lat / lng if not already set.
+        if (map.lat === 0 || map.lng === 0) {
+          map.lat = $('.geolocation-hidden-lat.for-' + map.id).attr('value');
+          map.lng = $('.geolocation-hidden-lng.for-' + map.id).attr('value');
+        }
+
         // Add the map by ID with settings.
         geolocation.add_map(map);
 
         // Add the geocoder to the map.
         geolocation.add_geocoder(map);
 
-        // Add the click responders ffor setting the value.
+        // Add the click responders for setting the value.
         geolocation.add_click_listener(map);
 
         // Set the already processed flag.
