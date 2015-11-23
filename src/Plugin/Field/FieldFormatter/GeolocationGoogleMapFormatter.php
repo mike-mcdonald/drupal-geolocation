@@ -6,6 +6,7 @@
 
 namespace Drupal\geolocation\Plugin\Field\FieldFormatter;
 
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -23,15 +24,37 @@ use Drupal\Core\Form\FormStateInterface;
  * )
  */
 class GeolocationGoogleMapFormatter extends FormatterBase {
+
+  const ROADMAP = 'ROADMAP';
+  const SATELLITE = 'SATELLITE';
+  const HYBRID = 'HYBRID';
+  const TERRAIN = 'TERRAIN';
+
+  static $mapTypes = [
+    self::ROADMAP => 'Road map view',
+    self::SATELLITE => 'Google Earth satellite images',
+    self::HYBRID => 'A mixture of normal and satellite views',
+    self::TERRAIN => 'A physical map based on terrain information',
+  ];
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct($plugin_id, $plugin_definition, \Drupal\Core\Field\FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
+  }
+
   /**
    * {@inheritdoc}
    */
   public static function defaultSettings() {
     return array(
-      'type' => 'ROADMAP',
+      'type' => static::ROADMAP,
       'zoom' => 10,
       'height' => '400px',
       'width' => '100%',
+      'title' => '',
+      'info_text' => '',
     ) + parent::defaultSettings();
   }
 
@@ -40,6 +63,7 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $settings = $this->getSettings();
+
     $elements['type'] = array(
       '#type' => 'select',
       '#title' => $this->t('Default map type'),
@@ -67,6 +91,26 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
       '#size' => 4,
       '#default_value' => $settings['width'],
     );
+    $elements['info_text'] = array(
+      '#type' => 'textarea',
+      '#title' => $this->t('Info Text'),
+      '#description' => $this->t('The "Info Text" is displayed when a user clicks on a map marker..'),
+      '#default_value' => $settings['info_text'],
+    );
+    $elements['title'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Hover Title'),
+      '#description' => $this->t('The hover title is a tool tip that will be displayed when the mouse is paused over the map marker.'),
+      '#default_value' => $settings['title'],
+      '#suffix' => $this->t('<h4>The following tokens are available:</h4><p>%lat: Latitude, %lng: Longitude</p>'),
+    );
+
+    // Add the token UI from the token module if present.
+    $elements['token_help'] = [
+      '#theme' => 'token_tree',
+      '#token_types' => [$this->fieldDefinition->getTargetEntityTypeId()],
+    ];
+
     return $elements;
   }
 
@@ -76,11 +120,13 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
   public function settingsSummary() {
     $settings = $this->getSettings();
     $types = $this->getMapTypes();
-    $summary = array();
-    $summary[] = $this->t('Type: @type', array('@type' => $types[$settings['type']]));
-    $summary[] = $this->t('Zoom level: @zoom', array('@zoom' => $settings['zoom']));
-    $summary[] = $this->t('Height: @height', array('@height' => $settings['height']));
-    $summary[] = $this->t('Width: @width', array('@width' => $settings['width']));
+    $summary = [];
+    $summary[] = $this->t('Type: @type', ['@type' => $types[$settings['type']]]);
+    $summary[] = $this->t('Zoom level: @zoom', ['@zoom' => $settings['zoom']]);
+    $summary[] = $this->t('Height: @height', ['@height' => $settings['height']]);
+    $summary[] = $this->t('Width: @width', ['@width' => $settings['width']]);
+    $summary[] = $this->t('Info Text: @type', ['@type' => current(explode(chr(10), wordwrap($settings['info_text'], 30)))]);
+    $summary[] = $this->t('Hover Title: @type', ['@type' => $settings['title']]);
     return $summary;
   }
 
@@ -91,7 +137,21 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
     // Add formatter settings to the drupalSettings array.
     $field_settings = $this->getSettings();
     $elements =  [];
+    // This is a list of tokenized settings that should have placeholders
+    // replaced with contextual values.
+    $tokenized_settings = [
+      'info_text',
+      'title',
+    ];
+
     foreach ($items as $delta => $item) {
+      // @todo: Add token support to the geolocaiton field exposing sub-fields.
+      // Get token context.
+      $token_context = [
+        'field' => $items,
+        $this->fieldDefinition->getTargetEntityTypeId() => $items->getEntity(),
+      ];
+
       $uniqueue_id = uniqid("map-canvas-");
 
       $elements[$delta] = [
@@ -113,6 +173,13 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
           ],
         ],
       ];
+
+      // Replace placeholders with token values.
+      $item_settings = &$elements[$delta]['#attached']['drupalSettings']['geolocation']['maps'][$uniqueue_id]['settings'];
+      array_walk($tokenized_settings, function ($v) use (&$item_settings, $token_context) {
+        $item_settings[$v] = \Drupal::token()->replace($item_settings[$v], $token_context);
+      });
+
     }
     return $elements;
   }
@@ -123,11 +190,7 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
    * @return array
    */
   private function getMapTypes() {
-    return array(
-      'ROADMAP' => $this->t('Road map view'),
-      'SATELLITE' => $this->t('Google Earth satellite images'),
-      'HYBRID' => $this->t('A mixture of normal and satellite views'),
-      'TERRAIN' => $this->t('A physical map based on terrain information'),
-    );
+    // Translate values.
+    return array_map([$this, 't'], static::$mapTypes);
   }
 }

@@ -219,11 +219,26 @@
       map.marker.setPosition(latLng);
       map.marker.setMap(map.google_map);
     } else {
+
+      // Set the info popup text.
+      map.infowindow = new google.maps.InfoWindow({
+        content: map.settings.info_text
+      });
+
       // Add the marker to the map.
       map.marker = new google.maps.Marker({
         position: latLng,
-        map: map.google_map
+        map: map.google_map,
+        title: map.settings.title,
+        label: map.settings.label
       });
+
+      // Add the info window event if the info text has been set.
+      if (map.settings.info_text && map.settings.info_text.length  > 0) {
+        map.marker.addListener('click', function() {
+          map.infowindow.open(map.google_map, map.marker);
+        });
+      }
     }
 
     // Add a visual indicator.
