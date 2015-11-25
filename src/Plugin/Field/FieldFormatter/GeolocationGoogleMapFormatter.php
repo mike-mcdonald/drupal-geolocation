@@ -48,14 +48,15 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public static function defaultSettings() {
-    return array(
+    return [
       'type' => static::ROADMAP,
       'zoom' => 10,
       'height' => '400px',
       'width' => '100%',
       'title' => '',
       'info_text' => '',
-    ) + parent::defaultSettings();
+      'info_auto_display' => TRUE,
+    ] + parent::defaultSettings();
   }
 
   /**
@@ -64,50 +65,67 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $settings = $this->getSettings();
 
-    $elements['type'] = array(
+    $elements['type'] = [
       '#type' => 'select',
       '#title' => $this->t('Default map type'),
       '#options' => $this->getMapTypes(),
       '#default_value' =>  $settings['type'],
-    );
-    $elements['zoom'] = array(
+    ];
+    $elements['zoom'] = [
       '#type' => 'select',
       '#title' => $this->t('Zoom level'),
       '#options' => range(0, 18),
       '#description' => $this->t('The initial resolution at which to display the map, where zoom 0 corresponds to a map of the Earth fully zoomed out, and higher zoom levels zoom in at a higher resolution.'),
       '#default_value' => $settings['zoom'],
-    );
-    $elements['height'] = array(
+    ];
+    $elements['height'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Height'),
       '#description' => $this->t('Enter the dimensions and the measurement units. E.g. 200px or 100%.'),
       '#size' => 4,
       '#default_value' => $settings['height'],
-    );
-    $elements['width'] = array(
+    ];
+    $elements['width'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Width'),
       '#description' => $this->t('Enter the dimensions and the measurement units. E.g. 200px or 100%.'),
       '#size' => 4,
       '#default_value' => $settings['width'],
-    );
-    $elements['info_text'] = array(
+    ];
+    $elements['info_text'] = [
       '#type' => 'textarea',
-      '#title' => $this->t('Info Text'),
-      '#description' => $this->t('The "Info Text" is displayed when a user clicks on a map marker..'),
+      '#title' => $this->t('Info text'),
+      '#description' => $this->t('This text will be displayed in an "Info'
+        .' window" above the map marker. The "Info window" will be displayed by'
+        .' default unless the "Automatically show info text" format setting'
+        .' is unchecked. Leave blank if you do not wish to display an "Info'
+        .' window". See "REPLACEMENT PATTERNS" below for available replacements.'),
       '#default_value' => $settings['info_text'],
-    );
-    $elements['title'] = array(
+    ];
+    $elements['info_auto_display'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Automatically show info text'),
+      '#default_value' => $settings['info_auto_display'],
+    ];
+    $elements['title'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Hover Title'),
+      '#title' => $this->t('Hover title'),
       '#description' => $this->t('The hover title is a tool tip that will be displayed when the mouse is paused over the map marker.'),
       '#default_value' => $settings['title'],
-      '#suffix' => $this->t('<h4>The following tokens are available:</h4><p>%lat: Latitude, %lng: Longitude</p>'),
-    );
+    ];
 
+    $elements['replacement_patterns'] = [
+      '#type' => 'details',
+      '#title' => 'Replacement patterns',
+      '#description' => $this->t('The following replacement patterns are available for the "Info text" and the "Hover title" settings.'),
+    ];
+    $elements['replacement_patterns']['native'] = [
+      '#markup' => $this->t('<h4>Geolocation field data:</h4><ul><li>Latitude (%lat) or (:lat)</li><li>Longitude (%lng) or (:lng)</li></ul>'),
+    ];
     // Add the token UI from the token module if present.
-    $elements['token_help'] = [
+    $elements['replacement_patterns']['token_help'] = [
       '#theme' => 'token_tree',
+      '#prefix' => $this->t('<h4>Tokens:</h4>'),
       '#token_types' => [$this->fieldDefinition->getTargetEntityTypeId()],
     ];
 
@@ -176,8 +194,14 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
 
       // Replace placeholders with token values.
       $item_settings = &$elements[$delta]['#attached']['drupalSettings']['geolocation']['maps'][$uniqueue_id]['settings'];
-      array_walk($tokenized_settings, function ($v) use (&$item_settings, $token_context) {
+      array_walk($tokenized_settings, function ($v) use (&$item_settings, $token_context, $item) {
         $item_settings[$v] = \Drupal::token()->replace($item_settings[$v], $token_context);
+        $item_settings[$v] = $this->t($item_settings[$v], [
+          ':lat' => (float)$item->lat,
+          '%lat' => (float)$item->lat,
+          ':lng' => (float)$item->lng,
+          '%lng' => (float)$item->lng,
+        ]);
       });
 
     }

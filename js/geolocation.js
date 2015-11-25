@@ -238,6 +238,9 @@
         map.marker.addListener('click', function() {
           map.infowindow.open(map.google_map, map.marker);
         });
+        if (map.settings.info_auto_display) {
+          map.infowindow.open(map.google_map, map.marker);
+        }
       }
     }
 
