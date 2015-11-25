@@ -15,7 +15,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @FieldWidget(
  *   id = "geolocation_googlegeocoder",
- *   label = @Translation("Geoloaction Google Geocoder"),
+ *   label = @Translation("Geolocation Google Geocoder"),
  *   field_types = {
  *     "geolocation"
  *   }

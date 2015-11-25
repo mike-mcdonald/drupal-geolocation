@@ -15,7 +15,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @FieldWidget(
  *   id = "geolocation_html5",
- *   label = @Translation("Geoloaction HTML5"),
+ *   label = @Translation("Geolocation HTML5"),
  *   field_types = {
  *     "geolocation"
  *   }

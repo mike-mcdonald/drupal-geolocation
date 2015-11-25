@@ -16,7 +16,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @FieldWidget(
  *   id = "geolocation_latlng",
- *   label = @Translation("Geoloaction Lat/Lng"),
+ *   label = @Translation("Geolocation Lat/Lng"),
  *   field_types = {
  *     "geolocation"
  *   }
