@@ -167,9 +167,9 @@ class GeolocationCore {
     $field_lng    = "{$table_name}.{$field_id}_lng_rad";
 
     // Pre-calculate filter values.
-    $filter_latcos = cos(deg2rad((float)$filter_lat));
-    $filter_latsin = sin(deg2rad((float)$filter_lat));
-    $filter_lng    = deg2rad((float)$filter_lng);
+    $filter_latcos = cos(deg2rad($filter_lat));
+    $filter_latsin = sin(deg2rad($filter_lat));
+    $filter_lng    = deg2rad($filter_lng);
 
     return "(
       ACOS(
