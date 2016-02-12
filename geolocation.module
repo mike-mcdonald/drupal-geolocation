@@ -44,6 +44,8 @@ function geolocation_theme() {
     'geolocation_common_map_display' => [
       'variables' => [
         'centre' => NULL,
+        'zoom' => NULL,
+        'fitbounds' => NULL,
         'locations' => NULL,
         'id' => NULL,
       ]

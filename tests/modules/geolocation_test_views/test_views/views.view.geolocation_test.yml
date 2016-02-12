@@ -56,11 +56,14 @@ display:
              first_row:
                enable: true
                weight: '-9'
+               settings:
+                 zoom: 12
              fixed_value:
                weight: '-8'
                settings:
                  latitude: '0'
                  longitude: '0'
+                 zoom: 12
                enable: 0
       row:
         type: fields
