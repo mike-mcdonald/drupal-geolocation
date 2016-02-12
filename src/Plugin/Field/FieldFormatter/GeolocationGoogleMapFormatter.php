@@ -124,7 +124,7 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
     ];
     // Add the token UI from the token module if present.
     $elements['replacement_patterns']['token_help'] = [
-      '#theme' => 'token_tree',
+      '#theme' => 'token_tree_link',
       '#prefix' => $this->t('<h4>Tokens:</h4>'),
       '#token_types' => [$this->fieldDefinition->getTargetEntityTypeId()],
     ];
