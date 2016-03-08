@@ -3,7 +3,7 @@
  * Javascript for the geocoder Google map formatter.
  */
 (function ($, Drupal) {
-  // Ensure and use shortcut for gwolocation.
+  // Ensure and use shortcut for geolocation.
   var geolocation = Drupal.geolocation = Drupal.geolocation || {};
 
   Drupal.behaviors.geolocationGoogleMaps = {
