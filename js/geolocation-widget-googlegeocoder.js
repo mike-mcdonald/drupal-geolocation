@@ -11,7 +11,7 @@
 
   Drupal.behaviors.geolocationGooglemaps = {
     attach: function (context, settings) {
-      // Ensure itterables.
+      // Ensure iterables.
       settings.geolocation = settings.geolocation || {widget_maps: []};
       // Make sure the lazy loader is available.
       if (typeof geolocation.load_google === 'function') {

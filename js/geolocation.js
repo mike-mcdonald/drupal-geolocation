@@ -5,6 +5,10 @@
 (function ($, _, Drupal, settings) {
   // Ensure the geolocation object without overwriting it.
   var geolocation = Drupal.geolocation = Drupal.geolocation || {};
+  // Google Maps are loaded lazily. In some situations load_google() is called twice, which results in
+  // "You have included the Google Maps API multiple times on this page. This may cause unexpected errors." errors.
+  // This flag will prevent repeat $.getScript() calls.
+  geolocation.maps_api_loading = false;
 
   /**
    * Gets the default settings for the google map.
@@ -62,9 +66,13 @@
     // Add the callback.
     geolocation.add_callback(callback);
     // Check for google maps.
-    if (typeof google == 'undefined' || typeof google.maps == 'undefined') {
+    if (!geolocation.maps_api_loading && (typeof google == 'undefined' || typeof google.maps == 'undefined')) {
+      geolocation.maps_api_loading = true;
       // google maps isn't loaded so lazy load google maps.
-      $.getScript("//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&callback=Drupal.geolocation.google_callback");
+      $.getScript("//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&callback=Drupal.geolocation.google_callback")
+        .done(function() {
+          geolocation.maps_api_loading = false;
+        });
     } else {
       // Google maps loaded. Run callback.
       geolocation.google_callback();
