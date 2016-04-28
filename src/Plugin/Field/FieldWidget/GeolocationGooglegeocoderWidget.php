@@ -67,6 +67,9 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
       '#attributes' => ['class' => ['geolocation-hidden-lng', "for-{$canvas_id}"]],
     ];
 
+    // Add Google API key to js.
+    $config = \Drupal::config('geolocation.settings');
+
     // Add the map container.
     $element['map_canvas'] = [
       '#type' => 'html_tag',
@@ -87,6 +90,7 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
                 'settings' => [],
               ],
             ],
+            'google_map_api_key' => $config->get('google_map_api_key'),
           ],
         ],
       ],

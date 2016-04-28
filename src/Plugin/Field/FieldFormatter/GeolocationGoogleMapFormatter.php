@@ -172,6 +172,9 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
 
       $uniqueue_id = uniqid("map-canvas-");
 
+      // Add Google API key to js.
+      $config = \Drupal::config('geolocation.settings');
+
       $elements[$delta] = [
         '#type' => 'markup',
         '#markup' => '<div id="' . $uniqueue_id . '" class="geolocation-google-map"></div>',
@@ -187,6 +190,7 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
                   'settings' => $field_settings,
                 ],
               ],
+              'google_map_api_key' => $config->get('google_map_api_key'),
             ],
           ],
         ],

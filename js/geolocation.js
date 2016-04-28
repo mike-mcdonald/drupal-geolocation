@@ -63,16 +63,25 @@
    * @param callback
    */
   geolocation.load_google = function(callback) {
+    // Default script path.
+    var scriptPath = '//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&callback=Drupal.geolocation.google_callback';
+
     // Add the callback.
     geolocation.add_callback(callback);
     // Check for google maps.
     if (!geolocation.maps_api_loading && (typeof google == 'undefined' || typeof google.maps == 'undefined')) {
       geolocation.maps_api_loading = true;
       // google maps isn't loaded so lazy load google maps.
-      $.getScript("//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&callback=Drupal.geolocation.google_callback")
+      // If a Google API key isset, use it.
+      if (settings.geolocation.google_map_api_key) {
+        scriptPath += '&key=' + settings.geolocation.google_map_api_key;
+      }
+
+      $.getScript(scriptPath)
         .done(function() {
           geolocation.maps_api_loading = false;
         });
+
     } else {
       // Google maps loaded. Run callback.
       geolocation.google_callback();
