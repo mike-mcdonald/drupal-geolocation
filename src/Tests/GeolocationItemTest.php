@@ -9,14 +9,14 @@ namespace Drupal\geolocation\Tests;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldItemInterface;
-use Drupal\field\Tests\FieldUnitTestBase;
+use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 
 /**
  * Tests the new entity API for the geolocation field type.
  *
  * @group geolocation
  */
-class GeolocationItemTest extends FieldUnitTestBase {
+class GeolocationItemTest extends FieldKernelTestBase {
 
   /**
    * Modules to enable.
