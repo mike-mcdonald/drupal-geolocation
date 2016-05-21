@@ -271,7 +271,7 @@ class CommonMap extends StylePluginBase {
     ];
 
     foreach ($options as $id => $label) {
-      $weight = $this->options['centre'][$id]['weight'] ?: 0;
+      $weight = isset($this->options['centre'][$id]['weight']) ? $this->options['centre'][$id]['weight'] : 0;
       $form['centre'][$id]['#weight'] = $weight;
 
       $form['centre'][$id]['enable'] = [
@@ -300,14 +300,14 @@ class CommonMap extends StylePluginBase {
       'latitude' => [
         '#type' => 'textfield',
         '#title' => t('Latitude'),
-        '#default_value' => $this->options['centre']['fixed_value']['settings']['latitude'],
+        '#default_value' => isset($this->options['centre']['fixed_value']['settings']['latitude']) ? $this->options['centre']['fixed_value']['settings']['latitude'] : '',
         '#size' => 60,
         '#maxlength' => 128,
       ],
       'longitude' => [
         '#type' => 'textfield',
         '#title' => t('Longitude'),
-        '#default_value' => $this->options['centre']['fixed_value']['settings']['longitude'],
+        '#default_value' => isset($this->options['centre']['fixed_value']['settings']['longitude']) ? $this->options['centre']['fixed_value']['settings']['longitude'] : '',
         '#size' => 60,
         '#maxlength' => 128,
       ],
