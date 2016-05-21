@@ -51,6 +51,12 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
     return [
       'type' => static::ROADMAP,
       'zoom' => 10,
+      'mapTypeControl' => TRUE,
+      'streetViewControl' => TRUE,
+      'zoomControl' => TRUE,
+      'scrollwheel' => TRUE,
+      'disableDoubleClickZoom' => FALSE,
+      'draggable' => TRUE,
       'height' => '400px',
       'width' => '100%',
       'title' => '',
@@ -77,6 +83,42 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
       '#options' => range(0, 18),
       '#description' => $this->t('The initial resolution at which to display the map, where zoom 0 corresponds to a map of the Earth fully zoomed out, and higher zoom levels zoom in at a higher resolution.'),
       '#default_value' => $settings['zoom'],
+    ];
+    $elements['mapTypeControl'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Map type control'),
+      '#description' => $this->t('Allow the user to change the map type.'),
+      '#default_value' => $settings['mapTypeControl'],
+    ];
+    $elements['streetViewControl'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Street view control'),
+      '#description' => $this->t('Allow the user to switch to google street view.'),
+      '#default_value' => $settings['streetViewControl'],
+    ];
+    $elements['zoomControl'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Zoom control'),
+      '#description' => $this->t('Show zoom controls.'),
+      '#default_value' => $settings['zoomControl'],
+    ];
+    $elements['scrollwheel'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Scrollwheel'),
+      '#description' => $this->t('Allow the user to zoom the map using the scrollwheel.'),
+      '#default_value' => $settings['scrollwheel'],
+    ];
+    $elements['disableDoubleClickZoom'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Disable double click zoom'),
+      '#description' => $this->t('Disables the double click zoom functionality.'),
+      '#default_value' => $settings['disableDoubleClickZoom'],
+    ];
+    $elements['draggable'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Draggable'),
+      '#description' => $this->t('Allow the user to change the field of view.'),
+      '#default_value' => $settings['draggable'],
     ];
     $elements['height'] = [
       '#type' => 'textfield',

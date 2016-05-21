@@ -107,7 +107,13 @@
     map.google_map = new google.maps.Map(map.container, {
       zoom: parseInt(map.settings.zoom),
       center: center,
-      mapTypeId: google.maps.MapTypeId[map.settings.type]
+      mapTypeId: google.maps.MapTypeId[map.settings.type],
+      zoomControl: map.settings.zoomControl,
+      streetViewControl: map.settings.streetViewControl,
+      mapTypeControl: map.settings.mapTypeControl,
+      scrollwheel: map.settings.scrollwheel,
+      disableDoubleClickZoom: map.settings.disableDoubleClickZoom,
+      draggable: map.settings.draggable
     });
 
     // Set the map marker.
