@@ -78,19 +78,28 @@ class GeolocationCore {
 
       $args = ['@field_name' => $field_storage->getName()];
 
+      $field_coordinates_table_data = [];
+      $entity_type_id = $field_storage->getTargetEntityTypeId();
       $target_entity_type = \Drupal::entityManager()->getDefinition($field_storage->getTargetEntityTypeId());
-      $field_coordinates_table_data = $data[$target_entity_type->getBaseTable() . '__' . $field_storage->getName()][$field_storage->getName()];
+
+      if (array_key_exists($target_entity_type->getBaseTable() . '__' . $field_storage->getName(), $data)) {
+        $field_coordinates_table_data = $data[$target_entity_type->getBaseTable() . '__' . $field_storage->getName()][$field_storage->getName()];
+      }
+      elseif (array_key_exists($entity_type_id . '__' . $field_storage->getName(), $data)) {
+        // Fall back to using the key format as defined in views_field_default_views_data().
+        $field_coordinates_table_data = $data[$entity_type_id . '__' . $field_storage->getName()][$field_storage->getName()];
+      }
 
       // Add proximity handlers.
       $data[$table_name][$args['@field_name'] . '_proximity'] = [
         'group' => 'Content',
         'title' => $this->t('Proximity (@field_name)', $args),
-        'title short' => $field_coordinates_table_data['title short'] . t(":proximity"),
-        'help' => $field_coordinates_table_data['help'],
+        'title short' => isset($field_coordinates_table_data['title short']) ? $field_coordinates_table_data['title short'] . t(":proximity") : '',
+        'help' => isset($field_coordinates_table_data['help']) ? $field_coordinates_table_data['help'] : '',
         'argument' => [
           'id' => 'geolocation_argument_proximity',
           'table' => $table_name,
-          'entity_type' => $field_storage->get('entity_type'),
+          'entity_type' => $entity_type_id,
           'field_name' => $args['@field_name'].'_proximity',
           'real field' => $args['@field_name'],
           'label' => $this->t('Distance to !field_name', $args),
@@ -106,7 +115,7 @@ class GeolocationCore {
         'filter' => [
           'id' => 'geolocation_filter_proximity',
           'table' => $table_name,
-          'entity_type' => $field_storage->get('entity_type'),
+          'entity_type' => $entity_type_id,
           'field_name' => $args['@field_name'].'_proximity',
           'real field' => $args['@field_name'],
           'label' => $this->t('Distance to !field_name', $args),
@@ -123,7 +132,7 @@ class GeolocationCore {
           'table' => $table_name,
           'id' => 'geolocation_field_proximity',
           'field_name' => $args['@field_name'].'_proximity',
-          'entity_type' => $field_storage->get('entity_type'),
+          'entity_type' => $entity_type_id,
           'real field' => $args['@field_name'],
           'additional fields' => [
             $args['@field_name'].'_lat',
@@ -140,7 +149,7 @@ class GeolocationCore {
           'table' => $table_name,
           'id' => 'geolocation_sort_proximity',
           'field_name' => $args['@field_name'].'_proximity',
-          'entity_type' => $field_storage->get('entity_type'),
+          'entity_type' => $entity_type_id,
           'real field' => $args['@field_name'],
         ],
       ];
