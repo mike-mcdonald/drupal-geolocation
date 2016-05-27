@@ -48,6 +48,14 @@ function geolocation_theme() {
         'fitbounds' => NULL,
         'locations' => NULL,
         'id' => NULL,
+        'mapTypeControl' => TRUE,
+        'streetViewControl' => TRUE,
+        'zoomControl' => TRUE,
+        'scrollwheel' => TRUE,
+        'disableDoubleClickZoom' => FALSE,
+        'draggable' => TRUE,
+        'height' => '400px',
+        'width' => '100%',
       ]
     ],
     'geolocation_common_map_location' => [
