@@ -103,7 +103,7 @@ class GeolocationCore {
 
       // Add proximity handlers.
       $data[$table_name][$args['@field_name'] . '_proximity'] = [
-        'group' => 'Content',
+        'group' => $target_entity_type->getLabel(),
         'title' => $this->t('Proximity (@field_name)', $args),
         'title short' => isset($field_coordinates_table_data['title short']) ? $field_coordinates_table_data['title short'] . t(":proximity") : '',
         'help' => isset($field_coordinates_table_data['help']) ? $field_coordinates_table_data['help'] : '',
