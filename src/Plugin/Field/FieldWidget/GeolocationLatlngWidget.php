@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\geolocation\Plugin\Field\FieldWidget\GeolocationLatlngWidget.
- */
-
 namespace Drupal\geolocation\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;

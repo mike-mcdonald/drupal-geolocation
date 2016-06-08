@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\geolocation\Plugin\Field\FieldWidget\GeolocationHTML5Widget.
- */
 
 namespace Drupal\geolocation\Plugin\Field\FieldWidget;
 
@@ -74,4 +70,5 @@ class GeolocationHTML5Widget extends WidgetBase {
 
     return $element;
   }
+
 }

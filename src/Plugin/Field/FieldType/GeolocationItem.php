@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\geolocation\Plugin\Field\FieldType\GeolocationItem.
- */
-
 namespace Drupal\geolocation\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\FieldItemBase;
@@ -106,8 +101,8 @@ class GeolocationItem extends FieldItemBase {
    * {@inheritdoc}
    */
   public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
-    $values['lat'] = rand(-90, 90) - rand(0, 999999)/1000000;
-    $values['lng'] = rand(-180, 180) - rand(0, 999999)/1000000;
+    $values['lat'] = rand(-90, 90) - rand(0, 999999) / 1000000;
+    $values['lng'] = rand(-180, 180) - rand(0, 999999) / 1000000;
     return $values;
   }
 
@@ -128,7 +123,7 @@ class GeolocationItem extends FieldItemBase {
       $values['data'] = NULL;
     }
     else {
-      $deserialized_data = unserialize((string)$values['data']);
+      $deserialized_data = unserialize((string) $values['data']);
       $values['data'] = is_array($deserialized_data) ? $deserialized_data : NULL;
     }
     parent::setValue($values, $notify);
@@ -138,11 +133,11 @@ class GeolocationItem extends FieldItemBase {
    * {@inheritdoc}
    */
   public function preSave() {
-    $this->lat = trim($this->lat);
-    $this->lng = trim($this->lng);
-    $this->lat_sin = sin(deg2rad($this->lat));
-    $this->lat_cos = cos(deg2rad($this->lat));
-    $this->lng_rad = deg2rad($this->lng);
+    $this->get('lat')->setValue(trim($this->get('lat')->getValue()));
+    $this->get('lng')->setValue(trim($this->get('lng')->getValue()));
+    $this->get('lat_sin')->setValue(sin(deg2rad($this->get('lat_sin')->getValue())));
+    $this->get('lat_cos')->setValue(cos(deg2rad($this->get('lat_cos')->getValue())));
+    $this->get('lng_rad')->setValue(deg2rad($this->get('lng_rad')->getValue()));
   }
 
 }

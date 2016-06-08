@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\geolocation\Plugin\views\style\CommonMap.
- */
-
 namespace Drupal\geolocation\Plugin\views\style;
 
 use Drupal\views\Plugin\views\style\StylePluginBase;
@@ -13,6 +8,8 @@ use Drupal\geolocation\Plugin\views\field\GeolocationField;
 use Drupal\Component\Utility\Html;
 
 /**
+ * Allow to display several field items on a common map.
+ *
  * @ingroup views_style_plugins
  *
  * @ViewsStyle(
@@ -60,7 +57,7 @@ class CommonMap extends StylePluginBase {
         ],
         'drupalSettings' => [
           'geolocation' => [
-            'commonMap' => []
+            'commonMap' => [],
           ],
         ],
       ],
@@ -103,8 +100,6 @@ class CommonMap extends StylePluginBase {
           '#title' => empty($title_build) ? '' : $title_build,
           '#position' => $position,
         ];
-
-
       }
     }
 
@@ -131,18 +126,17 @@ class CommonMap extends StylePluginBase {
         break;
       }
 
-
       switch ($id) {
 
         case 'fixed_value':
           $centre = [
-            'lat' => (float)$option['settings']['latitude'],
-            'lng' => (float)$option['settings']['longitude'],
+            'lat' => (float) $option['settings']['latitude'],
+            'lng' => (float) $option['settings']['longitude'],
           ];
-          $zoom = (int)$option['settings']['zoom'];
+          $zoom = (int) $option['settings']['zoom'];
           break;
 
-        case (preg_match('/proximity_filter_*/', $id) ? true : false) :
+        case (preg_match('/proximity_filter_*/', $id) ? TRUE : FALSE):
           $filter_id = substr($id, 17);
           /** @var \Drupal\geolocation\Plugin\views\filter\ProximityFilter $handler */
           $handler = $this->displayHandler->getHandler('filter', $filter_id);
@@ -158,7 +152,7 @@ class CommonMap extends StylePluginBase {
           if (!empty($build['#locations'][0]['#position'])) {
             $centre = $build['#locations'][0]['#position'];
           }
-          $zoom = (int)$option['settings']['zoom'];
+          $zoom = (int) $option['settings']['zoom'];
           break;
 
         case 'fit_bounds':
@@ -276,7 +270,15 @@ class CommonMap extends StylePluginBase {
     $form['centre'] = [
       '#type' => 'table',
       '#prefix' => t('Please note: Each option will, if it can be applied, supersede any following option.'),
-      '#header' => [ t('Enable'), t('Option'), t('settings'), array('data' => t('Settings'), 'colspan' => '1')],
+      '#header' => [
+        t('Enable'),
+        t('Option'),
+        t('settings'),
+        [
+          'data' => t('Settings'),
+          'colspan' => '1',
+        ],
+      ],
       '#attributes' => ['id' => 'geolocation-centre-options'],
       '#tabledrag' => [
         [
@@ -412,6 +414,6 @@ class CommonMap extends StylePluginBase {
       '#default_value' => $this->options['width'],
       '#required' => TRUE,
     ];
-
   }
+
 }

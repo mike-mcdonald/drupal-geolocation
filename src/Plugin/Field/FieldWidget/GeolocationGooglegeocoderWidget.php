@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\geolocation\Plugin\Field\FieldWidget\GeolocationGooglegeocoderWidget.
- */
 
 namespace Drupal\geolocation\Plugin\Field\FieldWidget;
 
@@ -33,7 +29,8 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
     // Get the field state.
     $field_state = static::getWidgetState($parents, $field_name, $form_state);
 
-    // Create a unique canvas id for each map of each geolocation field instance.
+    // Create a unique canvas id for each map of each geolocation field
+    // instance.
     $field_id = preg_replace('/[^a-zA-Z0-9\-]/', '-', $this->fieldDefinition->getName());
     $canvas_id = !empty($field_state['canvas_ids'][$delta])
       ? $field_state['canvas_ids'][$delta]
@@ -41,7 +38,7 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
 
     // Add the canvas id for this field.
     $field_state['canvas_ids'] = isset($field_state['canvas_ids'])
-      ?  $field_state['canvas_ids'] + [$delta => $canvas_id]
+      ? $field_state['canvas_ids'] + [$delta => $canvas_id]
       : [$delta => $canvas_id];
 
     // Save the field state for this field.
@@ -85,8 +82,8 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
             'widget_maps' => [
               $canvas_id => [
                 'id' => $canvas_id,
-                'lat' => (float)$lat_default_value,
-                'lng' => (float)$lng_default_value,
+                'lat' => (float) $lat_default_value,
+                'lng' => (float) $lng_default_value,
                 'settings' => [],
               ],
             ],
@@ -104,4 +101,5 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
 
     return $element;
   }
+
 }

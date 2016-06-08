@@ -1,12 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\geolocation\Form\GeolocationGoogleMapAPIkey.
- */
-
 namespace Drupal\geolocation\Form;
-
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -51,9 +45,15 @@ class GeolocationSettings extends ConfigFormBase {
     return 'geolocation_settings';
   }
 
+  /**
+   * Return the editable config names.
+   *
+   * @return array
+   *   The config names.
+   */
   protected function getEditableConfigNames() {
     return [
-      'geolocation.settings'
+      'geolocation.settings',
     ];
   }
 
@@ -66,8 +66,10 @@ class GeolocationSettings extends ConfigFormBase {
    *   Object describing the current state of the form.
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    /** @var \Drupal\Core\Config\Config $config */
     $config = \Drupal::service('config.factory')->getEditable('geolocation.settings');
     $config->set('google_map_api_key', $form_state->getValue('google_map_api_key'));
     $config->save();
   }
+
 }
