@@ -44,4 +44,5 @@ geolocation.commonmap:
     https://maps.googleapis.com/maps/api/js: { type: external }
     js/geolocation-common-map.js: {}
   dependencies:
+    - core/drupal
     - core/jquery
