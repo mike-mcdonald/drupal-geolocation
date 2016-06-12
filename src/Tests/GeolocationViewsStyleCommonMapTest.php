@@ -14,7 +14,7 @@ use Drupal\Core\Entity\Entity\EntityFormDisplay;
  *
  * @group views
  */
-class GeolocationViewsStyleCommonMap extends ViewTestBase {
+class GeolocationViewsStyleCommonMapTest extends ViewTestBase {
 
   /**
    * {@inheritdoc}
