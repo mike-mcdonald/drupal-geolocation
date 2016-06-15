@@ -4,18 +4,18 @@
  */
 
 (function ($, Drupal, navigator) {
-  "use strict";
 
+  'use strict';
 
   Drupal.behaviors.geolocationHTML5 = {
-    attach: function(context, settings) {
-      $('.geolocation-html5-button:not(.disabled)').each( function(index) {
+    attach: function (context, settings) {
+      $('.geolocation-html5-button:not(.disabled)').each(function (index) {
         // The parent element.
         var $thisButton = $(this);
 
         // Set the values of hidden form inputs.
-        var latDefault = $thisButton.siblings(".geolocation-hidden-lat").val();
-        var lngDefault = $thisButton.siblings(".geolocation-hidden-lng").val();
+        var latDefault = $thisButton.siblings('.geolocation-hidden-lat').val();
+        var lngDefault = $thisButton.siblings('.geolocation-hidden-lng').val();
 
         if (latDefault.length > 1 && lngDefault.length > 1) {
           // Hide the default text.
@@ -37,16 +37,16 @@
     }
   };
 
-  $('.geolocation-html5-button .clear').on('click', function(event) {
+  $('.geolocation-html5-button .clear').on('click', function (event) {
     // The parent element.
     var $thisButton = $(this).parent();
 
     // Prevent form submission.
-    event.stopPropagation()
+    event.stopPropagation();
 
     // Clear the values of hidden form inputs.
-    $thisButton.siblings(".geolocation-hidden-lat").val('');
-    $thisButton.siblings(".geolocation-hidden-lng").val('');
+    $thisButton.siblings('.geolocation-hidden-lat').val('');
+    $thisButton.siblings('.geolocation-hidden-lng').val('');
 
     // Show the default text.
     $('.default', $thisButton).show();
@@ -62,7 +62,7 @@
 
   });
 
-  $('.geolocation-html5-button').on('click', function(event) {
+  $('.geolocation-html5-button').on('click', function (event) {
     // The parent element.
     var $thisButton = $(this);
 
@@ -83,8 +83,8 @@
           var accuracy = position.coords.accuracy / 1000;
 
           // Set the values of hidden form inputs.
-          $thisButton.siblings(".geolocation-hidden-lat").val(lat);
-          $thisButton.siblings(".geolocation-hidden-lng").val(lng);
+          $thisButton.siblings('.geolocation-hidden-lat').val(lat);
+          $thisButton.siblings('.geolocation-hidden-lng').val(lng);
 
           // Hide the default text.
           $('.default', $thisButton).hide();
@@ -101,10 +101,10 @@
         },
 
         // Error handler for getCurrentPosition()
-        function(error) {
+        function (error) {
 
           // Alert with error message.
-          switch(error.code) {
+          switch (error.code) {
             case error.PERMISSION_DENIED:
               alert(Drupal.t('No location data found. Reason: PERMISSION_DENIED.'));
               break;
@@ -128,7 +128,8 @@
         }
       );
 
-    } else {
+    }
+    else {
       alert(Drupal.t('No location data found. Your browser does not support the W3C Geolocation API.'));
     }
   });
@@ -140,8 +141,10 @@
    */
   function initialize(settings) {
 
+    /* global geolocation */
+
     // Process drupalSettings for every Google map present on the current page.
-    $.each(settings.geolocation.widget_maps, function(widget_id, map) {
+    $.each(settings.geolocation.widget_maps, function (widget_id, map) {
 
       // Add any missing settings.
       map.settings = $.extend(geolocation.default_settings(), map.settings);

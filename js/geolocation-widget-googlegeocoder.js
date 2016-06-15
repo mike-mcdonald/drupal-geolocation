@@ -4,7 +4,9 @@
  */
 
 (function ($, Drupal, drupalSettings) {
-  "use strict";
+  'use strict';
+
+  /* global google */
 
   // Ensure and add shortcut to the geolocation object.
   var geolocation = Drupal.geolocation = Drupal.geolocation || {};
@@ -16,7 +18,7 @@
       // Make sure the lazy loader is available.
       if (typeof geolocation.load_google === 'function') {
         // First load the library from google.
-        geolocation.load_google(function(){
+        geolocation.load_google(function () {
           // This won't fire until window load.
           initialize(settings.geolocation.widget_maps);
         });
@@ -28,19 +30,19 @@
    * Adds the click listeners to the map.
    * @param map
    */
-  geolocation.add_click_listener = function(map) {
+  geolocation.add_click_listener = function (map) {
     // Used for a single click timeout.
     var singleClick;
     // Add the click listener.
-    google.maps.event.addListener(map.google_map, 'click', function(e) {
+    google.maps.event.addListener(map.google_map, 'click', function (e) {
       // Create 500ms timeout to wait for double click.
-      singleClick = setTimeout(function() {
+      singleClick = setTimeout(function () {
         geolocation.codeLatLng(e.latLng, map, 'marker');
         geolocation.setMapMarker(e.latLng, map);
       }, 500);
     });
     // Add a doubleclick listener.
-    google.maps.event.addListener(map.google_map, 'dblclick', function(e) {
+    google.maps.event.addListener(map.google_map, 'dblclick', function (e) {
       clearTimeout(singleClick);
     });
   };
@@ -52,7 +54,7 @@
    */
   function initialize(maps) {
     // Process drupalSettings for every Google map present on the current page.
-    $.each(maps, function(widget_id, map) {
+    $.each(maps, function (widget_id, map) {
 
       // Get the container object.
       map.container = document.getElementById(map.id);

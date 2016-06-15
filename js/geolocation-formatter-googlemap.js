@@ -3,6 +3,11 @@
  * Javascript for the geocoder Google map formatter.
  */
 (function ($, Drupal) {
+
+  'use strict';
+
+  /* global google */
+
   // Ensure and use shortcut for geolocation.
   var geolocation = Drupal.geolocation = Drupal.geolocation || {};
 
@@ -13,7 +18,7 @@
       // Make sure the lazy loader is available.
       if (typeof Drupal.geolocation.load_google === 'function') {
         // First load the library from google.
-        Drupal.geolocation.load_google(function(){
+        Drupal.geolocation.load_google(function () {
 
           initialize(settings.geolocation.maps);
         });
@@ -23,7 +28,7 @@
 
   function initialize(maps) {
     // Loop though all objects and add maps to the page.
-    $.each(maps, function(delta, map) {
+    $.each(maps, function (delta, map) {
       // Get the container object.
       map.container = document.getElementById(map.id);
 

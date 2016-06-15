@@ -3,6 +3,11 @@
  *   Javascript for the geocoder module.
  */
 (function ($, _, Drupal, settings) {
+
+  'use strict';
+
+  /* global google */
+
   // Ensure the geolocation object without overwriting it.
   var geolocation = Drupal.geolocation = Drupal.geolocation || {};
   // Google Maps are loaded lazily. In some situations load_google() is called twice, which results in
@@ -13,9 +18,9 @@
   /**
    * Gets the default settings for the google map.
    *
-   * @returns {{scrollwheel: boolean, panControl: boolean, mapTypeControl: boolean, scaleControl: boolean, streetViewControl: boolean, overviewMapControl: boolean, zoomControl: boolean, zoomControlOptions: {style: *, position: *}, mapTypeId: *, zoom: number}}
+   * @return {{scrollwheel: boolean, panControl: boolean, mapTypeControl: boolean, scaleControl: boolean, streetViewControl: boolean, overviewMapControl: boolean, zoomControl: boolean, zoomControlOptions: {style: *, position: *}, mapTypeId: *, zoom: number}}
    */
-  geolocation.default_settings = function() {
+  geolocation.default_settings = function () {
     return {
       scrollwheel: false,
       panControl: false,
@@ -36,13 +41,13 @@
   /**
    * Provides the callback that is called when maps loads.
    */
-  geolocation.google_callback = function() {
+  geolocation.google_callback = function () {
     // Ensure callbacks array;
     geolocation.google_load_callbacks = geolocation.google_load_callbacks || [];
 
     // Wait until the window load event to try to use the maps library.
-    $(document).ready(function(e) {
-      _.invoke(settings.geolocation.google_load_callbacks, "callback");
+    $(document).ready(function (e) {
+      _.invoke(settings.geolocation.google_load_callbacks, 'callback');
       geolocation.google_load_callbacks = [];
     });
   };
@@ -52,7 +57,7 @@
    *
    * @param callback
    */
-  geolocation.add_callback = function(callback) {
+  geolocation.add_callback = function (callback) {
     settings.geolocation.google_load_callbacks = geolocation.google_load_callbacks || [];
     settings.geolocation.google_load_callbacks.push({callback: callback});
   };
@@ -62,7 +67,7 @@
    *
    * @param callback
    */
-  geolocation.load_google = function(callback) {
+  geolocation.load_google = function (callback) {
     // Default script path.
     var scriptPath = '//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&callback=Drupal.geolocation.google_callback';
 
@@ -78,11 +83,12 @@
       }
 
       $.getScript(scriptPath)
-        .done(function() {
+        .done(function () {
           geolocation.maps_api_loading = false;
         });
 
-    } else {
+    }
+    else {
       // Google maps loaded. Run callback.
       geolocation.google_callback();
     }
@@ -93,7 +99,7 @@
    *
    * @param map
    */
-  geolocation.add_map = function(map) {
+  geolocation.add_map = function (map) {
     // Set the container size.
     $(map.container).css({
       height: map.settings.height,
@@ -117,7 +123,7 @@
     });
 
     // Set the map marker.
-    if (map.lat != '' && map.lng != '') {
+    if (map.lat !== '' && map.lng !== '') {
       geolocation.setMapMarker(center, map);
     }
 
@@ -133,14 +139,15 @@
    *
    * @param map
    */
-  geolocation.add_geocoder = function(map) {
+  geolocation.add_geocoder = function (map) {
+
     /**
      * Callback for geocoder controls click submit.
      *
      * @param e
      *   The event from input keypress or the click of the submit button.
      */
-    var handleControlEvent = function(e) {
+    var handleControlEvent = function (e) {
       if (typeof e.keyCode === 'undefined' || e.keyCode === 13 || e.keyCode === 0) {
         // We don't any forms submitting.
         e.preventDefault();
@@ -149,8 +156,8 @@
         // Make sure there are at least 2 characters for geocoding.
         if (address.length > 1) {
           // Run the geocode function with google maps.
-          map.geocoder.geocode({'address': address}, function (results, status) {
-            if (status == google.maps.GeocoderStatus.OK) {
+          map.geocoder.geocode({address: address}, function (results, status) {
+            if (status === google.maps.GeocoderStatus.OK) {
               // Set the map viewport.
               map.google_map.fitBounds(results[0].geometry.viewport);
               // Set the values for the field.
@@ -180,10 +187,10 @@
       .get(0);
 
     // Add the default indicator if the values aren't blank.
-    if (map.lat != '' && map.lng != '') {
+    if (map.lat !== '' && map.lng !== '') {
       $(map.controls).children('.geolocation-map-indicator')
         .addClass('has-location')
-        .text(map.lat+', '+map.lng);
+        .text(map.lat + ', ' + map.lng);
     }
 
     map.controls.index = 1;
@@ -195,7 +202,7 @@
     // Add the listened for the search click event.
     google.maps.event.addDomListener($(map.controls).children('input.input')[0], 'keyup', handleControlEvent);
     // Add the event listener for the remove button.
-    google.maps.event.addDomListener($(map.controls).children('button.clear')[0], 'click', function(e) {
+    google.maps.event.addDomListener($(map.controls).children('button.clear')[0], 'click', function (e) {
       // Stop all that bubbling and form submitting.
       e.preventDefault();
       // Remove the coordinates.
@@ -206,8 +213,8 @@
       $(map.controls).children('input.input').val('');
       // Remove the form values.
       // Update the lat and lng input fields
-      $('.geolocation-hidden-lat.for-'+map.id).attr('value', '');
-      $('.geolocation-hidden-lng.for-'+map.id).attr('value', '');
+      $('.geolocation-hidden-lat.for-' + map.id).attr('value', '');
+      $('.geolocation-hidden-lng.for-' + map.id).attr('value', '');
     });
   };
 
@@ -222,10 +229,10 @@
    * @param op
    *   the op that was performed
    */
-  geolocation.codeLatLng = function(latLng, map) {
+  geolocation.codeLatLng = function (latLng, map) {
     // Update the lat and lng input fields
-    $('.geolocation-hidden-lat.for-'+map.id).attr('value', latLng.lat());
-    $('.geolocation-hidden-lng.for-'+map.id).attr('value', latLng.lng());
+    $('.geolocation-hidden-lat.for-' + map.id).attr('value', latLng.lat());
+    $('.geolocation-hidden-lng.for-' + map.id).attr('value', latLng.lng());
   };
 
   /**
@@ -236,12 +243,13 @@
    * @param map
    *   The settings object that contains all of the necessary metadata for this map.
    */
-  geolocation.setMapMarker = function(latLng, map) {
+  geolocation.setMapMarker = function (latLng, map) {
     // make sure the marker exists.
     if (typeof map.marker !== 'undefined') {
       map.marker.setPosition(latLng);
       map.marker.setMap(map.google_map);
-    } else {
+    }
+    else {
 
       // Set the info popup text.
       map.infowindow = new google.maps.InfoWindow({
@@ -257,8 +265,8 @@
       });
 
       // Add the info window event if the info text has been set.
-      if (map.settings.info_text && map.settings.info_text.length  > 0) {
-        map.marker.addListener('click', function() {
+      if (map.settings.info_text && map.settings.info_text.length > 0) {
+        map.marker.addListener('click', function () {
           map.infowindow.open(map.google_map, map.marker);
         });
         if (map.settings.info_auto_display) {
@@ -269,7 +277,7 @@
 
     // Add a visual indicator.
     $(map.controls).children('.geolocation-map-indicator')
-      .text(latLng.lat()+', '+latLng.lng())
+      .text(latLng.lat() + ', ' + latLng.lng())
       .addClass('has-location');
   };
 
