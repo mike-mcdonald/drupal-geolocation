@@ -49,6 +49,7 @@ class GeolocationItemTest extends FieldKernelTestBase {
     $entityTestStorage = \Drupal::entityTypeManager()->getStorage('entity_test');
     $lat = '49.880657';
     $lng = '10.869212';
+    $data = 'Foo bar';
 
     // Verify entity creation.
     $entity = $entityTestStorage->create([
@@ -56,6 +57,7 @@ class GeolocationItemTest extends FieldKernelTestBase {
       'field_test' => [
         'lat' => $lat,
         'lng' => $lng,
+        'data' => $data,
       ],
     ]);
     $entity->save();
@@ -70,6 +72,7 @@ class GeolocationItemTest extends FieldKernelTestBase {
     $this->assertEquals($entity->get('field_test')[0]->lat, $lat, "Lat {$entity->get('field_test')[0]->lat} is equal to lat {$lat}.");
     $this->assertEquals($entity->get('field_test')->lng, $lng, "Lng {$entity->get('field_test')->lng} is equal to lng {$lng}.");
     $this->assertEquals($entity->get('field_test')[0]->lng, $lng, "Lng {$entity->get('field_test')[0]->lng} is equal to lng {$lng}.");
+    $this->assertEquals($entity->get('field_test')->data, $data, "Data {$entity->get('field_test')->data} is equal to data {$data}.");
 
     // Verify changing the field value.
     $new_lat = rand(-90, 90) - rand(0, 999999) / 1000000;
@@ -84,6 +87,7 @@ class GeolocationItemTest extends FieldKernelTestBase {
     $entity = $entityTestStorage->load($id);
     $this->assertEquals($entity->get('field_test')->lat, $new_lat, "Lat {$entity->get('field_test')->lat} is equal to new lat {$new_lat}.");
     $this->assertEquals($entity->get('field_test')->lng, $new_lng, "Lng {$entity->get('field_test')->lng} is equal to new lng {$new_lng}.");
+    $this->assertEquals($entity->get('field_test')->data, $data, "Data {$entity->get('field_test')->data} is equal to data {$data}.");
   }
 
 }
