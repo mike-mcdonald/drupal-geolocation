@@ -6,6 +6,7 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\geolocation\GoogleMapsDisplayTrait;
 
 /**
  * Plugin implementation of the 'geolocation_latlng' formatter.
@@ -21,17 +22,7 @@ use Drupal\Core\Form\FormStateInterface;
  */
 class GeolocationGoogleMapFormatter extends FormatterBase {
 
-  const ROADMAP = 'ROADMAP';
-  const SATELLITE = 'SATELLITE';
-  const HYBRID = 'HYBRID';
-  const TERRAIN = 'TERRAIN';
-
-  public static $mapTypes = [
-    self::ROADMAP => 'Road map view',
-    self::SATELLITE => 'Google Earth satellite images',
-    self::HYBRID => 'A mixture of normal and satellite views',
-    self::TERRAIN => 'A physical map based on terrain information',
-  ];
+  use GoogleMapsDisplayTrait;
 
   /**
    * {@inheritdoc}
@@ -44,21 +35,13 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public static function defaultSettings() {
-    return [
-      'type' => static::ROADMAP,
-      'zoom' => 10,
-      'mapTypeControl' => TRUE,
-      'streetViewControl' => TRUE,
-      'zoomControl' => TRUE,
-      'scrollwheel' => TRUE,
-      'disableDoubleClickZoom' => FALSE,
-      'draggable' => TRUE,
-      'height' => '400px',
-      'width' => '100%',
-      'title' => '',
-      'info_text' => '',
-      'info_auto_display' => TRUE,
-    ] + parent::defaultSettings();
+    $settings = [];
+    $settings['title'] = '';
+    $settings += parent::defaultSettings();
+    $settings['info_text'] = '';
+    $settings += self::getGoogleMapDefaultSettings();
+
+    return $settings;
   }
 
   /**
@@ -67,69 +50,15 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $settings = $this->getSettings();
 
-    $elements['type'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Default map type'),
-      '#options' => $this->getMapTypes(),
-      '#default_value' => $settings['type'],
-    ];
-    $elements['zoom'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Zoom level'),
-      '#options' => range(0, 18),
-      '#description' => $this->t('The initial resolution at which to display the map, where zoom 0 corresponds to a map of the Earth fully zoomed out, and higher zoom levels zoom in at a higher resolution.'),
-      '#default_value' => $settings['zoom'],
-    ];
-    $elements['mapTypeControl'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Map type control'),
-      '#description' => $this->t('Allow the user to change the map type.'),
-      '#default_value' => $settings['mapTypeControl'],
-    ];
-    $elements['streetViewControl'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Street view control'),
-      '#description' => $this->t('Allow the user to switch to google street view.'),
-      '#default_value' => $settings['streetViewControl'],
-    ];
-    $elements['zoomControl'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Zoom control'),
-      '#description' => $this->t('Show zoom controls.'),
-      '#default_value' => $settings['zoomControl'],
-    ];
-    $elements['scrollwheel'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Scrollwheel'),
-      '#description' => $this->t('Allow the user to zoom the map using the scrollwheel.'),
-      '#default_value' => $settings['scrollwheel'],
-    ];
-    $elements['disableDoubleClickZoom'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Disable double click zoom'),
-      '#description' => $this->t('Disables the double click zoom functionality.'),
-      '#default_value' => $settings['disableDoubleClickZoom'],
-    ];
-    $elements['draggable'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Draggable'),
-      '#description' => $this->t('Allow the user to change the field of view.'),
-      '#default_value' => $settings['draggable'],
-    ];
-    $elements['height'] = [
+    $elements['title'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Height'),
-      '#description' => $this->t('Enter the dimensions and the measurement units. E.g. 200px or 100%.'),
-      '#size' => 4,
-      '#default_value' => $settings['height'],
+      '#title' => $this->t('Hover title'),
+      '#description' => $this->t('The hover title is a tool tip that will be displayed when the mouse is paused over the map marker.'),
+      '#default_value' => $settings['title'],
     ];
-    $elements['width'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Width'),
-      '#description' => $this->t('Enter the dimensions and the measurement units. E.g. 200px or 100%.'),
-      '#size' => 4,
-      '#default_value' => $settings['width'],
-    ];
+
+    $elements += $this->getGoogleMapsSettingsForm($settings);
+
     $elements['info_text'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Info text'),
@@ -139,17 +68,6 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
         . ' is unchecked. Leave blank if you do not wish to display an "Info'
         . ' window". See "REPLACEMENT PATTERNS" below for available replacements.'),
       '#default_value' => $settings['info_text'],
-    ];
-    $elements['info_auto_display'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Automatically show info text'),
-      '#default_value' => $settings['info_auto_display'],
-    ];
-    $elements['title'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Hover title'),
-      '#description' => $this->t('The hover title is a tool tip that will be displayed when the mouse is paused over the map marker.'),
-      '#default_value' => $settings['title'],
     ];
 
     $elements['replacement_patterns'] = [
@@ -174,17 +92,15 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public function settingsSummary() {
-    $settings = $this->getSettings();
-    $types = $this->getMapTypes();
+    $settings = $this->getSettings();;
+
     $summary = [];
-    $summary[] = $this->t('Type: @type', ['@type' => $types[$settings['type']]]);
-    $summary[] = $this->t('Zoom level: @zoom', ['@zoom' => $settings['zoom']]);
-    $summary[] = $this->t('Height: @height', ['@height' => $settings['height']]);
-    $summary[] = $this->t('Width: @width', ['@width' => $settings['width']]);
+    $summary[] = $this->t('Hover Title: @type', ['@type' => $settings['title']]);
+    $summary += $this->getGoogleMapsSettingsSummary($settings);
     $summary[] = $this->t('Info Text: @type', [
       '@type' => current(explode(chr(10), wordwrap($settings['info_text'], 30))),
     ]);
-    $summary[] = $this->t('Hover Title: @type', ['@type' => $settings['title']]);
+
     return $summary;
   }
 
@@ -193,7 +109,7 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     // Add formatter settings to the drupalSettings array.
-    $field_settings = $this->getSettings();
+    $field_settings = $this->getGoogleMapsSettings($this->getSettings()) + $this->getSettings();
     $elements = [];
     // This is a list of tokenized settings that should have placeholders
     // replaced with contextual values.
@@ -212,9 +128,6 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
 
       $uniqueue_id = uniqid("map-canvas-");
 
-      // Add Google API key to js.
-      $config = \Drupal::config('geolocation.settings');
-
       $elements[$delta] = [
         '#type' => 'markup',
         '#markup' => '<div id="' . $uniqueue_id . '" class="geolocation-google-map"></div>',
@@ -230,7 +143,7 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
                   'settings' => $field_settings,
                 ],
               ],
-              'google_map_api_key' => $config->get('google_map_api_key'),
+              'google_map_api_key' => \Drupal::config('geolocation.settings')->get('google_map_api_key'),
             ],
           ],
         ],
@@ -251,17 +164,6 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
 
     }
     return $elements;
-  }
-
-  /**
-   * An array of all available map types.
-   *
-   * @return array
-   *   The map types.
-   */
-  private function getMapTypes() {
-    // Translate values.
-    return array_map([$this, 't'], static::$mapTypes);
   }
 
 }

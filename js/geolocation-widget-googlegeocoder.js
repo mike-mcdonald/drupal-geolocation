@@ -8,17 +8,27 @@
 
   /* global google */
 
-  // Ensure and add shortcut to the geolocation object.
-  var geolocation = Drupal.geolocation = Drupal.geolocation || {};
+  /**
+   * @namespace
+   */
+  Drupal.geolocation = Drupal.geolocation || {};
 
+  /**
+   * Attach geocoder functionality.
+   *
+   * @type {Drupal~behavior}
+   *
+   * @prop {Drupal~behaviorAttach} attach
+   *   Attaches geocoder functionality to relevant elements.
+   */
   Drupal.behaviors.geolocationGooglemaps = {
     attach: function (context, settings) {
       // Ensure iterables.
       settings.geolocation = settings.geolocation || {widget_maps: []};
       // Make sure the lazy loader is available.
-      if (typeof geolocation.load_google === 'function') {
+      if (typeof Drupal.geolocation.loadGoogle === 'function') {
         // First load the library from google.
-        geolocation.load_google(function () {
+        Drupal.geolocation.loadGoogle(function () {
           // This won't fire until window load.
           initialize(settings.geolocation.widget_maps);
         });
@@ -28,21 +38,22 @@
 
   /**
    * Adds the click listeners to the map.
-   * @param map
+   *
+   * @param {object} map - The current map object.
    */
-  geolocation.add_click_listener = function (map) {
+  Drupal.geolocation.addClickListener = function (map) {
     // Used for a single click timeout.
     var singleClick;
     // Add the click listener.
-    google.maps.event.addListener(map.google_map, 'click', function (e) {
+    google.maps.event.addListener(map.googleMap, 'click', function (e) {
       // Create 500ms timeout to wait for double click.
       singleClick = setTimeout(function () {
-        geolocation.codeLatLng(e.latLng, map, 'marker');
-        geolocation.setMapMarker(e.latLng, map);
+        Drupal.geolocation.codeLatLng(e.latLng, map);
+        Drupal.geolocation.setMapMarker(e.latLng, map);
       }, 500);
     });
     // Add a doubleclick listener.
-    google.maps.event.addListener(map.google_map, 'dblclick', function (e) {
+    google.maps.event.addListener(map.googleMap, 'dblclick', function (e) {
       clearTimeout(singleClick);
     });
   };
@@ -50,7 +61,7 @@
   /**
    * Runs after the google maps api is available
    *
-   * @param maps
+   * @param {object} maps - The google map object.
    */
   function initialize(maps) {
     // Process drupalSettings for every Google map present on the current page.
@@ -65,7 +76,7 @@
         && typeof google.maps !== 'undefined'
       ) {
         // Add any missing settings.
-        map.settings = $.extend(geolocation.default_settings(), map.settings);
+        map.settings = $.extend(Drupal.geolocation.defaultSettings(), map.settings);
 
         // Set the lat / lng if not already set.
         if (map.lat === 0 || map.lng === 0) {
@@ -74,13 +85,13 @@
         }
 
         // Add the map by ID with settings.
-        geolocation.add_map(map);
+        Drupal.geolocation.addMap(map);
 
         // Add the geocoder to the map.
-        geolocation.add_geocoder(map);
+        Drupal.geolocation.addGeocoder(map);
 
         // Add the click responders for setting the value.
-        geolocation.add_click_listener(map);
+        Drupal.geolocation.addClickListener(map);
 
         // Set the already processed flag.
         $(map.container).addClass('geolocation-processed');

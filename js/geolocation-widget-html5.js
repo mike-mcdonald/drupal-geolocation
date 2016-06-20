@@ -7,6 +7,14 @@
 
   'use strict';
 
+  /**
+   * Attach html5 widget functionality.
+   *
+   * @type {Drupal~behavior}
+   *
+   * @prop {Drupal~behaviorAttach} attach
+   *   Attaches html5 widget functionality to relevant elements.
+   */
   Drupal.behaviors.geolocationHTML5 = {
     attach: function (context, settings) {
       $('.geolocation-html5-button:not(.disabled)').each(function (index) {
@@ -133,28 +141,5 @@
       alert(Drupal.t('No location data found. Your browser does not support the W3C Geolocation API.'));
     }
   });
-
-  /**
-   * Runs after the google maps api is available
-   *
-   * @param settings
-   */
-  function initialize(settings) {
-
-    /* global geolocation */
-
-    // Process drupalSettings for every Google map present on the current page.
-    $.each(settings.geolocation.widget_maps, function (widget_id, map) {
-
-      // Add any missing settings.
-      map.settings = $.extend(geolocation.default_settings(), map.settings);
-
-      // Add the map by ID with settings.
-      geolocation.add_map(map);
-
-      // Add the click responders ffor setting the value.
-      geolocation.add_click_listener(map);
-    });
-  }
 
 })(jQuery, Drupal, navigator);

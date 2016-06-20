@@ -46,3 +46,4 @@ geolocation.commonmap:
   dependencies:
     - core/drupal
     - core/jquery
+    - geolocation/geolocation.core
