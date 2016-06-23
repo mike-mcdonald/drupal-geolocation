@@ -30,7 +30,7 @@
         // First load the library from google.
         Drupal.geolocation.loadGoogle(function () {
           // This won't fire until window load.
-          initialize(settings.geolocation.widget_maps);
+          initialize(settings.geolocation.widget_maps, context);
         });
       }
     }
@@ -62,13 +62,14 @@
    * Runs after the google maps api is available
    *
    * @param {object} maps - The google map object.
+   * @param {object} context - The html context.
    */
-  function initialize(maps) {
+  function initialize(maps, context) {
     // Process drupalSettings for every Google map present on the current page.
     $.each(maps, function (widget_id, map) {
 
       // Get the container object.
-      map.container = document.getElementById(map.id);
+      map.container = $('#' + map.id, context).first();
 
       if ($(map.container).length >= 1
         && !$(map.container).hasClass('geolocation-processed')

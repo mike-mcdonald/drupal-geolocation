@@ -44,6 +44,12 @@
     }
   };
 
+  /**
+   * Runs after the google maps api is available
+   *
+   * @param {object} maps - The google map object.
+   * @param {object} context - The html context.
+   */
   function initialize(maps, context) {
     // Loop though all objects and add maps to the page.
     $.each(maps, function (delta, map) {
