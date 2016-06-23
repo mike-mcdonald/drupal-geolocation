@@ -94,4 +94,94 @@ class GeolocationFieldTest extends WebTestBase {
     $this->assertRaw($expected_lng, 'Longitude value found on the article node page.');
   }
 
+  /**
+   * Helper function for testGeolocationField().
+   */
+  public function testGeolocationFieldGeocoderWidgetEmptyRequired() {
+
+    // Add the geolocation field to the article content type.
+    FieldStorageConfig::create([
+      'field_name' => 'field_geolocation',
+      'entity_type' => 'node',
+      'type' => 'geolocation',
+    ])->save();
+    FieldConfig::create([
+      'field_name' => 'field_geolocation',
+      'label' => 'Geolocation',
+      'entity_type' => 'node',
+      'bundle' => 'article',
+      'required' => TRUE,
+    ])->save();
+
+    EntityFormDisplay::load('node.article.default')
+      ->setComponent('field_geolocation', [
+        'type' => 'geolocation_googlegeocoder',
+      ])
+      ->save();
+
+    EntityViewDisplay::load('node.article.default')
+      ->setComponent('field_geolocation', [
+        'type' => 'geolocation_latlng',
+        'weight' => 1,
+      ])
+      ->save();
+
+    // Display creation form.
+    $this->drupalGet('node/add/article');
+    $this->assertFieldByName("field_geolocation[0][lat]", '', 'Geolocation lat input field found.');
+    $this->assertFieldByName("field_geolocation[0][lng]", '', 'Geolocation lng input field found.');
+
+    $edit = array(
+      'title[0][value]' => $this->randomMachineName(),
+    );
+
+    $this->drupalPostForm(NULL, $edit, t('Save'));
+    $this->assertText('No location has been selected yet for required field Geolocation', 'Empty message found for required field.');
+  }
+
+  /**
+   * Helper function for testGeolocationField().
+   */
+  public function testGeolocationFieldHtml5WidgetEmptyRequired() {
+
+    // Add the geolocation field to the article content type.
+    FieldStorageConfig::create([
+      'field_name' => 'field_geolocation',
+      'entity_type' => 'node',
+      'type' => 'geolocation',
+    ])->save();
+    FieldConfig::create([
+      'field_name' => 'field_geolocation',
+      'label' => 'Geolocation',
+      'entity_type' => 'node',
+      'bundle' => 'article',
+      'required' => TRUE,
+    ])->save();
+
+    EntityFormDisplay::load('node.article.default')
+      ->setComponent('field_geolocation', [
+        'type' => 'geolocation_html5',
+      ])
+      ->save();
+
+    EntityViewDisplay::load('node.article.default')
+      ->setComponent('field_geolocation', [
+        'type' => 'geolocation_latlng',
+        'weight' => 1,
+      ])
+      ->save();
+
+    // Display creation form.
+    $this->drupalGet('node/add/article');
+    $this->assertFieldByName("field_geolocation[0][lat]", '', 'Geolocation lat input field found.');
+    $this->assertFieldByName("field_geolocation[0][lng]", '', 'Geolocation lng input field found.');
+
+    $edit = array(
+      'title[0][value]' => $this->randomMachineName(),
+    );
+
+    $this->drupalPostForm(NULL, $edit, t('Save'));
+    $this->assertText('No location could be determined for required field Geolocation.', 'Empty message found for required field.');
+  }
+
 }
