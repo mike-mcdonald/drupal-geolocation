@@ -2,7 +2,6 @@
 
 namespace Drupal\geolocation\Plugin\views\argument;
 
-use Drupal\geolocation\GeoCoreInjectionTrait;
 use Drupal\geolocation\GeolocationCore;
 use Drupal\views\Plugin\views\argument\Formula;
 use Drupal\views\Plugin\views\query\Sql;
@@ -19,29 +18,8 @@ use Drupal\views\Plugin\views\query\Sql;
  */
 class ProximityArgument extends Formula {
 
-  use GeoCoreInjectionTrait;
-
   protected $operator = '<';
   protected $proximity = '';
-  protected $geolocationCore;
-
-  /**
-   * Constructs a new ProximityArgument instance.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\geolocation\GeolocationCore $geolocation_core
-   *   The geolocation core helper.
-   */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, GeolocationCore $geolocation_core) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
-
-    $this->geolocationCore = $geolocation_core;
-  }
 
   /**
    * {@inheritdoc}
@@ -54,7 +32,7 @@ class ProximityArgument extends Formula {
       // Get the earth radius in from the units.
       $earth_radius = $values['units'] === 'mile' ? GeolocationCore::EARTH_RADIUS_MILE : GeolocationCore::EARTH_RADIUS_KM;
       // Build a formula for the where clause.
-      $formula = $this->geolocationCore->getQueryFragment($this->tableAlias, $this->realField, $values['lat'], $values['lng'], $earth_radius);
+      $formula = \Drupal::service('geolocation.core')->getQueryFragment($this->tableAlias, $this->realField, $values['lat'], $values['lng'], $earth_radius);
       // Set the operator and value for the query.
       $this->proximity = $values['distance'];
       $this->operator = $values['operator'];
