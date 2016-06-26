@@ -121,9 +121,9 @@ class GeolocationItem extends FieldItemBase {
   public function preSave() {
     $this->get('lat')->setValue(trim($this->get('lat')->getValue()));
     $this->get('lng')->setValue(trim($this->get('lng')->getValue()));
-    $this->get('lat_sin')->setValue(sin(deg2rad($this->get('lat_sin')->getValue())));
-    $this->get('lat_cos')->setValue(cos(deg2rad($this->get('lat_cos')->getValue())));
-    $this->get('lng_rad')->setValue(deg2rad($this->get('lng_rad')->getValue()));
+    $this->get('lat_sin')->setValue(sin(deg2rad($this->get('lat')->getValue())));
+    $this->get('lat_cos')->setValue(cos(deg2rad($this->get('lat')->getValue())));
+    $this->get('lng_rad')->setValue(deg2rad($this->get('lng')->getValue()));
   }
 
 }
