@@ -37,3 +37,14 @@ views.style.maps_common:
 views.field.geolocation_field:
   type: views.field.field
   label: 'Geolocation Field'
+
+field.widget.settings.geolocation_googlegeocoder:
+  type: mapping
+  label: 'Geolocation Google Geocoder Widget settings'
+  mapping:
+    populate_address_field:
+      type: boolean
+      label: 'Store address'
+    target_address_field:
+      type: string
+      label: 'Target address field name'

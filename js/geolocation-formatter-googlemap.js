@@ -1,6 +1,6 @@
 /**
  * @file
- * Javascript for the geocoder Google map formatter.
+ * Javascript for the Google map formatter.
  */
 (function ($, Drupal) {
 

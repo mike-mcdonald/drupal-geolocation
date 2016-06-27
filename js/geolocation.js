@@ -1,9 +1,62 @@
 /**
  * @file
- *   Javascript for the geocoder module.
+ *   Javascript for the geolocation module.
  */
-(function ($, _, Drupal, drupalSettings) {
 
+/**
+ * @param {Object} drupalSettings
+ * @param {Object} drupalSettings.geolocation
+ * @param {String} drupalSettings.geolocation.google_map_api_key
+ */
+
+/**
+ * @name GoogleMapEvent
+ * @property {Function} addDomListener
+ */
+
+/**
+ * @name GoogleMap
+ * @property {Object} ZoomControlStyle
+ * @property {String} ZoomControlStyle.LARGE
+ *
+ * @property {Object} ControlPosition
+ * @property {String} ControlPosition.LEFT_TOP
+ * @property {String} ControlPosition.TOP_LEFT
+ *
+ * @property {Object} MapTypeId
+ * @property {String} MapTypeId.ROADMAP
+ *
+ * @property {Object} GeocoderStatus
+ * @property {String} GeocoderStatus.OK
+ *
+ * @property {Function} LatLng
+ *
+ * @function
+ * @property Map
+ *
+ * @function
+ * @property InfoWindow
+ *
+ * @function
+ * @property {function(Object):Object} Marker
+ * @property {Function} Marker.setPosition
+ * @property {Function} Marker.setMap
+ *
+ * @function
+ * @property {function():Object} Geocoder
+ * @property {Function} Geocoder.geocode
+ *
+ * @property {Function} fitBounds
+ */
+
+/**
+ * @name google
+ * @object
+ * @property {GoogleMap[]} maps
+ * @property {GoogleMapEvent[]} events
+ */
+
+(function ($, _, Drupal, drupalSettings) {
   'use strict';
 
   /* global google */
@@ -53,12 +106,12 @@
    */
   Drupal.geolocation.googleCallback = function () {
     // Ensure callbacks array;
-    Drupal.geolocation.google_load_callbacks = Drupal.geolocation.google_load_callbacks || [];
+    Drupal.geolocation.googleCallbacks = Drupal.geolocation.googleCallbacks || [];
 
     // Wait until the window load event to try to use the maps library.
     $(document).ready(function (e) {
-      _.invoke(drupalSettings.geolocation.google_load_callbacks, 'callback');
-      Drupal.geolocation.google_load_callbacks = [];
+      _.invoke(Drupal.geolocation.googleCallbacks, 'callback');
+      Drupal.geolocation.googleCallbacks = [];
     });
   };
 
@@ -68,8 +121,8 @@
    * @param {geolocationCallback} callback - The callback
    */
   Drupal.geolocation.addCallback = function (callback) {
-    drupalSettings.geolocation.google_load_callbacks = Drupal.geolocation.google_load_callbacks || [];
-    drupalSettings.geolocation.google_load_callbacks.push({callback: callback});
+    Drupal.geolocation.googleCallbacks = Drupal.geolocation.googleCallbacks || [];
+    Drupal.geolocation.googleCallbacks.push({callback: callback});
   };
 
   /**
@@ -153,109 +206,14 @@
   };
 
   /**
-   * Load google maps and set a callback to run when it's ready.
-   *
-   * @param {object} map - The Google Map object
-   */
-  Drupal.geolocation.addGeocoder = function (map) {
-
-    /**
-     * Callback for geocoder controls click submit.
-     *
-     * @param {object} e - The event from input keypress or the click of the submit button.
-     */
-    var handleControlEvent = function (e) {
-      if (typeof e.keyCode === 'undefined' || e.keyCode === 13 || e.keyCode === 0) {
-        // We don't any forms submitting.
-        e.preventDefault();
-        // Get the address from the input value.
-        var address = $(e.target).parent().children('input.input').val();
-        // Make sure there are at least 2 characters for geocoding.
-        if (address.length > 1) {
-          // Run the geocode function with google maps.
-          map.geocoder.geocode({address: address}, function (results, status) {
-            if (status === google.maps.GeocoderStatus.OK) {
-              // Set the map viewport.
-              map.googleMap.fitBounds(results[0].geometry.viewport);
-              // Set the values for the field.
-              Drupal.geolocation.codeLatLng(results[0].geometry.location, map);
-              // Set the map marker.
-              Drupal.geolocation.setMapMarker(results[0].geometry.location, map);
-            }
-            else {
-              // Alert of the error geocoding.
-              alert(Drupal.t('Geocode was not successful for the following reason: ') + status);
-            }
-          });
-        }
-      }
-    };
-
-    map.geocoder = new google.maps.Geocoder();
-    map.controls = $('<div class="geocode-controlls-wrapper" />')
-      .append($('<input type="text" class="input" placeholder="Enter a location" />'))
-      // Create submit button
-      .append($('<button class="submit" />'))
-      // Create clear button
-      .append($('<button class="clear" />'))
-      // Create clear button
-      .append($('<div class="geolocation-map-indicator" />'))
-      // Use the DOM element.
-      .get(0);
-
-    // Add the default indicator if the values aren't blank.
-    if (map.lat !== '' && map.lng !== '') {
-      $(map.controls).children('.geolocation-map-indicator')
-        .addClass('has-location')
-        .text(map.lat + ', ' + map.lng);
-    }
-
-    map.controls.index = 1;
-
-    map.googleMap.controls[google.maps.ControlPosition.TOP_LEFT].push(map.controls);
-
-    // Add the listened for the search click event.
-    google.maps.event.addDomListener($(map.controls).children('button.submit')[0], 'click', handleControlEvent);
-    // Add the listened for the search click event.
-    google.maps.event.addDomListener($(map.controls).children('input.input')[0], 'keyup', handleControlEvent);
-    // Add the event listener for the remove button.
-    google.maps.event.addDomListener($(map.controls).children('button.clear')[0], 'click', function (e) {
-      // Stop all that bubbling and form submitting.
-      e.preventDefault();
-      // Remove the coordinates.
-      $(map.controls).children('.geolocation-map-indicator').text('').removeClass('has-location');
-      // Clear the map point.
-      map.marker.setMap();
-      // Clear the input text.
-      $(map.controls).children('input.input').val('');
-      // Remove the form values.
-      // Update the lat and lng input fields
-      $('.geolocation-hidden-lat.for-' + map.id).attr('value', '');
-      $('.geolocation-hidden-lng.for-' + map.id).attr('value', '');
-    });
-  };
-
-  /**
-   * Set the latitude and longitude values to the input fields
-   *
-   * @param {object} latLng - A location (latLng) object from google maps API.
-   * @param {object} map - The settings object that contains all of the necessary metadata for this map.
-   */
-  Drupal.geolocation.codeLatLng = function (latLng, map) {
-    // Update the lat and lng input fields
-    $('.geolocation-hidden-lat.for-' + map.id).attr('value', latLng.lat());
-    $('.geolocation-hidden-lng.for-' + map.id).attr('value', latLng.lng());
-  };
-
-  /**
    * Set/Update a marker on a map
    *
-   * @param {object} latLng - A location (latLng) object from google maps API.
-   * @param {object} map - The settings object that contains all of the necessary metadata for this map.
+   * @param {Object} latLng - A location (latLng) object from google maps API.
+   * @param {Object} map - The settings object that contains all of the necessary metadata for this map.
    */
   Drupal.geolocation.setMapMarker = function (latLng, map) {
     // make sure the marker exists.
-    if (typeof map.marker !== 'undefined') {
+    if (map.marker instanceof google.maps.Marker) {
       map.marker.setPosition(latLng);
       map.marker.setMap(map.googleMap);
     }
