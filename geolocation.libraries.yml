@@ -18,7 +18,7 @@ geolocation.geocoder:
     - geolocation/geolocation.core
 
 # Google maps display formatter.
-geolocation.maps:
+geolocation.formatter.googlemap:
   version: 8.x-1.x
   js:
     js/geolocation-formatter-googlemap.js: {}

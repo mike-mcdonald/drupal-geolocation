@@ -132,7 +132,7 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
         '#type' => 'markup',
         '#markup' => '<div id="' . $uniqueue_id . '" class="geolocation-google-map"></div>',
         '#attached' => [
-          'library' => ['geolocation/geolocation.maps'],
+          'library' => ['geolocation/geolocation.formatter.googlemap'],
           'drupalSettings' => [
             'geolocation' => [
               'maps' => [
