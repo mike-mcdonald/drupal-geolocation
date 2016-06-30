@@ -34,42 +34,9 @@
    * @param {object} map - The Google Map object
    */
   Drupal.geolocation.geocoder.add = function (map) {
-
-    /**
-     * Callback for geocoder controls click submit.
-     *
-     * @param {object} e - The event from input keypress or the click of the submit button.
-     */
-    var handleControlEvent = function (e) {
-      if (typeof e.keyCode === 'undefined' || e.keyCode === 13 || e.keyCode === 0) {
-        // We don't any forms submitting.
-        e.preventDefault();
-        // Get the address from the input value.
-        var address = $(e.target).parent().children('input.input').val();
-        // Make sure there are at least 2 characters for geocoding.
-        if (address.length > 1) {
-          // Run the geocode function with google maps.
-          map.geocoder.geocode({address: address}, function (results, status) {
-            if (status === google.maps.GeocoderStatus.OK) {
-              // Set the map viewport.
-              map.googleMap.fitBounds(results[0].geometry.viewport);
-              // Set the map marker.
-              Drupal.geolocation.setMapMarker(results[0].geometry.location, map);
-
-              Drupal.geolocation.geocoder.resultCallback(results[0]);
-            }
-            else {
-              // Alert of the error geocoding.
-              alert(Drupal.t('Geocode was not successful for the following reason: ') + status);
-            }
-          });
-        }
-      }
-    };
-
     map.geocoder = new google.maps.Geocoder();
-    map.controls = $('<div class="geocode-controls-wrapper" />')
-      .append($('<input type="text" class="input" placeholder="Enter a location" />'))
+    map.controls = $('<form class="geocode-controls-wrapper" />')
+      .append($('<input id="geocoder-input-' + map.id + '" type="text" class="input" placeholder="Enter a location" />'))
       // Create submit button
       .append($('<button class="submit" />'))
       // Create clear button
@@ -90,8 +57,47 @@
 
     map.googleMap.controls[google.maps.ControlPosition.TOP_LEFT].push(map.controls);
 
-    google.maps.event.addDomListener($(map.controls).children('button.submit')[0], 'click', handleControlEvent);
-    google.maps.event.addDomListener($(map.controls).children('input.input')[0], 'keyup', handleControlEvent);
+    $(map.controls).children('input.input').first().autocomplete({
+      autoFocus: true,
+      source: function (request, response) {
+        var responseData = [];
+        map.geocoder.geocode({address: request.term}, function (results, status) {
+          if (status === google.maps.GeocoderStatus.OK) {
+            $.each(results, function (index, item) {
+              responseData.push({
+                value: item.formatted_address,
+                address: item
+              });
+            });
+          }
+          response(responseData);
+        });
+      },
+      select: function (event, ui) {
+        // Set the map viewport.
+        map.googleMap.fitBounds(ui.item.address.geometry.viewport);
+        // Set the map marker.
+        Drupal.geolocation.setMapMarker(ui.item.address.geometry.location, map);
+        Drupal.geolocation.geocoder.resultCallback(ui.item.address);
+      }
+    });
+
+    $(map.controls).submit(function (e) {
+      e.preventDefault();
+      map.geocoder.geocode({address: $(this).children('input.input').val()}, function (results, status) {
+        if (status === google.maps.GeocoderStatus.OK) {
+          map.googleMap.fitBounds(results[0].geometry.viewport);
+          // Set the map marker.
+          Drupal.geolocation.setMapMarker(results[0].geometry.location, map);
+          Drupal.geolocation.geocoder.resultCallback(results[0]);
+        }
+        else {
+          // Alert of the error geocoding.
+          alert(Drupal.t('Geocode was not successful for the following reason: ') + status);
+        }
+      });
+    });
+
     google.maps.event.addDomListener($(map.controls).children('button.clear')[0], 'click', function (e) {
       // Stop all that bubbling and form submitting.
       e.preventDefault();
