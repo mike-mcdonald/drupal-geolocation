@@ -131,15 +131,22 @@
    * @param {geolocationCallback} callback - The callback
    */
   Drupal.geolocation.loadGoogle = function (callback) {
-    // Default script path.
-    var scriptPath = '//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&callback=Drupal.geolocation.googleCallback';
 
     // Add the callback.
     Drupal.geolocation.addCallback(callback);
+
     // Check for google maps.
-    if (!Drupal.geolocation.maps_api_loading && (typeof google == 'undefined' || typeof google.maps == 'undefined')) {
+    if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+      if (Drupal.geolocation.maps_api_loading === true) {
+        return;
+      }
+
       Drupal.geolocation.maps_api_loading = true;
-      // google maps isn't loaded so lazy load google maps.
+      // Google maps isn't loaded so lazy load google maps.
+
+      // Default script path.
+      var scriptPath = '//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&callback=Drupal.geolocation.googleCallback';
+
       // If a Google API key isset, use it.
       if (drupalSettings.geolocation.google_map_api_key) {
         scriptPath += '&key=' + drupalSettings.geolocation.google_map_api_key;

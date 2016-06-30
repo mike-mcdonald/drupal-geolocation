@@ -23,11 +23,6 @@
    */
   Drupal.behaviors.geolocationCommonMap = {
     attach: function (context, settings) {
-      if (typeof google !== 'object' || typeof google.maps !== 'object') {
-        // If google maps api is not present, we can already stop.
-        return;
-      }
-
       if (typeof Drupal.geolocation.loadGoogle === 'function') {
         // First load the library from google.
         Drupal.geolocation.loadGoogle(function () {
