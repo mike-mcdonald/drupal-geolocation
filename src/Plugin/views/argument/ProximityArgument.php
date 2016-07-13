@@ -93,6 +93,8 @@ class ProximityArgument extends Formula {
           '=',
           '>=',
           '<=',
+          '>',
+          '<',
         ])) ? $values[3] : '<=',
         'distance' => (isset($values[4])) ? floatval($values[4]) : FALSE,
         'units' => (isset($values[5]) && strpos(strtolower($values[5]), 'mile') !== FALSE) ? 'mile' : 'km',

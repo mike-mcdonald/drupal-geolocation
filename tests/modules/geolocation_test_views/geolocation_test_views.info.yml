@@ -1,3 +1,4 @@
+core: '8.x'
 name: 'Geolocation Views Test'
 type: module
 description: 'Support module for Geolocation Views tests'
@@ -8,8 +9,3 @@ dependencies:
   - node
   - field
 hidden: true
-version: '8.0.0-rc2'
-core: '8.x'
-project: 'drupal'
-datestamp: 1445469654
-
