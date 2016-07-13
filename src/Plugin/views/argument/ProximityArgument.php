@@ -5,6 +5,7 @@ namespace Drupal\geolocation\Plugin\views\argument;
 use Drupal\geolocation\GeolocationCore;
 use Drupal\views\Plugin\views\argument\Formula;
 use Drupal\views\Plugin\views\query\Sql;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Argument handler for geolocation proximity.
@@ -20,6 +21,14 @@ class ProximityArgument extends Formula {
 
   protected $operator = '<';
   protected $proximity = '';
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+    parent::buildOptionsForm($form, $form_state);
+    $form['description']['#markup'] .= $this->t('<br/> Proximity format should be in the following format: <strong>"37.7749295,-122.41941550000001<=5miles"</strong> (defaults to km).');
+  }
 
   /**
    * {@inheritdoc}
