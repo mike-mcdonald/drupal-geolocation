@@ -185,7 +185,7 @@ class ProximityField extends NumericField {
     $earth_radius = $units === 'mile' ? GeolocationCore::EARTH_RADIUS_MILE : GeolocationCore::EARTH_RADIUS_KM;
 
     // Build the query expression.
-    $expression = \Drupal::service('geolocation.core')->getQueryFragment($this->ensureMyTable(), $this->realField, $lat, $lgn, $earth_radius);
+    $expression = \Drupal::service('geolocation.core')->getProximityQueryFragment($this->ensureMyTable(), $this->realField, $lat, $lgn, $earth_radius);
 
     // Get a placeholder for this query and save the field_alias for it.
     $placeholder = $this->placeholder();

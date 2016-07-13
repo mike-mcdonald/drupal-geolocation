@@ -34,14 +34,14 @@
 
   function initialize(settings, context) {
     // Their could be several maps/views present. Go over each entry.
-    $.each(settings.commonMap, function (index, item) {
+    $.each(settings.commonMap, function (mapId, mapSettings) {
 
       var bubble; // Keep track if a bubble is currently open.
       var fitBounds = false; // Whether to execute fitBounds().
       var bounds = false; // Placeholder for google boundaries tool.
 
       // The DOM-node the map and everything else resides in.
-      var map = $('#' + index, context);
+      var map = $('#' + mapId, context);
 
       // If the map is not present, we can go to the next entry.
       if (!map.length) {
@@ -53,7 +53,7 @@
       // Map-container is not hidden by default in case of graceful-fallback.
 
       var geolocationMap = {};
-      geolocationMap.settings = item.settings;
+      geolocationMap.settings = mapSettings.settings;
 
       geolocationMap.container = map.children('.geolocation-common-map-container');
       geolocationMap.container.show();
@@ -76,9 +76,9 @@
       var googleMap = Drupal.geolocation.addMap(geolocationMap);
 
       // Add the locations to the map.
-      map.find('.geolocation-common-map-locations .geolocation').each(function (index, item) {
-        item = $(item);
-        var position = new google.maps.LatLng(item.data('lat'), item.data('lng'));
+      map.find('.geolocation-common-map-locations .geolocation').each(function (key, location) {
+        location = $(location);
+        var position = new google.maps.LatLng(location.data('lat'), location.data('lng'));
 
         if (fitBounds && bounds) {
           bounds.extend(position);
@@ -87,8 +87,8 @@
         var marker = new google.maps.Marker({
           position: position,
           map: googleMap,
-          title: item.children('h2').text(),
-          content: item.html()
+          title: location.children('h2').text(),
+          content: location.html()
         });
 
         marker.addListener('click', function () {

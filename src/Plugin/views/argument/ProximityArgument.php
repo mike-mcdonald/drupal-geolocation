@@ -32,7 +32,7 @@ class ProximityArgument extends Formula {
       // Get the earth radius in from the units.
       $earth_radius = $values['units'] === 'mile' ? GeolocationCore::EARTH_RADIUS_MILE : GeolocationCore::EARTH_RADIUS_KM;
       // Build a formula for the where clause.
-      $formula = \Drupal::service('geolocation.core')->getQueryFragment($this->tableAlias, $this->realField, $values['lat'], $values['lng'], $earth_radius);
+      $formula = \Drupal::service('geolocation.core')->getProximityQueryFragment($this->tableAlias, $this->realField, $values['lat'], $values['lng'], $earth_radius);
       // Set the operator and value for the query.
       $this->proximity = $values['distance'];
       $this->operator = $values['operator'];

@@ -203,7 +203,7 @@ trait GoogleMapsDisplayTrait {
    *   Values to validate.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   Current Formstate.
-   * @param null $prefix
+   * @param string|null $prefix
    *   Form state prefix if needed.
    */
   public function validateGoogleMapsSettingsForm($form, FormStateInterface $form_state, $prefix = NULL) {

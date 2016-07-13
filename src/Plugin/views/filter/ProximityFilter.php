@@ -158,12 +158,12 @@ class ProximityFilter extends NumericFilter {
   public function query() {
     // Get the field alias.
     $lat = $this->value['lat'];
-    $lgn = $this->value['lng'];
+    $lng = $this->value['lng'];
 
     // Get the earth radius from the units.
     $earth_radius = $this->value['units'] === 'mile' ? GeolocationCore::EARTH_RADIUS_MILE : GeolocationCore::EARTH_RADIUS_KM;
     // Build the query expression.
-    $this->queryFragment = \Drupal::service('geolocation.core')->getQueryFragment($this->ensureMyTable(), $this->realField, $lat, $lgn, $earth_radius);
+    $this->queryFragment = \Drupal::service('geolocation.core')->getProximityQueryFragment($this->ensureMyTable(), $this->realField, $lat, $lng, $earth_radius);
     // Get operator info.
     $info = $this->operators();
     // Create a placeholder.

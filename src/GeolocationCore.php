@@ -186,7 +186,7 @@ class GeolocationCore {
    * @return string
    *   The fragment to enter to actual query.
    */
-  public function getQueryFragment($table_name, $field_id, $filter_lat, $filter_lng, $earth_radius = self::EARTH_RADIUS_KM) {
+  public function getProximityQueryFragment($table_name, $field_id, $filter_lat, $filter_lng, $earth_radius = self::EARTH_RADIUS_KM) {
 
     // Define the field names.
     $field_latsin = "{$table_name}.{$field_id}_lat_sin";
@@ -212,7 +212,6 @@ class GeolocationCore {
         * $field_latsin
       ) * $earth_radius
     )";
-
   }
 
 }

@@ -30,7 +30,7 @@ class CommonMap extends StylePluginBase {
   protected $usesGrouping = FALSE;
 
   /**
-   * Overrides \Drupal\views\Plugin\views\display\PathPluginBase::render().
+   * {@inheritdoc}
    */
   public function render() {
 
@@ -207,6 +207,7 @@ class CommonMap extends StylePluginBase {
       if ($field['plugin_id'] == 'geolocation_field') {
         $geo_options[$field_name] = $labels[$field_name];
       }
+
       if (
         $field['plugin_id'] == 'field'
         && !empty($field['entity_type'])
@@ -219,10 +220,12 @@ class CommonMap extends StylePluginBase {
           $geo_options[$field_name] = $labels[$field_name];
         }
       }
+
       if (!empty($field['type']) && $field['type'] == 'string') {
         $title_options[$field_name] = $labels[$field_name];
       }
     }
+
     $form['geolocation_field'] = [
       '#title' => $this->t('Geolocation source field'),
       '#type' => 'select',
@@ -235,10 +238,13 @@ class CommonMap extends StylePluginBase {
       '#title' => $this->t('Title source field'),
       '#type' => 'select',
       '#default_value' => $this->options['title_field'],
-      '#description' => $this->t("The source of the title for each entity. Must be string"),
+      '#description' => $this->t("The source of the title for each entity. Field type must be 'string'."),
       '#options' => $title_options,
     ];
 
+    /*
+     * Centre handling.
+     */
     $options = [
       'fit_bounds' => $this->t('Automatically fit map bounds to results. Disregards any set center or zoom.'),
       'first_row' => $this->t('Use first row as centre.'),
@@ -289,7 +295,7 @@ class CommonMap extends StylePluginBase {
         '#markup' => $label,
       ];
 
-      // Optionally, to add tableDrag support:
+      // Add tabledrag supprt.
       $form['centre'][$id]['#attributes']['class'][] = 'draggable';
       $form['centre'][$id]['weight'] = [
         '#type' => 'weight',
@@ -326,6 +332,9 @@ class CommonMap extends StylePluginBase {
 
     uasort($form['centre'], 'Drupal\Component\Utility\SortArray::sortByWeightProperty');
 
+    /*
+     * Additional map settings.
+     */
     $form += $this->getGoogleMapsSettingsForm($this->options);
   }
 
