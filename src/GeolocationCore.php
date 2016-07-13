@@ -164,6 +164,27 @@ class GeolocationCore {
           'real field' => $args['@field_name'],
         ],
       ];
+
+      // Add boundary handlers.
+      $data[$table_name][$args['@field_name'] . '_boundary'] = [
+        'group' => $target_entity_type->getLabel(),
+        'title' => $this->t('Boundary (@field_name)', $args),
+        'title short' => isset($field_coordinates_table_data['title short']) ? $field_coordinates_table_data['title short'] . t(":boundary") : '',
+        'help' => isset($field_coordinates_table_data['help']) ? $field_coordinates_table_data['help'] : '',
+        'filter' => [
+          'id' => 'geolocation_filter_boundary',
+          'table' => $table_name,
+          'entity_type' => $entity_type_id,
+          'field_name' => $args['@field_name'] . '_boundary',
+          'real field' => $args['@field_name'],
+          'label' => $this->t('Boundaries around !field_name', $args),
+          'allow empty' => TRUE,
+          'additional fields' => [
+            $args['@field_name'] . '_lat',
+            $args['@field_name'] . '_lng',
+          ],
+        ],
+      ];
     }
 
     return $data;
@@ -211,6 +232,38 @@ class GeolocationCore {
         $filter_latsin
         * $field_latsin
       ) * $earth_radius
+    )";
+  }
+
+  /**
+   * Gets the query fragment for adding a boundary field to a query.
+   *
+   * @param string $table_name
+   *   The proximity table name.
+   * @param string $field_id
+   *   The proximity field ID.
+   * @param string $filter_lat_north_east
+   *   The latitude to filter for.
+   * @param string $filter_lng_north_east
+   *   The longitude to filter for.
+   * @param string $filter_lat_south_west
+   *   The latitude to filter for.
+   * @param string $filter_lng_south_west
+   *   The longitude to filter for.
+   *
+   * @return string
+   *   The fragment to enter to actual query.
+   */
+  public function getBoundaryQueryFragment($table_name, $field_id, $filter_lat_north_east, $filter_lng_north_east, $filter_lat_south_west, $filter_lng_south_west) {
+    // Define the field name.
+    $field_lat = "{$table_name}.{$field_id}_lat";
+    $field_lng = "{$table_name}.{$field_id}_lng";
+
+    return "(
+      $field_lat < $filter_lat_north_east
+      AND $field_lat > $filter_lat_south_west
+      AND $field_lng < $filter_lng_north_east
+      AND $field_lng > $filter_lng_south_west
     )";
   }
 

@@ -74,6 +74,27 @@ views.field.geolocation_field:
   type: views.field.field
   label: 'Geolocation Field'
 
+views.filter.geolocation_filter_boundary:
+  type: views.filter.filter
+  label: 'Geolocation Boundary Filter'
+  mapping:
+    value:
+      type: mapping
+      label: 'Value'
+      mapping:
+        lat_north_east:
+          type: string
+          label: 'North East Latitude'
+        lng_north_east:
+           type: string
+           label: 'North East Longitude'
+        lat_south_west:
+           type: string
+           label: 'South West Latitude'
+        lng_south_west:
+           type: string
+           label: 'North East Longitude'
+
 field.formatter.settings.geolocation_map:
   type: mapping
   label: 'Geolocation Google Map Formatter'
