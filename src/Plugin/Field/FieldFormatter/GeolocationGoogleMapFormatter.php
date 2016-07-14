@@ -96,7 +96,7 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
 
     $summary = [];
     $summary[] = $this->t('Hover Title: @type', ['@type' => $settings['title']]);
-    $summary += $this->getGoogleMapsSettingsSummary($settings);
+    $summary = array_merge($summary, $this->getGoogleMapsSettingsSummary($settings));
     $summary[] = $this->t('Info Text: @type', [
       '@type' => current(explode(chr(10), wordwrap($settings['info_text'], 30))),
     ]);

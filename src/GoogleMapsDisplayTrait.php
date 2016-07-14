@@ -41,18 +41,20 @@ trait GoogleMapsDisplayTrait {
    */
   public static function getGoogleMapDefaultSettings() {
     return [
-      'type' => static::$ROADMAP,
-      'zoom' => 10,
-      'mapTypeControl' => TRUE,
-      'streetViewControl' => TRUE,
-      'zoomControl' => TRUE,
-      'scrollwheel' => TRUE,
-      'disableDoubleClickZoom' => FALSE,
-      'draggable' => TRUE,
-      'height' => '400px',
-      'width' => '100%',
-      'info_auto_display' => TRUE,
-      'style' => '',
+      'google_map_settings' => [
+        'type' => static::$ROADMAP,
+        'zoom' => 10,
+        'mapTypeControl' => TRUE,
+        'streetViewControl' => TRUE,
+        'zoomControl' => TRUE,
+        'scrollwheel' => TRUE,
+        'disableDoubleClickZoom' => FALSE,
+        'draggable' => TRUE,
+        'height' => '400px',
+        'width' => '100%',
+        'info_auto_display' => TRUE,
+        'style' => '',
+      ],
     ];
   }
 
@@ -69,17 +71,17 @@ trait GoogleMapsDisplayTrait {
     $default_settings = self::getGoogleMapDefaultSettings();
     $settings = array_merge($default_settings, $settings);
 
-    foreach ($settings as $key => $setting) {
-      if (!isset($default_settings[$key])) {
-        unset($settings[$key]);
+    foreach ($settings['google_map_settings'] as $key => $setting) {
+      if (!isset($default_settings['google_map_settings'][$key])) {
+        unset($settings['google_map_settings'][$key]);
       }
     }
 
     // Convert JSON string to actual array before handing to Renderer.
-    if (!empty($settings['style'])) {
-      $json = json_decode($settings['style']);
+    if (!empty($settings['google_map_settings']['style'])) {
+      $json = json_decode($settings['google_map_settings']['style']);
       if (is_array($json)) {
-        $settings['style'] = $json;
+        $settings['google_map_settings']['style'] = $json;
       }
     }
 
@@ -98,11 +100,10 @@ trait GoogleMapsDisplayTrait {
   public function getGoogleMapsSettingsSummary($settings) {
     $types = $this->getMapTypes();
     $summary = [];
-    $summary[] = $this->t('Type: @type', ['@type' => $types[$settings['type']]]);
-    $summary[] = $this->t('Zoom level: @zoom', ['@zoom' => $settings['zoom']]);
-    $summary[] = $this->t('Height: @height', ['@height' => $settings['height']]);
-    $summary[] = $this->t('Width: @width', ['@width' => $settings['width']]);
-    $summary[] = $this->t('Hover Title: @type', ['@type' => $settings['title']]);
+    $summary[] = $this->t('Map Type: @type', ['@type' => $types[$settings['google_map_settings']['type']]]);
+    $summary[] = $this->t('Zoom level: @zoom', ['@zoom' => $settings['google_map_settings']['zoom']]);
+    $summary[] = $this->t('Height: @height', ['@height' => $settings['google_map_settings']['height']]);
+    $summary[] = $this->t('Width: @width', ['@width' => $settings['google_map_settings']['width']]);
     return $summary;
   }
 
@@ -116,81 +117,87 @@ trait GoogleMapsDisplayTrait {
    *   A form array to be integrated in whatever.
    */
   public function getGoogleMapsSettingsForm($settings = []) {
-    $form = [];
+    $form = [
+      'google_map_settings' => [
+        '#type' => 'details',
+        '#title' => t('GoogleMap settings'),
+        '#description' => t('Addtional map settings provided by GoogleMaps'),
+      ],
+    ];
 
-    $form['type'] = [
+    $form['google_map_settings']['type'] = [
       '#type' => 'select',
       '#title' => $this->t('Default map type'),
       '#options' => $this->getMapTypes(),
-      '#default_value' => $settings['type'],
+      '#default_value' => $settings['google_map_settings']['type'],
     ];
-    $form['zoom'] = [
+    $form['google_map_settings']['zoom'] = [
       '#type' => 'select',
       '#title' => $this->t('Zoom level'),
       '#options' => range(0, 18),
       '#description' => $this->t('The initial resolution at which to display the map, where zoom 0 corresponds to a map of the Earth fully zoomed out, and higher zoom levels zoom in at a higher resolution.'),
-      '#default_value' => $settings['zoom'],
+      '#default_value' => $settings['google_map_settings']['zoom'],
     ];
-    $form['mapTypeControl'] = [
+    $form['google_map_settings']['mapTypeControl'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Map type control'),
       '#description' => $this->t('Allow the user to change the map type.'),
-      '#default_value' => $settings['mapTypeControl'],
+      '#default_value' => $settings['google_map_settings']['mapTypeControl'],
     ];
-    $form['streetViewControl'] = [
+    $form['google_map_settings']['streetViewControl'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Street view control'),
       '#description' => $this->t('Allow the user to switch to google street view.'),
-      '#default_value' => $settings['streetViewControl'],
+      '#default_value' => $settings['google_map_settings']['streetViewControl'],
     ];
-    $form['zoomControl'] = [
+    $form['google_map_settings']['zoomControl'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Zoom control'),
       '#description' => $this->t('Show zoom controls.'),
-      '#default_value' => $settings['zoomControl'],
+      '#default_value' => $settings['google_map_settings']['zoomControl'],
     ];
-    $form['scrollwheel'] = [
+    $form['google_map_settings']['scrollwheel'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Scrollwheel'),
       '#description' => $this->t('Allow the user to zoom the map using the scrollwheel.'),
-      '#default_value' => $settings['scrollwheel'],
+      '#default_value' => $settings['google_map_settings']['scrollwheel'],
     ];
-    $form['disableDoubleClickZoom'] = [
+    $form['google_map_settings']['disableDoubleClickZoom'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Disable double click zoom'),
       '#description' => $this->t('Disables the double click zoom functionality.'),
-      '#default_value' => $settings['disableDoubleClickZoom'],
+      '#default_value' => $settings['google_map_settings']['disableDoubleClickZoom'],
     ];
-    $form['draggable'] = [
+    $form['google_map_settings']['draggable'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Draggable'),
       '#description' => $this->t('Allow the user to change the field of view.'),
-      '#default_value' => $settings['draggable'],
+      '#default_value' => $settings['google_map_settings']['draggable'],
     ];
-    $form['style'] = [
+    $form['google_map_settings']['style'] = [
       '#title' => $this->t('JSON styles'),
       '#type' => 'textarea',
-      '#default_value' => $settings['style'],
+      '#default_value' => $settings['google_map_settings']['style'],
       '#description' => $this->t('A JSON encoded styles array to customize the presentation of the Google Map. See the <a href="https://developers.google.com/maps/documentation/javascript/styling">Styled Map</a> section of the Google Maps website for further information.'),
     ];
-    $form['height'] = [
+    $form['google_map_settings']['height'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Height'),
       '#description' => $this->t('Enter the dimensions and the measurement units. E.g. 200px or 100%.'),
       '#size' => 4,
-      '#default_value' => $settings['height'],
+      '#default_value' => $settings['google_map_settings']['height'],
     ];
-    $form['width'] = [
+    $form['google_map_settings']['width'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Width'),
       '#description' => $this->t('Enter the dimensions and the measurement units. E.g. 200px or 100%.'),
       '#size' => 4,
-      '#default_value' => $settings['width'],
+      '#default_value' => $settings['google_map_settings']['width'],
     ];
-    $form['info_auto_display'] = [
+    $form['google_map_settings']['info_auto_display'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Automatically show info text'),
-      '#default_value' => $settings['info_auto_display'],
+      '#default_value' => $settings['google_map_settings']['info_auto_display'],
     ];
 
     return $form;
@@ -221,17 +228,17 @@ trait GoogleMapsDisplayTrait {
       $values = $form_state->getValues();
     }
 
-    $json_style = $values['style'];
+    $json_style = $values['google_map_settings']['style'];
     if (!empty($json_style)) {
       if (!is_string($json_style)) {
-        $form_state->setErrorByName($prefix . 'style', $this->t('Please enter a JSON string as style.'));
+        $form_state->setErrorByName($prefix . 'google_map_settings][style', $this->t('Please enter a JSON string as style.'));
       }
       $json_result = json_decode($json_style);
       if ($json_result === NULL) {
-        $form_state->setErrorByName($prefix . 'style', $this->t('Decoding style JSON failed. Error: %error.', ['%error' => json_last_error()]));
+        $form_state->setErrorByName($prefix . 'google_map_settings][style', $this->t('Decoding style JSON failed. Error: %error.', ['%error' => json_last_error()]));
       }
       elseif (!is_array($json_result)) {
-        $form_state->setErrorByName($prefix . 'style', $this->t('Decoded style JSON is not an array.'));
+        $form_state->setErrorByName($prefix . 'google_map_settings][style', $this->t('Decoded style JSON is not an array.'));
       }
     }
   }

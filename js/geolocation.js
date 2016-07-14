@@ -177,8 +177,8 @@
 
     // Set the container size.
     map.container.css({
-      height: map.settings.height,
-      width: map.settings.width
+      height: map.settings.google_map_settings.height,
+      width: map.settings.google_map_settings.width
     });
 
     // Get the center point.
@@ -186,16 +186,16 @@
 
     // Create the map object and assign it to the map.
     map.googleMap = new google.maps.Map(map.container.get(0), {
-      zoom: parseInt(map.settings.zoom),
+      zoom: parseInt(map.settings.google_map_settings.zoom),
       center: center,
-      mapTypeId: google.maps.MapTypeId[map.settings.type],
-      zoomControl: map.settings.zoomControl,
-      streetViewControl: map.settings.streetViewControl,
-      mapTypeControl: map.settings.mapTypeControl,
-      scrollwheel: map.settings.scrollwheel,
-      disableDoubleClickZoom: map.settings.disableDoubleClickZoom,
-      draggable: map.settings.draggable,
-      styles: map.settings.style
+      mapTypeId: google.maps.MapTypeId[map.settings.google_map_settings.type],
+      zoomControl: map.settings.google_map_settings.zoomControl,
+      streetViewControl: map.settings.google_map_settings.streetViewControl,
+      mapTypeControl: map.settings.google_map_settings.mapTypeControl,
+      scrollwheel: map.settings.google_map_settings.scrollwheel,
+      disableDoubleClickZoom: map.settings.google_map_settings.disableDoubleClickZoom,
+      draggable: map.settings.google_map_settings.draggable,
+      styles: map.settings.google_map_settings.style
     });
 
     // Set the map marker.
