@@ -35,6 +35,7 @@
    */
   Drupal.geolocation.geocoder.add = function (map) {
     map.geocoder = new google.maps.Geocoder();
+
     map.controls = $('<form class="geocode-controls-wrapper" />')
       .append($('<input id="geocoder-input-' + map.id + '" type="text" class="input" placeholder="Enter a location" />'))
       // Create submit button
@@ -42,22 +43,18 @@
       // Create clear button
       .append($('<button class="clear" />'))
       // Create clear button
-      .append($('<div class="geolocation-map-indicator" />'))
-      // Use the DOM element.
-      .get(0);
+      .append($('<div class="geolocation-map-indicator" />'));
 
     // Add the default indicator if the values aren't blank.
     if (map.lat !== '' && map.lng !== '') {
-      $(map.controls).children('.geolocation-map-indicator')
+      map.controls.children('.geolocation-map-indicator')
         .addClass('has-location')
         .text(map.lat + ', ' + map.lng);
     }
 
-    map.controls.index = 1;
+    map.googleMap.controls[google.maps.ControlPosition.TOP_LEFT].push(map.controls.get(0));
 
-    map.googleMap.controls[google.maps.ControlPosition.TOP_LEFT].push(map.controls);
-
-    $(map.controls).children('input.input').first().autocomplete({
+    map.controls.children('input.input').first().autocomplete({
       autoFocus: true,
       source: function (request, response) {
         var responseData = [];
@@ -82,7 +79,7 @@
       }
     });
 
-    $(map.controls).submit(function (e) {
+    map.controls.submit(function (e) {
       e.preventDefault();
       map.geocoder.geocode({address: $(this).children('input.input').val()}, function (results, status) {
         if (status === google.maps.GeocoderStatus.OK) {
@@ -98,16 +95,34 @@
       });
     });
 
-    google.maps.event.addDomListener($(map.controls).children('button.clear')[0], 'click', function (e) {
+    google.maps.event.addDomListener(map.controls.children('button.clear')[0], 'click', function (e) {
       // Stop all that bubbling and form submitting.
       e.preventDefault();
       // Remove the coordinates.
-      $(map.controls).children('.geolocation-map-indicator').text('').removeClass('has-location');
+      map.controls.children('.geolocation-map-indicator').text('').removeClass('has-location');
       // Clear the map point.
       map.marker.setMap();
       // Clear the input text.
-      $(map.controls).children('input.input').val('');
+      map.controls.children('input.input').val('');
     });
+
+    // If the browser supports W3C Geolocation API.
+    if (navigator.geolocation) {
+      map.controls.children('button.clear').first().before($('<button class="locate" />'));
+
+      google.maps.event.addDomListener(map.controls.children('button.locate')[0], 'click', function (e) {
+        // Stop all that bubbling and form submitting.
+        e.preventDefault();
+
+        // Get the geolocation from the browser.
+        navigator.geolocation.getCurrentPosition(function (position) {
+          map.googleMap.setCenter({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        });
+      });
+    }
   };
 
   /**

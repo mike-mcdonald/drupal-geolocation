@@ -42,7 +42,6 @@
   box-sizing: content-box;
   -webkit-appearance: none;
   -moz-appearance: none;
-  appearance: none;
 }
 
 .geocode-controls-wrapper input {
@@ -76,19 +75,19 @@
   text-align: right;
   margin-left: 10%;
   width: 40%;
-  border-radius: 0px 0px 2px 2px;
-  padding: 0px 2%;
+  border-radius: 0 0 2px 2px;
+  padding: 0 2%;
   top: -20px;
   color: rgb(255,255,255);
 }
 .geocode-controls-wrapper .geolocation-map-indicator.has-location {
-  top: 0px;
-  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.3);
+  top: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 button.submit {
-  background-color: #4d90fe;
-  background-image: -webkit-linear-gradient(top,#4d90fe,#4787ed);
+  background: #4d90fe;
+  background: linear-gradient(top,#4d90fe,#4787ed);
   border-radius: 0 2px 2px 0;
   width: 72px;
 }
@@ -102,10 +101,27 @@ button.submit::before {
   width: 17px;
 }
 
+button.locate {
+  margin: 0 0.5em;
+  background: #4d90fe;
+  background: linear-gradient(top, #4d90fe, #4787ed);
+  border-radius: 2px;
+  width: 36px;
+}
+button.locate::before {
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4AcVCg45w2bqzwAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAHjSURBVEjHxdY7aFZBEAXg75qIhTEaBU2tpBC7IBgfTSoxQiy0EcFCsRKfRcBCopWSgAgWNmIjdlaiSECwUMHGRtRGErSSCPGBIKKRscj+sFnun9xA0APL3T27s7PMnJ29IkLDNhgRUxExGRH9Te1WaI416VthbVOjKiIWml+Ng9iLbehO/Be8wkPcx6+lOujAYZxDzyKH/IgreNDUwUpcxz5Lw+3k6E9OljmoMFaz+Swms/G7ciMcw6XSa+ngKA4U3B3sxI2Mu4o9KQc5jmConYPuFPMcIxjFTE1IpnEqhTPHhZTDOWSaPZF03mqjhaZ7ImJ3al0ZX0XEzcJ2f2s+T/I99Kf+b+zA14YJ7sNENn6Ek9CZErou6byF99iFwDN8b7Pxegyk/gw2pP72JPPpKiKmFjndcTxpMzdck4MFVbTsqCJiIGX9FlYl/m26NFJJWChEW1N/HL3Z7R7Bz068SOSbLMl9abxYkj/jeVrfm/EvEz8vRI+LcnGm5rRDqXUVt/98sXai7h5sjIjXhZ4PZfPDGT+Y8acLm6cR0VH3HnyqUcQYLmfyy7EplY+zBT+v4JXVtMK1mno0iw/YkhW7zfNKwhzu4uI/Ldf/5cFZ1ifTEv4q2qlo2f4qfrTOhG9Njf4C0EWk9x5z6KYAAAAASUVORK5CYII=);
+  background-size: 14px;
+  content: "";
+  display: block;
+  height: 14px;
+  margin: 0 auto;
+  width: 14px;
+}
+
 button.clear {
   margin: 0 0.5em;
-  background-color: #736648;
-  background-image: -webkit-linear-gradient(top,#736648,#685C41);
+  background: #736648;
+  background: linear-gradient(top,#736648,#685C41);
   border-radius: 2px;
   width: 36px;
 }
