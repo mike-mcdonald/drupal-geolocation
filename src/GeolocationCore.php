@@ -259,12 +259,24 @@ class GeolocationCore {
     $field_lat = "{$table_name}.{$field_id}_lat";
     $field_lng = "{$table_name}.{$field_id}_lng";
 
-    return "(
-      $field_lat < $filter_lat_north_east
-      AND $field_lat > $filter_lat_south_west
-      AND $field_lng < $filter_lng_north_east
-      AND $field_lng > $filter_lng_south_west
-    )";
+    /*
+     * GoogleMaps shows a map, not a globe. Therefore it will never flip over
+     * the poles, but it will move across -180°/+180° longitude.
+     * So latitude will always have north larger than south, but east not
+     * necessarily larger than west.
+     */
+    return "($field_lat BETWEEN $filter_lat_south_west AND $filter_lat_north_east) 
+      AND
+      (
+        ($filter_lng_south_west < $filter_lng_north_east AND $field_lng BETWEEN $filter_lng_south_west AND $filter_lng_north_east) 
+        OR
+        (
+          $filter_lng_south_west > $filter_lng_north_east AND (
+            $field_lng BETWEEN $filter_lng_south_west AND 180 OR $field_lng BETWEEN -180 AND $filter_lng_north_east
+          )
+        )
+      )
+    ";
   }
 
 }

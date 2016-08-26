@@ -85,7 +85,9 @@ trait GoogleMapsDisplayTrait {
       }
     }
 
-    return $settings;
+    return [
+      'google_map_settings' => $settings['google_map_settings'],
+    ];
   }
 
   /**

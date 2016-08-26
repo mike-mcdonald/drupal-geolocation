@@ -30,6 +30,56 @@ class CommonMap extends StylePluginBase {
   protected $usesGrouping = FALSE;
 
   /**
+   * Map update option handling.
+   *
+   * Dynamic map and client location and potentially others update the view by
+   * information determined on the client site. They may want to update the
+   * view result as well. So we need to provide the possible ways to do that.
+   *
+   * @return array
+   *   The determined options.
+   */
+  protected function getMapUpdateOptions() {
+    $options = [
+      'boundary_filters' => [],
+      'boundary_filters_exposed' => [],
+      'map_update_options' => [],
+    ];
+
+    $filters = $this->displayHandler->getOption('filters');
+    foreach ($filters as $filter_name => $filter) {
+      if (empty($filter['plugin_id'])) {
+        continue;
+      }
+
+      /** @var \Drupal\views\Plugin\views\filter\FilterPluginBase $filter_handler */
+      $filter_handler = $this->displayHandler->getHandler('filter', $filter_name);
+
+      switch ($filter['plugin_id']) {
+        case 'geolocation_filter_boundary':
+          $map_update_target_options['boundary_filters'][$filter_name] = $filter_handler;
+          if ($filter_handler->isExposed()) {
+            $options['boundary_filters_exposed'][$filter_name] = $filter_handler;
+          }
+          break;
+      }
+    }
+
+    foreach ($options['boundary_filters_exposed'] as $filter_name => $filter_handler) {
+      $options['map_update_options']['boundary_filter_' . $filter_name] = $this->t('Boundary Filter') . ' - ' . $filter_handler->adminLabel();
+    }
+
+    return $options;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function evenEmpty() {
+    return $this->options['even_empty'] ? TRUE : FALSE;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function render() {
@@ -48,11 +98,11 @@ class CommonMap extends StylePluginBase {
       $this->view->field[$title_field]->options['exclude'] = TRUE;
     }
 
-    $id = uniqid($this->pluginId);
+    $map_id = $this->view->dom_id;
 
     $build = [
       '#theme' => 'geolocation_common_map_display',
-      '#id' => $id,
+      '#id' => $map_id,
       '#attached' => [
         'library' => [
           'geolocation/geolocation.commonmap',
@@ -60,9 +110,10 @@ class CommonMap extends StylePluginBase {
         'drupalSettings' => [
           'geolocation' => [
             'commonMap' => [
-              $id => [
+              $map_id => [
+                'view_id' => $this->view->id(),
+                'current_display_id' => $this->view->current_display,
                 'settings' => $this->getGoogleMapsSettings($this->options),
-                'google_map_api_key' => \Drupal::config('geolocation.settings')->get('google_map_api_key'),
               ],
             ],
             'google_map_api_key' => \Drupal::config('geolocation.settings')->get('google_map_api_key'),
@@ -71,6 +122,34 @@ class CommonMap extends StylePluginBase {
       ],
     ];
 
+    /*
+     * Dynamic map handling.
+     */
+    if (!empty($this->options['dynamic_map']['enabled'])) {
+
+      // TODO: Allow attachments/blocks to instead update their parent?
+      $update_dom_id = $this->view->dom_id;
+
+      $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['dynamic_map'] = [
+        'enable' => TRUE,
+        'hide_form' => $this->options['dynamic_map']['hide_form'],
+        'dom_id' => $update_dom_id,
+      ];
+
+      if (substr($this->options['dynamic_map']['update_handler'], 0, strlen('boundary_filter_')) === 'boundary_filter_') {
+        $filter_id = substr($this->options['dynamic_map']['update_handler'], strlen('boundary_filter_'));
+        $filters = $this->displayHandler->getOption('filters');
+        $filter_options = $filters[$filter_id];
+        $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['dynamic_map'] += [
+          'boundary_filter' => TRUE,
+          'parameter_identifier' => $filter_options['expose']['identifier'],
+        ];
+      }
+    }
+
+    /*
+     * Add locations to output.
+     */
     foreach ($this->view->result as $row) {
       if (!empty($title_field)) {
         $title_field_handler = $this->view->field[$title_field];
@@ -109,10 +188,15 @@ class CommonMap extends StylePluginBase {
 
     $centre = NULL;
     $fitbounds = FALSE;
+
+    // Maps will not load without any centre defined.
     if (!is_array($this->options['centre'])) {
       return $build;
     }
 
+    /*
+     * Centre handling.
+     */
     foreach ($this->options['centre'] as $id => $option) {
       // Ignore if not enabled.
       if (empty($option['enable'])) {
@@ -125,7 +209,7 @@ class CommonMap extends StylePluginBase {
       }
 
       // Ignore if center is already set.
-      if (!empty($centre['lat']) && !empty($centre['lng'])) {
+      if (isset($centre['lat']) && isset($centre['lng'])) {
         break;
       }
 
@@ -136,18 +220,6 @@ class CommonMap extends StylePluginBase {
             'lat' => (float) $option['settings']['latitude'],
             'lng' => (float) $option['settings']['longitude'],
           ];
-          break;
-
-        case (preg_match('/proximity_filter_*/', $id) ? TRUE : FALSE):
-          $filter_id = substr($id, 17);
-          /** @var \Drupal\geolocation\Plugin\views\filter\ProximityFilter $handler */
-          $handler = $this->displayHandler->getHandler('filter', $filter_id);
-          if ($handler->value['lat'] && $handler->value['lng']) {
-            $centre = [
-              'lat' => (float) $handler->value['lat'],
-              'lng' => (float) $handler->value['lng'],
-            ];
-          }
           break;
 
         case 'first_row':
@@ -163,6 +235,46 @@ class CommonMap extends StylePluginBase {
           }
           break;
 
+        case 'client_location':
+          $build['#clientlocation'] = TRUE;
+          $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['client_location'] = [
+            'enable' => TRUE,
+          ];
+
+          if (
+            !empty($option['settings']['update_map'])
+            && !empty($option['settings']['update_map_option'])
+          ) {
+            $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['client_location']['update_map'] = TRUE;
+
+            if (substr($option['settings']['update_map_option'], 0, strlen('boundary_filter_')) === 'boundary_filter_') {
+              $filter_id = substr($option['settings']['update_map_option'], strlen('boundary_filter_'));
+              $filters = $this->displayHandler->getOption('filters');
+              $filter_options = $filters[$filter_id];
+              $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['client_location'] += [
+                'boundary_filter' => TRUE,
+                'parameter_identifier' => $filter_options['expose']['identifier'],
+              ];
+            }
+          }
+          break;
+
+        /*
+         * Handle the dynamic options.
+         */
+        default:
+          if (preg_match('/proximity_filter_*/', $id)) {
+            $filter_id = substr($id, 17);
+            /** @var \Drupal\geolocation\Plugin\views\filter\ProximityFilter $handler */
+            $handler = $this->displayHandler->getHandler('filter', $filter_id);
+            if ($handler->value['lat'] && $handler->value['lng']) {
+              $centre = [
+                'lat' => (float) $handler->value['lat'],
+                'lng' => (float) $handler->value['lng'],
+              ];
+            }
+            break;
+          }
       }
     }
 
@@ -180,8 +292,15 @@ class CommonMap extends StylePluginBase {
   protected function defineOptions() {
     $options = parent::defineOptions();
 
+    $options['even_empty'] = ['default' => '0'];
     $options['geolocation_field'] = ['default' => ''];
     $options['title_field'] = ['default' => ''];
+    $options['dynamic_map'] = [
+      'default' => TRUE,
+      'enabled' => ['default' => 0],
+      'update_handler' => ['default' => ''],
+      'hide_form' => ['default' => 0],
+    ];
     $options['centre'] = ['default' => ''];
 
     foreach (self::getGoogleMapDefaultSettings() as $key => $setting) {
@@ -201,7 +320,7 @@ class CommonMap extends StylePluginBase {
     $fieldMap = \Drupal::service('entity_field.manager')->getFieldMap();
     $geo_options = [];
     $title_options = [];
-    $filters = $this->displayHandler->getOption('filters');
+
     $fields = $this->displayHandler->getOption('fields');
     foreach ($fields as $field_name => $field) {
       if ($field['plugin_id'] == 'geolocation_field') {
@@ -226,6 +345,12 @@ class CommonMap extends StylePluginBase {
       }
     }
 
+    $form['even_empty'] = [
+      '#title' => $this->t('Display map when no locations are found.'),
+      '#type' => 'checkbox',
+      '#default_value' => $this->options['even_empty'],
+    ];
+
     $form['geolocation_field'] = [
       '#title' => $this->t('Geolocation source field'),
       '#type' => 'select',
@@ -242,6 +367,48 @@ class CommonMap extends StylePluginBase {
       '#options' => $title_options,
     ];
 
+    $map_update_target_options = $this->getMapUpdateOptions();
+
+    /*
+     * Dynamic map handling.
+     */
+    if (!empty($map_update_target_options['map_update_options'])) {
+      $form['dynamic_map'] = [
+        '#title' => $this->t('Dynamic Map'),
+        '#type' => 'fieldset',
+      ];
+      $form['dynamic_map']['enabled'] = [
+        '#title' => $this->t('Update view on map boundary changes. Also known as "AirBnB" style.'),
+        '#type' => 'checkbox',
+        '#default_value' => $this->options['dynamic_map']['enabled'],
+        '#description' => $this->t("If enabled, moving the map will filter results based on current map boundary. This functionality requires an exposed boundary filter. Enabling AJAX is highly recommend for best user experience. If additional views are to be updated with the map change as well, it is highly recommended to use the view containing the map as 'parent' and the additional views as attachments."),
+      ];
+
+      $form['dynamic_map']['update_handler'] = [
+        '#title' => $this->t('Dynamic map update handler'),
+        '#type' => 'select',
+        '#default_value' => $this->options['dynamic_map']['update_handler'],
+        '#description' => $this->t("The map has to know how to feed back the update boundary data to the view."),
+        '#options' => $map_update_target_options['map_update_options'],
+        '#states' => [
+          'visible' => [
+            ':input[name="style_options[dynamic_map][enabled]"]' => ['checked' => TRUE],
+          ],
+        ],
+      ];
+
+      $form['dynamic_map']['hide_form'] = [
+        '#title' => $this->t('Hide exposed filter form element if applicable.'),
+        '#type' => 'checkbox',
+        '#default_value' => $this->options['dynamic_map']['hide_form'],
+        '#states' => [
+          'visible' => [
+            ':input[name="style_options[dynamic_map][enabled]"]' => ['checked' => TRUE],
+          ],
+        ],
+      ];
+    }
+
     /*
      * Centre handling.
      */
@@ -249,20 +416,14 @@ class CommonMap extends StylePluginBase {
       'fit_bounds' => $this->t('Automatically fit map bounds to results. Disregards any set center or zoom.'),
       'first_row' => $this->t('Use first row as centre.'),
       'fixed_value' => $this->t('Provide fixed latitude and longitude.'),
+      'client_location' => $this->t('Ask client for location via HTML5 geolocation API.'),
     ];
 
-    foreach ($filters as $filter_name => $filter) {
-      if (empty($filter['plugin_id']) || $filter['plugin_id'] != 'geolocation_filter_proximity') {
-        continue;
-      }
-      /** @var \Drupal\geolocation\Plugin\views\filter\ProximityFilter $proximity_filter_handler */
-      $proximity_filter_handler = $this->displayHandler->getHandler('filter', $filter_name);
-      $options['proximity_filter_' . $filter_name] = $proximity_filter_handler->adminLabel();
-    }
+    $options += $map_update_target_options['map_update_options'];
 
     $form['centre'] = [
       '#type' => 'table',
-      '#prefix' => t('Please note: Each option will, if it can be applied, supersede any following option.'),
+      '#prefix' => $this->t('<h3>Centre options</h3>Please note: Each option will, if it can be applied, supersede any following option.'),
       '#header' => [
         t('Enable'),
         t('Option'),
@@ -304,6 +465,32 @@ class CommonMap extends StylePluginBase {
         '#size' => 4,
         '#default_value' => $weight,
         '#attributes' => ['class' => ['geolocation-centre-option-weight']],
+      ];
+    }
+
+    if (!empty($map_update_target_options['map_update_options'])) {
+      $form['centre']['client_location']['settings'] = [
+        '#type' => 'container',
+        'update_map' => [
+          '#type' => 'checkbox',
+          '#title' => $this->t('Additionally feed clients location back to view?'),
+          '#default_value' => isset($this->options['centre']['client_location']['settings']['update_map']) ? $this->options['centre']['client_location']['settings']['update_map'] : FALSE,
+        ],
+        'update_map_option' => [
+          '#type' => 'select',
+          '#options' => $map_update_target_options['map_update_options'],
+          '#default_value' => isset($this->options['centre']['client_location']['settings']['update_map_option']) ? $this->options['centre']['client_location']['settings']['update_map_option'] : '',
+          '#states' => [
+            'visible' => [
+              ':input[name="style_options[centre][client_location][settings][update_map]"]' => ['checked' => TRUE],
+            ],
+          ],
+        ],
+        '#states' => [
+          'visible' => [
+            ':input[name="style_options[centre][client_location][enable]"]' => ['checked' => TRUE],
+          ],
+        ],
       ];
     }
 

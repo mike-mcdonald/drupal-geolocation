@@ -47,6 +47,7 @@ function geolocation_theme() {
       'variables' => [
         'centre' => NULL,
         'fitbounds' => NULL,
+        'clientlocation' => NULL,
         'locations' => NULL,
         'id' => NULL,
       ],

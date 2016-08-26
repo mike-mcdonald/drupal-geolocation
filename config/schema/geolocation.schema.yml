@@ -10,12 +10,28 @@ views.style.maps_common:
   type: views_style
   label: 'Geolocation CommonMap'
   mapping:
+    even_empty:
+      type: integer
+      label: 'Even empty'
     geolocation_field:
       type: string
       label: 'Geolocation Field'
     title_field:
       type: string
       label: 'Title Field'
+    dynamic_map:
+      type: mapping
+      label: 'Dynamic map settings'
+      mapping:
+      enabled:
+        type: integer
+        label: 'Dynamic content refresh'
+      hide_form:
+        type: integer
+        label: 'Hide form'
+      update_handler:
+        type: string
+        label: 'Filter or agurment name'
     centre:
       type: sequence
       label: 'Centre Option'

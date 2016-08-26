@@ -57,5 +57,8 @@ geolocation.commonmap:
     js/geolocation-common-map.js: {}
   dependencies:
     - core/drupal
+    - core/drupalSettings
+    - core/drupal.ajax
     - core/jquery
+    - core/jquery.once
     - geolocation/geolocation.core
