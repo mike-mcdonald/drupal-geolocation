@@ -94,6 +94,57 @@ views.field.geolocation_field:
   type: views.field.field
   label: 'Geolocation Field'
 
+views.field.geolocation_field_proximity:
+  type: views.field.field
+  label: 'Geolocation Proximity Field'
+  mapping:
+    proximity_source:
+      type: string
+      label: 'Proximity Field Source'
+    proximity_lat:
+      type: string
+      label: 'Proximity Latitude'
+    proximity_lng:
+      type: string
+      label: 'Proximity Longitude'
+    proximity_filter:
+      type: string
+      label: 'Proximity Filter'
+    proximity_argument:
+      type: string
+      label: 'Proximity Argument'
+    entity_id_argument:
+      type: string
+      label: 'Proximity Entity ID argument'
+    entity_id_argument_units:
+      type: string
+      label: 'Proximity Entity ID units'
+    # Inherit from views
+    set_precision:
+      type: boolean
+      label: 'Round'
+    precision:
+      type: integer
+      label: 'Precision'
+    decimal:
+      type: string
+      label: 'Decimal point'
+    separator:
+      type: string
+      label: 'Thousands marker'
+    format_plural:
+      type: boolean
+      label: 'Format plural'
+    format_plural_string:
+      type: plural_label
+      label: 'Plural variants'
+    prefix:
+      type: label
+      label: 'Prefix'
+    suffix:
+      type: label
+      label: 'Suffix'
+
 views.filter.geolocation_filter_boundary:
   type: views.filter.filter
   label: 'Geolocation Boundary Filter'
@@ -114,6 +165,14 @@ views.filter.geolocation_filter_boundary:
         lng_south_west:
            type: string
            label: 'North East Longitude'
+
+views.sort.geolocation_sort_proximity:
+  type: views_sort
+  label: 'Geolocation Proximity Sort'
+  mapping:
+    proximity_field:
+      type: string
+      label: 'Proximity Field Source'
 
 field.formatter.settings.geolocation_map:
   type: mapping

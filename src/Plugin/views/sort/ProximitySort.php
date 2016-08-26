@@ -29,25 +29,29 @@ class ProximitySort extends SortPluginBase {
    * {@inheritdoc}
    */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
-    // Buffer available  filters.
-    $valid_feilds = ['--none--' => $this->t('-- None --')];
+    $proximity_fields = [];
 
-    // Check for valid filters.
     foreach ($this->view->getHandlers('field', $this->view->current_display) as $delta => $field) {
       if ($field['plugin_id'] === 'geolocation_field_proximity') {
-        $valid_feilds[$delta] = $field['id'];
+        $proximity_fields[$delta] = $field['id'];
       }
     }
-    // Add the Filter selector.
-    $form['proximity_field'] = empty($valid_feilds)
-      ? ['#markup' => $this->t('There are no proximity fields available in this display.')]
-      : [
+
+    if (empty($proximity_fields)) {
+      $form['proximity_field'] = [
+        '#markup' => $this->t('There are no proximity fields available in this display.'),
+      ];
+    }
+    else {
+      // Add the Filter selector.
+      $form['proximity_field'] = [
         '#type' => 'select',
         '#title' => $this->t('Select field.'),
         '#description' => $this->t('Select the field to use for sorting.'),
-        '#options' => $valid_feilds,
+        '#options' => $proximity_fields,
         '#default_value' => $this->options['proximity_field'],
       ];
+    }
 
     // Add the Drupal\views\Plugin\views\field\Numeric settings to the form.
     parent::buildOptionsForm($form, $form_state);
@@ -62,7 +66,7 @@ class ProximitySort extends SortPluginBase {
     }
     // Get the field for sorting.
     $field = isset($this->view->field[$this->options['proximity_field']]) ? $this->view->field[$this->options['proximity_field']] : NULL;
-    if (!empty($field->field_alias)) {
+    if (!empty($field->field_alias) && $field->field_alias != 'unknown') {
       $this->query->addOrderBy(NULL, NULL, $this->options['order'], $field->field_alias);
       $this->tableAlias = $field->tableAlias;
     }

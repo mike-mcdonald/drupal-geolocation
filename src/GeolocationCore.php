@@ -61,6 +61,8 @@ class GeolocationCore {
     // Get the default data from the views module.
     $data = views_field_default_views_data($field_storage);
 
+    $args = ['@field_name' => $field_storage->getName()];
+
     // Loop through all of the results and set our overrides.
     foreach ($data as $table_name => $table_data) {
       foreach ($table_data as $field_name => $field_data) {
@@ -72,7 +74,15 @@ class GeolocationCore {
             $data[$table_name][$field_name]['field']['click sortable'] = FALSE;
           }
           if (isset($field_data['filter'])) {
-            // The default filters aren't useful at all so remove them.
+            if (substr($field_name, -4, 4) == '_lat') {
+              $data[$table_name][$field_name]['title'] = $this->t('Latitude (@field_name)', $args);
+              continue;
+            }
+            if (substr($field_name, -4, 4) == '_lng') {
+              $data[$table_name][$field_name]['title'] = $this->t('Longitude (@field_name)', $args);
+              continue;
+            }
+            // The default filters are mostly not useful except lat/lng.
             unset($data[$table_name][$field_name]['filter']);
           }
           if (isset($field_data['argument'])) {
@@ -85,8 +95,6 @@ class GeolocationCore {
           }
         }
       }
-
-      $args = ['@field_name' => $field_storage->getName()];
 
       $field_coordinates_table_data = [];
       $entity_type_id = $field_storage->getTargetEntityTypeId();
@@ -145,6 +153,7 @@ class GeolocationCore {
           'field_name' => $args['@field_name'] . '_proximity',
           'entity_type' => $entity_type_id,
           'real field' => $args['@field_name'],
+          'float' => TRUE,
           'additional fields' => [
             $args['@field_name'] . '_lat',
             $args['@field_name'] . '_lng',
