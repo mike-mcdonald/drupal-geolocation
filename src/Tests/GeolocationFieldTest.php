@@ -44,7 +44,7 @@ class GeolocationFieldTest extends WebTestBase {
   /**
    * Helper function for testGeolocationField().
    */
-  public function testGeolocationField() {
+  public function testGeolocationFieldLatlngWidget() {
 
     // Add the geolocation field to the article content type.
     FieldStorageConfig::create([
@@ -79,7 +79,9 @@ class GeolocationFieldTest extends WebTestBase {
 
     // Test basic entery of geolocation field.
     $lat = '49.880657';
+    $lat_sexagesimal = '49° 52\' 50.3652"';
     $lng = '10.869212';
+    $lng_sexagesimal = '10° 52\' 9.1632"';
     $edit = array(
       'title[0][value]' => $this->randomMachineName(),
       'field_geolocation[0][lat]' => $lat,
@@ -88,10 +90,23 @@ class GeolocationFieldTest extends WebTestBase {
 
     // Test if the raw lat, lng values are found on the page.
     $this->drupalPostForm(NULL, $edit, t('Save'));
-    $expected_lat = $lat;
-    $this->assertRaw($expected_lat, 'Latitude value found on the article node page.');
-    $expected_lng = $lng;
-    $this->assertRaw($expected_lng, 'Longitude value found on the article node page.');
+    $this->assertRaw($lat, 'Latitude value found on the article node page.');
+    $this->assertRaw($lng, 'Longitude value found on the article node page.');
+
+    $this->drupalGet('node/1/edit');
+
+    $this->assertRaw(htmlspecialchars($lat_sexagesimal, ENT_QUOTES), 'Latitude sexagesimal value found on node edit page.');
+    $this->assertRaw(htmlspecialchars($lng_sexagesimal, ENT_QUOTES), 'Longitude sexagesimal value found on node edit page.');
+
+    $edit = array(
+      'field_geolocation[0][lat]' => $lat_sexagesimal,
+      'field_geolocation[0][lng]' => $lng_sexagesimal,
+    );
+
+    // Test if the raw lat, lng values are found on the page.
+    $this->drupalPostForm(NULL, $edit, t('Save'));
+    $this->assertRaw($lat, 'Latitude value correct for sexagesimal input.');
+    $this->assertRaw($lng, 'Longitude value correct for sexagesimal input.');
   }
 
   /**

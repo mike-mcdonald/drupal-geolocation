@@ -5,6 +5,7 @@ namespace Drupal\geolocation\Plugin\Field\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\geolocation\GeolocationCore;
 
 /**
  * Plugin implementation of the 'geolocation_latlng' widget.
@@ -30,9 +31,11 @@ class GeolocationLatlngWidget extends WidgetBase {
       '#empty_value' => '',
       '#default_value' => (isset($items[$delta]->lat)) ? $items[$delta]->lat : NULL,
       '#maxlength' => 255,
-      '#description' => $this->t('Latitude'),
       '#required' => $this->fieldDefinition->isRequired(),
     );
+    if (!empty($element['lat']['#default_value'])) {
+      $element['lat']['#description'] = $this->t('<span>Sexagesimal/DMS notation value: %sexagesimal</span>', ['%sexagesimal' => GeolocationCore::DecimalToSexagesimal($element['lat']['#default_value'])]);
+    }
 
     $element['lng'] = array(
       '#type' => 'textfield',
@@ -40,11 +43,35 @@ class GeolocationLatlngWidget extends WidgetBase {
       '#empty_value' => '',
       '#default_value' => (isset($items[$delta]->lng)) ? $items[$delta]->lng : NULL,
       '#maxlength' => 255,
-      '#description' => $this->t('Longitude'),
       '#required' => $this->fieldDefinition->isRequired(),
     );
+    if (!empty($element['lng']['#default_value'])) {
+      $element['lng']['#description'] = $this->t('<span>Sexagesimal/DMS notation value: %sexagesimal</span>', ['%sexagesimal' => GeolocationCore::DecimalToSexagesimal($element['lng']['#default_value'])]);
+    }
 
     return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
+    // Grep GPS values and transform to regular float.
+    foreach ($values as $index => $geolocation) {
+      if (
+        !empty($geolocation['lat'])
+        && !empty($geolocation['lng'])
+      ) {
+        $latitude = GeolocationCore::SexagesimalToDecimal($values[$index]['lat']);
+        $longitude = GeolocationCore::SexagesimalToDecimal($values[$index]['lng']);
+
+        if (!empty($latitude) && !empty($longitude)) {
+          $values[$index]['lat'] = $latitude;
+          $values[$index]['lng'] = $longitude;
+        }
+      }
+    }
+    return parent::massageFormValues($values, $form, $form_state);
   }
 
 }

@@ -43,6 +43,13 @@ function geolocation_theme() {
       ],
       'template' => 'geolocation-latlng-formatter',
     ],
+    'geolocation_sexagesimal_formatter' => [
+      'variables' => [
+        'lat' => NULL,
+        'lng' => NULL,
+      ],
+      'template' => 'geolocation-sexagesimal-formatter',
+    ],
     'geolocation_common_map_display' => [
       'variables' => [
         'centre' => NULL,
