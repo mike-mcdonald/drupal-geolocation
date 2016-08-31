@@ -92,8 +92,8 @@
 
         // Set the lat / lng if not already set.
         if (map.lat === 0 || map.lng === 0) {
-          map.lat = $('fieldset.canvas-' + map.id + ' .geolocation-hidden-lat').attr('value');
-          map.lng = $('fieldset.canvas-' + map.id + ' .geolocation-hidden-lng').attr('value');
+          map.lat = $('.canvas-' + map.id + ' .geolocation-hidden-lat').attr('value');
+          map.lng = $('.canvas-' + map.id + ' .geolocation-hidden-lng').attr('value');
         }
 
         // Add the map by ID with settings.
@@ -210,8 +210,8 @@
    */
   Drupal.geolocation.geocoderWidget.setHiddenInputFields = function (latLng, map) {
     // Update the lat and lng input fields.
-    $('fieldset.canvas-' + map.id + ' .geolocation-hidden-lat').attr('value', latLng.lat());
-    $('fieldset.canvas-' + map.id + ' .geolocation-hidden-lng').attr('value', latLng.lng());
+    $('.canvas-' + map.id + ' .geolocation-hidden-lat').attr('value', latLng.lat());
+    $('.canvas-' + map.id + ' .geolocation-hidden-lng').attr('value', latLng.lng());
   };
 
   /**
@@ -221,8 +221,8 @@
    */
   Drupal.geolocation.geocoderWidget.clearHiddenInputFields = function (map) {
     // Update the lat and lng input fields.
-    $('fieldset.canvas-' + map.id + ' .geolocation-hidden-lat').attr('value', '');
-    $('fieldset.canvas-' + map.id + ' .geolocation-hidden-lng').attr('value', '');
+    $('.canvas-' + map.id + ' .geolocation-hidden-lat').attr('value', '');
+    $('.canvas-' + map.id + ' .geolocation-hidden-lng').attr('value', '');
   };
 
 
