@@ -267,7 +267,7 @@ class CommonMap extends StylePluginBase {
             $filter_id = substr($id, 17);
             /** @var \Drupal\geolocation\Plugin\views\filter\ProximityFilter $handler */
             $handler = $this->displayHandler->getHandler('filter', $filter_id);
-            if ($handler->value['lat'] && $handler->value['lng']) {
+            if (isset($handler->value['lat']) && isset($handler->value['lng'])) {
               $centre = [
                 'lat' => (float) $handler->value['lat'],
                 'lng' => (float) $handler->value['lng'],
