@@ -166,6 +166,33 @@ views.filter.geolocation_filter_boundary:
            type: string
            label: 'North East Longitude'
 
+views.filter.geolocation_filter_proximity:
+  type: views.filter.filter
+  label: 'Geolocation Proximity Filter'
+  mapping:
+    value:
+      type: mapping
+      label: 'Proximity Value'
+      mapping:
+        min:
+          type: string
+          label: 'Minimum Distance'
+        max:
+          type: string
+          label: 'Maximum Distance'
+        value:
+          type: string
+          label: 'Value'
+        lat:
+          type: string
+          label: 'Latitude'
+        lng:
+          type: string
+          label: 'Longitude'
+        units:
+          type: string
+          label: 'Units'
+
 views.sort.geolocation_sort_proximity:
   type: views_sort
   label: 'Geolocation Proximity Sort'
