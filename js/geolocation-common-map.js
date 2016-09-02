@@ -276,6 +276,10 @@
           content: location.html()
         });
 
+        if (typeof location.data('icon') !== 'undefined') {
+          marker.setIcon(location.data('icon'));
+        }
+
         currentMarkers.push(marker);
 
         marker.addListener('click', function () {

@@ -64,6 +64,7 @@
  * @property {function(Object):Object} Marker
  * @property {Function} Marker.setPosition
  * @property {Function} Marker.setMap
+ * @property {Function} Marker.setIcon
  *
  * @function
  * @property {function():Object} Geocoder

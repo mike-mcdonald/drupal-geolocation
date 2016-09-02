@@ -64,6 +64,7 @@ function geolocation_theme() {
         'content' => NULL,
         'title' => NULL,
         'position' => NULL,
+        'icon' => NULL,
       ],
     ],
   ];

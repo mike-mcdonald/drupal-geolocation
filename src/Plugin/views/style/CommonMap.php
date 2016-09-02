@@ -6,6 +6,7 @@ use Drupal\views\Plugin\views\style\StylePluginBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\geolocation\Plugin\views\field\GeolocationField;
 use Drupal\geolocation\GoogleMapsDisplayTrait;
+use Drupal\image\Entity\ImageStyle;
 
 /**
  * Allow to display several field items on a common map.
@@ -86,16 +87,24 @@ class CommonMap extends StylePluginBase {
 
     if (!empty($this->options['geolocation_field'])) {
       $geo_field = $this->options['geolocation_field'];
-      $this->view->field[$geo_field]->options['exclude'] = TRUE;
     }
     else {
       \Drupal::logger('geolocation')->error("The geolocation common map views style was called without a geolocation field defined in the views style settings.");
       return [];
     }
 
-    if (!empty($this->options['title_field'])) {
+    if (
+      !empty($this->options['title_field'])
+      && $this->options['title_field'] != 'none'
+    ) {
       $title_field = $this->options['title_field'];
-      $this->view->field[$title_field]->options['exclude'] = TRUE;
+    }
+
+    if (
+      !empty($this->options['icon_field'])
+      && $this->options['icon_field'] != 'none'
+    ) {
+      $icon_field = $this->options['icon_field'];
     }
 
     $map_id = $this->view->dom_id;
@@ -171,6 +180,18 @@ class CommonMap extends StylePluginBase {
         return $build;
       }
 
+      if (!empty($icon_field)) {
+        /** @var \Drupal\views\Plugin\views\field\Field $icon_field_handler */
+        $icon_field_handler = $this->view->field[$icon_field];
+        $image_items = $icon_field_handler->getItems($row);
+        if (!empty($image_items[0])) {
+          /** @var \Drupal\image\Plugin\Field\FieldType\ImageItem $item */
+          $item = $image_items[0]['rendered']['#item'];
+          $style = ImageStyle::load($image_items[0]['rendered']['#image_style']);
+          $icon_url = $style->buildUrl($item->entity->getFileUri());
+        }
+      }
+
       foreach ($geo_items as $delta => $item) {
         $geolocation = $item['raw'];
         $position = [
@@ -178,12 +199,18 @@ class CommonMap extends StylePluginBase {
           'lng' => $geolocation->lng,
         ];
 
-        $build['#locations'][] = [
+        $location = [
           '#theme' => 'geolocation_common_map_location',
           '#content' => $this->view->rowPlugin->render($row),
           '#title' => empty($title_build) ? '' : $title_build,
           '#position' => $position,
         ];
+
+        if (!empty($icon_url)) {
+          $location['#icon'] = $icon_url;
+        }
+
+        $build['#locations'][] = $location;
       }
     }
 
@@ -296,6 +323,7 @@ class CommonMap extends StylePluginBase {
     $options['even_empty'] = ['default' => '0'];
     $options['geolocation_field'] = ['default' => ''];
     $options['title_field'] = ['default' => ''];
+    $options['icon_field'] = ['default' => ''];
     $options['dynamic_map'] = [
       'default' => TRUE,
       'enabled' => ['default' => 0],
@@ -321,6 +349,7 @@ class CommonMap extends StylePluginBase {
     $fieldMap = \Drupal::service('entity_field.manager')->getFieldMap();
     $geo_options = [];
     $title_options = [];
+    $icon_options = [];
 
     $fields = $this->displayHandler->getOption('fields');
     foreach ($fields as $field_name => $field) {
@@ -341,6 +370,10 @@ class CommonMap extends StylePluginBase {
         }
       }
 
+      if (!empty($field['type']) && $field['type'] == 'image') {
+        $icon_options[$field_name] = $labels[$field_name];
+      }
+
       if (!empty($field['type']) && $field['type'] == 'string') {
         $title_options[$field_name] = $labels[$field_name];
       }
@@ -358,6 +391,7 @@ class CommonMap extends StylePluginBase {
       '#default_value' => $this->options['geolocation_field'],
       '#description' => $this->t("The source of geodata for each entity."),
       '#options' => $geo_options,
+      '#required' => TRUE,
     ];
 
     $form['title_field'] = [
@@ -366,6 +400,16 @@ class CommonMap extends StylePluginBase {
       '#default_value' => $this->options['title_field'],
       '#description' => $this->t("The source of the title for each entity. Field type must be 'string'."),
       '#options' => $title_options,
+      '#empty_value' => 'none',
+    ];
+
+    $form['icon_field'] = [
+      '#title' => $this->t('Icon source field'),
+      '#type' => 'select',
+      '#default_value' => $this->options['icon_field'],
+      '#description' => $this->t("Optional image (field) to use as icon."),
+      '#options' => $icon_options,
+      '#empty_value' => 'none',
     ];
 
     $map_update_target_options = $this->getMapUpdateOptions();
