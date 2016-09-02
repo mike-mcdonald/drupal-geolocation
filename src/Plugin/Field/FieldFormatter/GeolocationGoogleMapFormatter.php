@@ -144,6 +144,7 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
                 ],
               ],
               'google_map_api_key' => \Drupal::config('geolocation.settings')->get('google_map_api_key'),
+              'google_map_additional_parameters' => \Drupal::config('geolocation.settings')->get('google_map_additional_parameters'),
             ],
           ],
         ],

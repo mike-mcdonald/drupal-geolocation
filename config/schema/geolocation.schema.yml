@@ -4,7 +4,10 @@ geolocation.settings:
   mapping:
     google_map_api_key:
       type: string
-      label: 'Geoogle Maps API Key'
+      label: 'Google Maps API Key'
+    google_map_additional_parameters:
+      type: string
+      label: 'Additional Google Maps API parameters'
 
 views.style.maps_common:
   type: views_style

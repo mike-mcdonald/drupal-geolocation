@@ -7,6 +7,7 @@
  * @param {Object} drupalSettings
  * @param {Object} drupalSettings.geolocation
  * @param {String} drupalSettings.geolocation.google_map_api_key
+ * @param {String} drupalSettings.geolocation.google_map_additional_parameters
  */
 
 /**
@@ -178,9 +179,14 @@
       // Default script path.
       var scriptPath = '//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&callback=Drupal.geolocation.googleCallback';
 
-      // If a Google API key isset, use it.
+      // If a Google API key is set, use it.
       if (typeof drupalSettings.geolocation.google_map_api_key !== 'undefined') {
         scriptPath += '&key=' + drupalSettings.geolocation.google_map_api_key;
+      }
+
+      // If additional Google API parameters are set, use them.
+      if (typeof drupalSettings.geolocation.google_map_additional_parameters !== 'undefined') {
+        scriptPath += '&' + drupalSettings.geolocation.google_map_additional_parameters;
       }
 
       $.getScript(scriptPath)
