@@ -17,10 +17,8 @@ class AjaxResponseSubscriber implements EventSubscriberInterface {
    *
    * @param array $commands
    *   An array of commands to alter.
-   * @param bool $map_triggered
-   *   Whether the request was triggered by map or not.
    */
-  protected function alterCommands(&$commands, $map_triggered) {
+  protected function alterCommands(&$commands) {
     foreach ($commands as $delta => &$command) {
       // Substitute the 'replace' method without our custom jQuery method which
       // will allow views content to be injected one after the other.
@@ -57,15 +55,29 @@ class AjaxResponseSubscriber implements EventSubscriberInterface {
     $view = $response->getView();
 
     if ($view->getStyle()->getPluginId() !== 'maps_common') {
-      return;
+      // This view is not of maps_common style, but maybe an attachment is.
+      $common_map_attachment = FALSE;
+
+      $attached_display_ids = $view->display_handler->getAttachedDisplays();
+      foreach ($attached_display_ids as $display_id) {
+        $current_display = $view->displayHandlers->get($display_id);
+        if (!empty($current_display)) {
+          if (
+            !empty($current_display->getOption('style')['type'])
+            && $current_display->getOption('style')['type'] == 'maps_common'
+          ) {
+            $common_map_attachment = TRUE;
+          }
+        }
+      }
+
+      if (!$common_map_attachment) {
+        return;
+      }
     }
 
-    $a = dpq($view->getQuery()->query(), TRUE);
-
-    $map_triggered = $event->getRequest()->get('geolocation_common_map_dynamic_map_trigger', FALSE);
-
     $commands = &$response->getCommands();
-    $this->alterCommands($commands, $map_triggered);
+    $this->alterCommands($commands);
   }
 
   /**
