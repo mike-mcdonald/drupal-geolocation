@@ -22,19 +22,28 @@ views.style.maps_common:
     title_field:
       type: string
       label: 'Title Field'
+    icon_field:
+      type: string
+      label: 'Icon Field'
     dynamic_map:
       type: mapping
       label: 'Dynamic map settings'
       mapping:
-      enabled:
-        type: integer
-        label: 'Dynamic content refresh'
-      hide_form:
-        type: integer
-        label: 'Hide form'
-      update_handler:
-        type: string
-        label: 'Filter or agurment name'
+        enabled:
+          type: integer
+          label: 'Dynamic content refresh'
+        hide_form:
+          type: integer
+          label: 'Hide form'
+        update_handler:
+          type: string
+          label: 'Filter or agurment name'
+        update_target:
+          type: string
+          label: 'Display to update'
+        update_dom_id:
+                  type: string
+                  label: 'Display to update'
     centre:
       type: sequence
       label: 'Centre Option'

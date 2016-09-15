@@ -5,26 +5,22 @@
 
 /**
  * @name CommonMapUpdateSettings
- * @property {String} settings.client_location.boundary_filter
- * @property {String} settings.client_location.parameter_identifier
+ * @property {String} enable
+ * @property {String} hide_form
+ * @property {String} update_dom_id
+ * @property {String} update_view_id
+ * @property {String} update_view_display_id
+ * @property {String} boundary_filter
+ * @property {String} parameter_identifier
  */
 
 /**
  * @name CommonMapSettings
- * @property {String} view_id
- * @property {String} current_display_id
  * @property {Object} settings
- *
- * @property {CommonMapUpdateSettings} settings.client_location
- * @property {String} settings.client_location.enable
- * @property {String} settings.client_location.update_map
- *
  * @property {CommonMapUpdateSettings} settings.dynamic_map
- * @property {String} settings.dynamic_map.enable
- * @property {String} settings.dynamic_map.hide_form
- * @property {String} settings.dom_id
- *
  * @property {GoogleMapSettings} settings.google_map_settings
+ * @property {String} client_location.enable
+ * @property {String} client_location.update_map
  */
 
 /**
@@ -88,7 +84,7 @@
         return;
       }
 
-      var exposedForm = $('form[id^=views-exposed-form-' + mapSettings.view_id.replace(/_/g, '-') + ']');
+      var exposedForm = $('.js-view-dom-id-' + mapId + ' form.views-exposed-form', context);
       if (exposedForm.length) {
         exposedForm = exposedForm.first();
       }
@@ -150,7 +146,7 @@
        * These possibilities are ordered by UX preference.
        *
        * @param {Object} settings The settings to update the map.
-       * @param {Boolean} mapReset Whether this update is triggered by the map itself or not.
+       * @param {Boolean} mapReset Reset map values.
        */
       if (typeof googleMap.updateDrupalView === 'undefined') {
         googleMap.updateDrupalView = function (settings, mapReset) {
@@ -161,33 +157,52 @@
             typeof settings.boundary_filter !== 'undefined'
           ) {
             if (ajaxViewsEnabled === true) {
-              var view = $('.js-view-dom-id-' + settings.dom_id).first();
+              var update_dom_id = null;
+              if (typeof settings.update_dom_id !== 'undefined') {
+                update_dom_id = settings.update_dom_id;
+              }
+              else {
+                $.each(drupalSettings.views.ajaxViews, function (view_index, view_settings) {
+                  if (
+                    view_settings.view_name === settings.update_view_id
+                    && view_settings.view_display_id === settings.update_view_display_id
+                  ) {
+                    if ($('.js-view-dom-id-' + view_settings.view_dom_id).length > 0) {
+                      update_dom_id = view_settings.view_dom_id;
+                      // break
+                      return false;
+                    }
+                  }
+                });
+              }
 
-              if (typeof Drupal.views.instances['views_dom_id:' + settings.dom_id] === 'undefined') {
+              var view = $('.js-view-dom-id-' + update_dom_id).first();
+
+              if (typeof Drupal.views.instances['views_dom_id:' + update_dom_id] === 'undefined') {
                 return;
               }
 
               if (mapReset === true) {
-                Drupal.views.instances['views_dom_id:' + settings.dom_id].settings['geolocation_common_map_dynamic_map_reset'] = true;
+                Drupal.views.instances['views_dom_id:' + update_dom_id].settings['geolocation_common_map_dynamic_map_reset'] = true;
               }
               else {
 
-                Drupal.views.instances['views_dom_id:' + settings.dom_id].settings[settings.parameter_identifier + '[lat_north_east]'] = currentBounds.getNorthEast().lat();
-                Drupal.views.instances['views_dom_id:' + settings.dom_id].settings[settings.parameter_identifier + '[lng_north_east]'] = currentBounds.getNorthEast().lng();
-                Drupal.views.instances['views_dom_id:' + settings.dom_id].settings[settings.parameter_identifier + '[lat_south_west]'] = currentBounds.getSouthWest().lat();
-                Drupal.views.instances['views_dom_id:' + settings.dom_id].settings[settings.parameter_identifier + '[lng_south_west]'] = currentBounds.getSouthWest().lng();
+                Drupal.views.instances['views_dom_id:' + update_dom_id].settings[settings.parameter_identifier + '[lat_north_east]'] = currentBounds.getNorthEast().lat();
+                Drupal.views.instances['views_dom_id:' + update_dom_id].settings[settings.parameter_identifier + '[lng_north_east]'] = currentBounds.getNorthEast().lng();
+                Drupal.views.instances['views_dom_id:' + update_dom_id].settings[settings.parameter_identifier + '[lat_south_west]'] = currentBounds.getSouthWest().lat();
+                Drupal.views.instances['views_dom_id:' + update_dom_id].settings[settings.parameter_identifier + '[lng_south_west]'] = currentBounds.getSouthWest().lng();
 
-                Drupal.views.instances['views_dom_id:' + settings.dom_id].settings['geolocation_common_map_dynamic_map_reset'] = false;
+                Drupal.views.instances['views_dom_id:' + update_dom_id].settings['geolocation_common_map_dynamic_map_reset'] = false;
               }
 
               view.trigger('RefreshView');
 
-              delete Drupal.views.instances['views_dom_id:' + settings.dom_id].settings['geolocation_common_map_dynamic_map_reset'];
+              delete Drupal.views.instances['views_dom_id:' + update_dom_id].settings['geolocation_common_map_dynamic_map_reset'];
 
-              delete Drupal.views.instances['views_dom_id:' + settings.dom_id].settings[settings.parameter_identifier + '[lat_north_east]'];
-              delete Drupal.views.instances['views_dom_id:' + settings.dom_id].settings[settings.parameter_identifier + '[lng_north_east]'];
-              delete Drupal.views.instances['views_dom_id:' + settings.dom_id].settings[settings.parameter_identifier + '[lat_south_west]'];
-              delete Drupal.views.instances['views_dom_id:' + settings.dom_id].settings[settings.parameter_identifier + '[lng_south_west]'];
+              delete Drupal.views.instances['views_dom_id:' + update_dom_id].settings[settings.parameter_identifier + '[lat_north_east]'];
+              delete Drupal.views.instances['views_dom_id:' + update_dom_id].settings[settings.parameter_identifier + '[lng_north_east]'];
+              delete Drupal.views.instances['views_dom_id:' + update_dom_id].settings[settings.parameter_identifier + '[lat_south_west]'];
+              delete Drupal.views.instances['views_dom_id:' + update_dom_id].settings[settings.parameter_identifier + '[lng_south_west]'];
             }
             // AJAX disabled, form available. Set boundary values and trigger.
             else if (exposedForm) {
@@ -231,7 +246,8 @@
         // Only act when location still unknown.
         if (typeof map.data('centre-lat') === 'undefined' || typeof map.data('centre-lng') === 'undefined') {
           if (
-            navigator.geolocation
+            map.data('geolocationAjaxProcessed') !== 1
+            && navigator.geolocation
             && typeof mapSettings.client_location !== 'undefined'
             && mapSettings.client_location.enable === true
           ) {
@@ -245,11 +261,11 @@
               googleMap.setZoom(parseInt(mapSettings.settings.google_map_settings.zoom));
 
               if (
-                map.data('geolocationAjaxProcessed') !== 1
-                && typeof mapSettings.client_location.update_map !== 'undefined'
+                typeof mapSettings.client_location.update_map !== 'undefined'
                 && mapSettings.client_location.update_map === true
+                && typeof mapSettings.dynamic_map !== 'undefined'
               ) {
-                googleMap.updateDrupalView(mapSettings.client_location, true);
+                googleMap.updateDrupalView(mapSettings.dynamic_map, true);
               }
             });
           }
@@ -380,8 +396,8 @@
 
     Drupal.detachBehaviors($wrapper.get(0), settings);
 
-    detachedMap = $wrapper.find('.geolocation-common-map-container').detach();
-    $new_content.find('.geolocation-common-map-container').replaceWith(detachedMap);
+    detachedMap = $wrapper.find('.geolocation-common-map-container').first().detach();
+    $new_content.find('.geolocation-common-map-container').first().replaceWith(detachedMap);
     $new_content.find('.geolocation-common-map').data('geolocation-ajax-processed', 1);
 
     $wrapper.replaceWith($new_content);

@@ -120,8 +120,6 @@ class CommonMap extends StylePluginBase {
           'geolocation' => [
             'commonMap' => [
               $map_id => [
-                'view_id' => $this->view->id(),
-                'current_display_id' => $this->view->current_display,
                 'settings' => $this->getGoogleMapsSettings($this->options),
               ],
             ],
@@ -137,14 +135,32 @@ class CommonMap extends StylePluginBase {
      */
     if (!empty($this->options['dynamic_map']['enabled'])) {
 
-      // TODO: Allow attachments/blocks to instead update their parent?
-      $update_dom_id = $this->view->dom_id;
+      if (!empty($this->options['dynamic_map']['update_target']) && $this->view->displayHandlers->has($this->options['dynamic_map']['update_target'])) {
+        $update_view_id = $this->view->id();
+        $update_view_display_id = $this->options['dynamic_map']['update_target'];
+        $update_dom_id = NULL;
+      }
+      else {
+        $update_dom_id = $this->view->dom_id;
+        $update_view_id = $this->view->id();
+        $update_view_display_id = $this->view->current_display;
+      }
+
 
       $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['dynamic_map'] = [
         'enable' => TRUE,
         'hide_form' => $this->options['dynamic_map']['hide_form'],
-        'dom_id' => $update_dom_id,
       ];
+
+      if (!empty($update_dom_id)) {
+        $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['dynamic_map']['update_dom_id'] = $update_dom_id;
+      }
+      else {
+        $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['dynamic_map'] += [
+          'update_view_id' => $update_view_id,
+          'update_view_display_id' => $update_view_display_id,
+        ];
+      }
 
       if (substr($this->options['dynamic_map']['update_handler'], 0, strlen('boundary_filter_')) === 'boundary_filter_') {
         $filter_id = substr($this->options['dynamic_map']['update_handler'], strlen('boundary_filter_'));
@@ -274,16 +290,6 @@ class CommonMap extends StylePluginBase {
             && !empty($option['settings']['update_map_option'])
           ) {
             $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['client_location']['update_map'] = TRUE;
-
-            if (substr($option['settings']['update_map_option'], 0, strlen('boundary_filter_')) === 'boundary_filter_') {
-              $filter_id = substr($option['settings']['update_map_option'], strlen('boundary_filter_'));
-              $filters = $this->displayHandler->getOption('filters');
-              $filter_options = $filters[$filter_id];
-              $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['client_location'] += [
-                'boundary_filter' => TRUE,
-                'parameter_identifier' => $filter_options['expose']['identifier'],
-              ];
-            }
           }
           break;
 
@@ -343,6 +349,7 @@ class CommonMap extends StylePluginBase {
    * {@inheritdoc}
    */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+
     parent::buildOptionsForm($form, $form_state);
 
     $labels = $this->displayHandler->getFieldLabels();
@@ -452,6 +459,32 @@ class CommonMap extends StylePluginBase {
           ],
         ],
       ];
+
+      if ($this->displayHandler->getPluginId() !== 'page') {
+        $update_targets = [
+          $this->displayHandler->display['id'] => t('- This display -'),
+        ];
+        foreach ($this->view->displayHandlers->getInstanceIds() as $instance_id) {
+          $display_instance = $this->view->displayHandlers->get($instance_id);
+          if ($display_instance->getPluginId() == 'page') {
+            $update_targets[$instance_id] = $display_instance->getPluginDefinition()['admin'];
+          }
+        }
+        if (!empty($update_targets)) {
+          $form['dynamic_map']['update_target'] = [
+            '#title' => $this->t('Dynamic map update target'),
+            '#type' => 'select',
+            '#default_value' => $this->options['dynamic_map']['update_target'],
+            '#description' => $this->t("Non-page displays will only update themselves. Most likely a page view should be updated instead."),
+            '#options' => $update_targets,
+            '#states' => [
+              'visible' => [
+                ':input[name="style_options[dynamic_map][enabled]"]' => ['checked' => TRUE],
+              ],
+            ],
+          ];
+        }
+      }
     }
 
     /*
@@ -513,31 +546,20 @@ class CommonMap extends StylePluginBase {
       ];
     }
 
-    if (!empty($map_update_target_options['map_update_options'])) {
-      $form['centre']['client_location']['settings'] = [
-        '#type' => 'container',
-        'update_map' => [
-          '#type' => 'checkbox',
-          '#title' => $this->t('Additionally feed clients location back to view?'),
-          '#default_value' => isset($this->options['centre']['client_location']['settings']['update_map']) ? $this->options['centre']['client_location']['settings']['update_map'] : FALSE,
+    $form['centre']['client_location']['settings'] = [
+      '#type' => 'container',
+      'update_map' => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Additionally feed clients location back to view via dynamic map settings?'),
+        '#default_value' => isset($this->options['centre']['client_location']['settings']['update_map']) ? $this->options['centre']['client_location']['settings']['update_map'] : FALSE,
+      ],
+      '#states' => [
+        'visible' => [
+          ':input[name="style_options[centre][client_location][enable]"]' => ['checked' => TRUE],
+          ':input[name="style_options[dynamic_map][enabled]"]' => ['checked' => TRUE],
         ],
-        'update_map_option' => [
-          '#type' => 'select',
-          '#options' => $map_update_target_options['map_update_options'],
-          '#default_value' => isset($this->options['centre']['client_location']['settings']['update_map_option']) ? $this->options['centre']['client_location']['settings']['update_map_option'] : '',
-          '#states' => [
-            'visible' => [
-              ':input[name="style_options[centre][client_location][settings][update_map]"]' => ['checked' => TRUE],
-            ],
-          ],
-        ],
-        '#states' => [
-          'visible' => [
-            ':input[name="style_options[centre][client_location][enable]"]' => ['checked' => TRUE],
-          ],
-        ],
-      ];
-    }
+      ],
+    ];
 
     $form['centre']['fixed_value']['settings'] = [
       '#type' => 'container',
