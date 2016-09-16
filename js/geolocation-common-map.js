@@ -123,6 +123,21 @@
 
         googleMap = Drupal.geolocation.addMap(geolocationMap);
       }
+      else if (
+        map.data('centre-lat-north-east')
+        && map.data('centre-lng-north-east')
+        && map.data('centre-lat-south-west')
+        && map.data('centre-lng-south-west')
+      ) {
+        var centerBounds = new google.maps.LatLngBounds();
+        centerBounds.extend(new google.maps.LatLng(map.data('centre-lat-north-east'), map.data('centre-lng-north-east')));
+        centerBounds.extend(new google.maps.LatLng(map.data('centre-lat-south-west'), map.data('centre-lng-south-west')));
+
+        geolocationMap.lat = geolocationMap.lng = 0;
+        googleMap = Drupal.geolocation.addMap(geolocationMap);
+
+        googleMap.fitBounds(centerBounds);
+      }
       else {
         geolocationMap.lat = geolocationMap.lng = 0;
 

@@ -146,7 +146,6 @@ class CommonMap extends StylePluginBase {
         $update_view_display_id = $this->view->current_display;
       }
 
-
       $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['dynamic_map'] = [
         'enable' => TRUE,
         'hide_form' => $this->options['dynamic_map']['hide_form'],
@@ -199,12 +198,17 @@ class CommonMap extends StylePluginBase {
       if (!empty($icon_field)) {
         /** @var \Drupal\views\Plugin\views\field\Field $icon_field_handler */
         $icon_field_handler = $this->view->field[$icon_field];
-        $image_items = $icon_field_handler->getItems($row);
-        if (!empty($image_items[0])) {
-          /** @var \Drupal\image\Plugin\Field\FieldType\ImageItem $item */
-          $item = $image_items[0]['rendered']['#item'];
-          $style = ImageStyle::load($image_items[0]['rendered']['#image_style']);
-          $icon_url = $style->buildUrl($item->entity->getFileUri());
+        if (!empty($icon_field_handler)) {
+          $image_items = $icon_field_handler->getItems($row);
+          if (!empty($image_items[0])) {
+            /** @var \Drupal\image\Plugin\Field\FieldType\ImageItem $item */
+            $item = $image_items[0]['rendered']['#item'];
+            /** @var \Drupal\image\Entity\ImageStyle $style */
+            $style = ImageStyle::load($image_items[0]['rendered']['#image_style']);
+            if (!empty($style)) {
+              $icon_url = $style->buildUrl($item->entity->getFileUri());
+            }
+          }
         }
       }
 
@@ -305,6 +309,25 @@ class CommonMap extends StylePluginBase {
               $centre = [
                 'lat' => (float) $handler->value['lat'],
                 'lng' => (float) $handler->value['lng'],
+              ];
+            }
+            break;
+          }
+          elseif (preg_match('/boundary_filter_*/', $id)) {
+            $filter_id = substr($id, 16);
+            /** @var \Drupal\geolocation\Plugin\views\filter\ProximityFilter $handler */
+            $handler = $this->displayHandler->getHandler('filter', $filter_id);
+            if (
+              isset($handler->value['lat_north_east'])
+              && isset($handler->value['lng_north_east'])
+              && isset($handler->value['lat_south_west'])
+              && isset($handler->value['lng_south_west'])
+            ) {
+              $centre = [
+                'lat_north_east' => (float) $handler->value['lat_north_east'],
+                'lng_north_east' => (float) $handler->value['lng_north_east'],
+                'lat_south_west' => (float) $handler->value['lat_south_west'],
+                'lng_south_west' => (float) $handler->value['lng_south_west'],
               ];
             }
             break;
