@@ -161,4 +161,27 @@ class GeolocationViewsProximityArgumentTest extends ViewTestBase {
     $this->assertText('Proximity 3', 'Proximity 3 element found.');
   }
 
+  /**
+   * Tests to ensure rounding error doesn't occur (d.o #2796999).
+   */
+  public function testRoundingError() {
+    $entity_test_storage = \Drupal::entityTypeManager()->getStorage('node');
+
+    $entity_test_storage->create([
+      'id' => 1,
+      'title' => 'Proximity 1',
+      'body' => 'test test',
+      'type' => 'article',
+      $this->fieldId => [
+        'lat' => 51.4545,
+        'lng' => -2.5879,
+      ],
+    ])->save();
+
+    $this->drupalGet($this->viewsPath . '/51.4545,-2.5879<10000miles');
+    $this->assertResponse(200);
+
+    $this->assertText('Proximity 1', 'Proximity 1 element found.');
+  }
+
 }

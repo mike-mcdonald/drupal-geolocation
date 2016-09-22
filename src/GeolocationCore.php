@@ -233,14 +233,14 @@ class GeolocationCore {
     $filter_lng    = deg2rad($filter_lng);
 
     return "(
-      ACOS(
+      ACOS(LEAST(1,
         $filter_latcos
         * $field_latcos
         * COS( $filter_lng - $field_lng  )
         +
         $filter_latsin
         * $field_latsin
-      ) * $earth_radius
+      )) * $earth_radius
     )";
   }
 
