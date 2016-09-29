@@ -279,11 +279,6 @@
         }
       }
     }
-
-    // Add a visual indicator.
-    $(map.controls).children('.geolocation-map-indicator')
-      .text(latLng.lat() + ', ' + latLng.lng())
-      .addClass('has-location');
   };
 
 })(jQuery, _, Drupal, drupalSettings);

@@ -40,8 +40,12 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
    */
   public static function defaultSettings() {
     $settings = [
-      'populate_address_field' => NULL,
+      'populate_address_field' => FALSE,
       'target_address_field' => NULL,
+      'default_longitude' => NULL,
+      'default_latitude' => NULL,
+      'auto_client_location' => FALSE,
+      'auto_client_location_marker' => FALSE,
     ];
     $settings += parent::defaultSettings();
     $settings += self::getGoogleMapDefaultSettings();
@@ -56,7 +60,35 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
     $settings = $this->getSettings();
     $element = [];
 
-    $element += $this->getGoogleMapsSettingsForm($settings);
+    $element['default_longitude'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Default Longitude'),
+      '#description' => $this->t('The default center point, before a value is set.'),
+      '#default_value' => $settings['default_longitude'],
+    ];
+
+    $element['default_latitude'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Default Latitude'),
+      '#description' => $this->t('The default center point, before a value is set.'),
+      '#default_value' => $settings['default_latitude'],
+    ];
+
+    $element['auto_client_location'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Automatically use client location, when no value is set'),
+      '#default_value' => $settings['auto_client_location'],
+    ];
+    $element['auto_client_location_marker'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Automatically set marker to client location as well'),
+      '#default_value' => $settings['auto_client_location_marker'],
+      '#states' => [
+        'visible' => [
+          ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][auto_client_location]"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
 
     /** @var \Drupal\Core\Entity\EntityFieldManager $field_manager */
     $field_manager = \Drupal::service('entity_field.manager');
@@ -71,29 +103,28 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
       }
     }
 
-    if (empty($address_fields)) {
-      return $element;
+    if (!empty($address_fields)) {
+      $element['populate_address_field'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Store retrieved address data in address field?'),
+        '#default_value' => $settings['populate_address_field'],
+      ];
+
+      $element['target_address_field'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Select target field to append address data.'),
+        '#description' => $this->t('Only fields of type "address" with a cardinality of 1 are available.'),
+        '#options' => $address_fields,
+        '#default_value' => $settings['target_address_field'],
+        '#states' => [
+          'visible' => [
+            ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][populate_address_field]"]' => ['checked' => TRUE],
+          ],
+        ],
+      ];
     }
 
-    $element['populate_address_field'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Store retrieved address data in address field?'),
-      '#default_value' => $settings['populate_address_field'],
-    ];
-
-    $element['target_address_field'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Select target field to append address data.'),
-      '#description' => $this->t('Only fields of type "address" with a cardinality of 1 are available.'),
-      '#options' => $address_fields,
-      '#default_value' => $settings['target_address_field'],
-      '#states' => [
-        // Only show this field when the 'toggle_me' checkbox is enabled.
-        'visible' => [
-          ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][populate_address_field]"]' => ['checked' => TRUE],
-        ],
-      ],
-    ];
+    $element += $this->getGoogleMapsSettingsForm($settings);
 
     return $element;
   }
@@ -105,11 +136,23 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
     $summary = [];
     $settings = $this->getSettings();
 
-    $summary = array_merge($summary, $this->getGoogleMapsSettingsSummary($settings));
+    $summary[] = t('Default center longitude @default_longitude and latitude @default_latitude', [
+      '@default_longitude' => $settings['default_longitude'],
+      '@default_latitude' => $settings['default_latitude'],
+    ]);
+
+    if (!empty($settings['auto_client_location'])) {
+      $summary[] = t('Will use client location automatically by default');
+      if (!empty($settings['auto_client_location_marker'])) {
+        $summary[] = t('Will set client location marker automatically by default');
+      }
+    }
 
     if (!empty($settings['populate_address_field'])) {
-      $summary[] = t('Geocoded address will be stored in @field', array('@field' => $settings['target_address_field']));
+      $summary[] = t('Geocoded address will be stored in @field', ['@field' => $settings['target_address_field']]);
     }
+
+    $summary = array_merge($summary, $this->getGoogleMapsSettingsSummary($settings));
 
     return $summary;
   }
@@ -146,8 +189,8 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
     $lng = $items[$delta]->lng;
 
     // Get the default values for existing field.
-    $lat_default_value = isset($lat) ? $lat : NULL;
-    $lng_default_value = isset($lng) ? $lng : NULL;
+    $lat_default_value = isset($lat) ? $lat : $settings['default_latitude'];
+    $lng_default_value = isset($lng) ? $lng : $settings['default_longitude'];
 
     // Hidden lat,lng input fields.
     $element['lat'] = [
@@ -176,7 +219,13 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
         'library' => ['geolocation/geolocation.widgets.googlegeocoder'],
         'drupalSettings' => [
           'geolocation' => [
-            'widgetSettings' => [],
+            'widgetSettings' => [
+              $canvas_id => [
+                'autoClientLocation' => $settings['auto_client_location'] ? TRUE : FALSE,
+                'autoClientLocationMarker' => $settings['auto_client_location_marker'] ? TRUE : FALSE,
+                'locationSet' => (!empty($lat) && !empty($lng)),
+              ],
+            ],
             'widgetMaps' => [
               $canvas_id => [
                 'id' => $canvas_id,
@@ -192,7 +241,7 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
       ],
     ];
     if ($settings['populate_address_field']) {
-      $element['map_canvas']['#attached']['drupalSettings']['geolocation']['widgetSettings']['addressFieldTarget'] = $settings['target_address_field'];
+      $element['map_canvas']['#attached']['drupalSettings']['geolocation']['widgetSettings'][$canvas_id]['addressFieldTarget'] = $settings['target_address_field'];
 
       foreach ([
         'country_code',

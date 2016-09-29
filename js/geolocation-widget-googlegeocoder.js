@@ -4,9 +4,17 @@
  */
 
 /**
- * @param {Object} drupalSettings.geolocation.widgetSettings
- * @param {String} drupalSettings.geolocation.widgetSettings.addressFieldTarget
+ * @name GeocoderWidgetSettings
+ * @property {String} addressFieldTarget
+ * @property {String} autoClientLocation
+ * @property {String} autoClientLocationMarker
+ * @property {String} locationSet
  */
+
+/**
+ * @param {GeocoderWidgetSettings[]} drupalSettings.geolocation.widgetSettings
+ */
+
 (function ($, Drupal, drupalSettings) {
   'use strict';
 
@@ -29,7 +37,7 @@
   Drupal.behaviors.geolocationGeocoderWidget = {
     attach: function (context, settings) {
       // Ensure iterables.
-      settings.geolocation = settings.geolocation || {widgetMaps: []};
+      settings.geolocation = settings.geolocation || {widgetMaps: [], widgetSettings: []};
       // Make sure the lazy loader is available.
       if (typeof Drupal.geolocation.loadGoogle === 'function') {
         // First load the library from google.
@@ -42,34 +50,6 @@
   };
 
   /**
-   * Adds the click listeners to the map.
-   *
-   * @param {object} map - The current map object.
-   */
-  Drupal.geolocation.geocoderWidget.addClickListener = function (map) {
-    // Used for a single click timeout.
-    var singleClick;
-
-    /**
-     * Add the click listener.
-     *
-     * @param {{latLng:object}} e
-     */
-    google.maps.event.addListener(map.googleMap, 'click', function (e) {
-      // Create 500ms timeout to wait for double click.
-      singleClick = setTimeout(function () {
-        Drupal.geolocation.geocoderWidget.setHiddenInputFields(e.latLng, map);
-        Drupal.geolocation.setMapMarker(e.latLng, map);
-      }, 500);
-    });
-
-    // Add a doubleclick listener.
-    google.maps.event.addListener(map.googleMap, 'dblclick', function (e) {
-      clearTimeout(singleClick);
-    });
-  };
-
-  /**
    * Runs after the google maps api is available
    *
    * @param {object} maps - The google map object.
@@ -78,6 +58,9 @@
   function initialize(maps, context) {
     // Process drupalSettings for every Google map present on the current page.
     $.each(maps, function (widget_id, map) {
+      if (typeof (drupalSettings.geolocation.widgetSettings[widget_id]) === 'undefined') {
+        drupalSettings.geolocation.widgetSettings[widget_id] = [];
+      }
 
       // Get the container object.
       map.container = $('#' + map.id, context).first();
@@ -89,6 +72,28 @@
       ) {
         // Add any missing settings.
         map.settings = $.extend(Drupal.geolocation.defaultSettings(), map.settings);
+
+        // If the browser supports W3C Geolocation API.
+        if (typeof (drupalSettings.geolocation.widgetSettings[widget_id].autoClientLocation) != 'undefined') {
+          if (
+            drupalSettings.geolocation.widgetSettings[widget_id].autoClientLocation
+            && navigator.geolocation
+            && !drupalSettings.geolocation.widgetSettings[widget_id].locationSet
+          ) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+              map.googleMap.setCenter({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+              });
+
+              if (typeof (drupalSettings.geolocation.widgetSettings[widget_id].autoClientLocationMarker) != 'undefined') {
+                if (drupalSettings.geolocation.widgetSettings[widget_id].autoClientLocationMarker) {
+                  Drupal.geolocation.geocoder.setMapMarker(new google.maps.LatLng(position.coords.latitude, position.coords.longitude), map);
+                }
+              }
+            });
+          }
+        }
 
         // Set the lat / lng if not already set.
         if (map.lat === 0 || map.lng === 0) {
@@ -102,11 +107,17 @@
         // Add the geocoder to the map.
         Drupal.geolocation.geocoder.add(map);
 
+        if (typeof (drupalSettings.geolocation.widgetSettings[widget_id].locationSet) != 'undefined') {
+          if (drupalSettings.geolocation.widgetSettings[widget_id].locationSet) {
+            Drupal.geolocation.geocoder.setMapMarker(new google.maps.LatLng(map.lat, map.lng), map);
+          }
+        }
+
         Drupal.geolocation.geocoder.addResultCallback(function (address) {
           Drupal.geolocation.geocoderWidget.setHiddenInputFields(address.geometry.location, map);
         });
 
-        if (typeof drupalSettings.geolocation.widgetSettings.addressFieldTarget !== 'undefined') {
+        if (typeof drupalSettings.geolocation.widgetSettings[widget_id].addressFieldTarget !== 'undefined') {
           var targetField = drupalSettings.geolocation.widgetSettings.addressFieldTarget;
 
           Drupal.geolocation.geocoder.addResultCallback(function (address) {
@@ -201,6 +212,35 @@
       }
     });
   }
+
+  /**
+   * Adds the click listeners to the map.
+   *
+   * @param {object} map - The current map object.
+   */
+  Drupal.geolocation.geocoderWidget.addClickListener = function (map) {
+    // Used for a single click timeout.
+    var singleClick;
+
+    /**
+     * Add the click listener.
+     *
+     * @param {{latLng:object}} e
+     */
+    google.maps.event.addListener(map.googleMap, 'click', function (e) {
+      // Create 500ms timeout to wait for double click.
+      singleClick = setTimeout(function () {
+        Drupal.geolocation.geocoderWidget.setHiddenInputFields(e.latLng, map);
+        Drupal.geolocation.geocoder.setMapMarker(e.latLng, map);
+      }, 500);
+    });
+
+    // Add a doubleclick listener.
+    google.maps.event.addListener(map.googleMap, 'dblclick', function (e) {
+      clearTimeout(singleClick);
+    });
+  };
+
 
   /**
    * Set the latitude and longitude values to the input fields

@@ -42,15 +42,8 @@
       .append($('<button class="submit" />'))
       // Create clear button
       .append($('<button class="clear" />'))
-      // Create clear button
+      // Create indicator
       .append($('<div class="geolocation-map-indicator" />'));
-
-    // Add the default indicator if the values aren't blank.
-    if (map.lat !== '' && map.lng !== '') {
-      map.controls.children('.geolocation-map-indicator')
-        .addClass('has-location')
-        .text(map.lat + ', ' + map.lng);
-    }
 
     map.googleMap.controls[google.maps.ControlPosition.TOP_LEFT].push(map.controls.get(0));
 
@@ -74,7 +67,7 @@
         // Set the map viewport.
         map.googleMap.fitBounds(ui.item.address.geometry.viewport);
         // Set the map marker.
-        Drupal.geolocation.setMapMarker(ui.item.address.geometry.location, map);
+        Drupal.geolocation.geocoder.setMapMarker(ui.item.address.geometry.location, map);
         Drupal.geolocation.geocoder.resultCallback(ui.item.address);
       }
     });
@@ -85,7 +78,7 @@
         if (status === google.maps.GeocoderStatus.OK) {
           map.googleMap.fitBounds(results[0].geometry.viewport);
           // Set the map marker.
-          Drupal.geolocation.setMapMarker(results[0].geometry.location, map);
+          Drupal.geolocation.geocoder.setMapMarker(results[0].geometry.location, map);
           Drupal.geolocation.geocoder.resultCallback(results[0]);
         }
         else {
@@ -162,6 +155,20 @@
         Drupal.geolocation.geocoder.resultCallbacks.splice(index, 1);
       }
     });
+  };
+
+  /**
+   * Extend geolocation core setMapMarker to also add text to indicator.
+   *
+   * @param {Object} latLng - A location (latLng) object from google maps API.
+   * @param {Object} map - The settings object that contains all of the necessary metadata for this map.
+   */
+  Drupal.geolocation.geocoder.setMapMarker = function (latLng, map) {
+    Drupal.geolocation.setMapMarker(latLng, map);
+    // Add a visual indicator.
+    $(map.controls).children('.geolocation-map-indicator')
+      .text(Drupal.t('Latitude') + ': ' + latLng.lat() + ' ' + Drupal.t('Longitude') + ': ' + latLng.lng())
+      .addClass('has-location');
   };
 
 })(jQuery, Drupal, _);

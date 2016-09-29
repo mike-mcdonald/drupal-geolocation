@@ -268,6 +268,18 @@ field.widget.settings.geolocation_googlegeocoder:
   type: mapping
   label: 'Geolocation Google Geocoder Widget settings'
   mapping:
+    default_longitude:
+      type: string
+      label: 'Default Longitude'
+    default_latitude:
+      type: string
+      label: 'Default Latitude'
+    auto_client_location:
+      type: string
+      label: 'Automatically use client location'
+    auto_client_location_marker:
+      type: string
+      label: 'Automatically set marker as well'
     populate_address_field:
       type: string
       label: 'Store address'
