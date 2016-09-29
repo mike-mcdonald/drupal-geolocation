@@ -55,6 +55,7 @@ trait GoogleMapsDisplayTrait {
         'info_auto_display' => TRUE,
         'disableAutoPan' => TRUE,
         'style' => '',
+        'preferScrollingToZooming' => FALSE,
       ],
     ];
   }
@@ -164,6 +165,12 @@ trait GoogleMapsDisplayTrait {
       '#title' => $this->t('Scrollwheel'),
       '#description' => $this->t('Allow the user to zoom the map using the scrollwheel.'),
       '#default_value' => $settings['google_map_settings']['scrollwheel'],
+    ];
+    $form['google_map_settings']['preferScrollingToZooming'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Require the user to click the map once to zoom, to ease scrolling behavior.'),
+      '#description' => $this->t('Note: this is only relevant, when the Scrollwheel option is enabled.'),
+      '#default_value' => $settings['google_map_settings']['preferScrollingToZooming'],
     ];
     $form['google_map_settings']['disableDoubleClickZoom'] = [
       '#type' => 'checkbox',

@@ -104,6 +104,9 @@ views.style.maps_common:
         style:
           type: string
           label: 'JSON encoded style'
+        preferScrollingToZooming:
+          type: integer
+          label: 'Require user to click map before zooming'
 
 views.field.geolocation_field:
   type: views.field.field
@@ -269,6 +272,9 @@ field.formatter.settings.geolocation_map:
         style:
           type: string
           label: 'JSON encoded style'
+        preferScrollingToZooming:
+          type: integer
+          label: 'Require user to click map before zooming'
 
 field.widget.settings.geolocation_googlegeocoder:
   type: mapping
@@ -335,3 +341,6 @@ field.widget.settings.geolocation_googlegeocoder:
         style:
           type: string
           label: 'JSON encoded style'
+        preferScrollingToZooming:
+          type: integer
+          label: 'Require user to click map before zooming'

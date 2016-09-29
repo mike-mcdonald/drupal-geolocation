@@ -17,6 +17,17 @@
  * @property {String} width
  * @property {String} zoom
  * @property {String} type
+ * @property {Boolean} scrollwheel
+ * @property {Boolean} preferScrollingToZooming
+ * @property {Boolean} panControl
+ * @property {Boolean} mapTypeControl
+ * @property {Boolean} scaleControl
+ * @property {Boolean} streetViewControl
+ * @property {Boolean} overviewMapControl
+ * @property {Boolean} zoomControl
+ * @property {Object} zoomControlOptions
+ * @property {String} mapTypeId
+ * @property {String} info_text
  */
 
 /**
@@ -61,7 +72,7 @@
  * @property InfoWindow
  *
  * @function
- * @property {function(Object):Object} Marker
+ * @property {Object} Marker
  * @property {Function} Marker.setPosition
  * @property {Function} Marker.setMap
  * @property {Function} Marker.setIcon
@@ -75,6 +86,7 @@
  * @property {Function} setCenter
  * @property {Function} setZoom
  * @property {Function} getZoom
+ * @property {Function} setOptions
  *
  * @property {function():GoogleMapBounds} getBounds
  * @property {function():GoogleMapLatLng} getCenter
@@ -85,6 +97,17 @@
  * @object
  * @property {GoogleMap[]} maps
  * @property {GoogleMapEvent[]} events
+ */
+
+/**
+ * @name GeolocationMap
+ * @property {GoogleMapSettings} settings
+ * @property {GoogleMap} googleMap
+ * @property {Number} lat
+ * @property {Number} lng
+ * @property {Object} container
+ * @property {Object} marker
+ * @property {Object} infowindow
  */
 
 (function ($, _, Drupal, drupalSettings) {
@@ -111,7 +134,7 @@
   /**
    * Gets the default settings for the google map.
    *
-   * @return {{scrollwheel: boolean, panControl: boolean, mapTypeControl: boolean, scaleControl: boolean, streetViewControl: boolean, overviewMapControl: boolean, zoomControl: boolean, zoomControlOptions: {style: *, position: *}, mapTypeId: *, zoom: number}} - The map settings mostly.
+   * @return {{GoogleMapSettings}}.
    */
   Drupal.geolocation.defaultSettings = function () {
     return {
@@ -205,7 +228,7 @@
   /**
    * Load google maps and set a callback to run when it's ready.
    *
-   * @param {object} map - Container of settings and ID.
+   * @param {GeolocationMap} map - Container of settings and ID.
    *
    * @return {object} - The google map object.
    */
@@ -219,7 +242,11 @@
     // Get the center point.
     var center = new google.maps.LatLng(map.lat, map.lng);
 
-    // Create the map object and assign it to the map.
+    /**
+     * Create the map object and assign it to the map.
+     *
+     * @type {GoogleMap} map.googleMap
+     */
     map.googleMap = new google.maps.Map(map.container.get(0), {
       zoom: parseInt(map.settings.google_map_settings.zoom),
       center: center,
@@ -237,6 +264,13 @@
       Drupal.geolocation.maps = [];
     }
 
+    if (map.settings.google_map_settings.scrollwheel && map.settings.google_map_settings.preferScrollingToZooming) {
+      map.googleMap.setOptions({scrollwheel: false});
+      map.googleMap.addListener('click', function () {
+        map.googleMap.setOptions({scrollwheel: true});
+      });
+    }
+
     Drupal.geolocation.maps.push(map);
 
     return map.googleMap;
@@ -246,7 +280,7 @@
    * Set/Update a marker on a map
    *
    * @param {Object} latLng - A location (latLng) object from google maps API.
-   * @param {Object} map - The settings object that contains all of the necessary metadata for this map.
+   * @param {GeolocationMap} map - The settings object that contains all of the necessary metadata for this map.
    */
   Drupal.geolocation.setMapMarker = function (latLng, map) {
     // make sure the marker exists.

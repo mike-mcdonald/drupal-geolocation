@@ -96,6 +96,9 @@
       // Map-container is not hidden by default in case of graceful-fallback.
       map.children('.geolocation-common-map-locations').hide();
 
+      /**
+       * @type {GeolocationMap}
+       */
       var geolocationMap = {};
       geolocationMap.settings = mapSettings.settings;
 
