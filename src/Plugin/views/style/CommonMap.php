@@ -130,6 +130,10 @@ class CommonMap extends StylePluginBase {
       ],
     ];
 
+    if (!empty($this->options['show_raw_locations'])) {
+      $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['showRawLocations'] = TRUE;
+    }
+
     /*
      * Dynamic map handling.
      */
@@ -349,6 +353,7 @@ class CommonMap extends StylePluginBase {
   protected function defineOptions() {
     $options = parent::defineOptions();
 
+    $options['show_raw_locations'] = ['default' => '0'];
     $options['even_empty'] = ['default' => '0'];
     $options['geolocation_field'] = ['default' => ''];
     $options['title_field'] = ['default' => ''];
@@ -408,6 +413,13 @@ class CommonMap extends StylePluginBase {
         $title_options[$field_name] = $labels[$field_name];
       }
     }
+
+    $form['show_raw_locations'] = [
+      '#title' => $this->t('Show raw locations.'),
+      '#description' => $this->t('By default, the location data for the map will be hidden when the map loads.'),
+      '#type' => 'checkbox',
+      '#default_value' => $this->options['show_raw_locations'],
+    ];
 
     $form['even_empty'] = [
       '#title' => $this->t('Display map when no locations are found.'),

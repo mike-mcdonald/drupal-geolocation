@@ -13,6 +13,9 @@ views.style.maps_common:
   type: views_style
   label: 'Geolocation CommonMap'
   mapping:
+    show_raw_locations:
+      type: integer
+      label: 'Show raw locations'
     even_empty:
       type: integer
       label: 'Even empty'

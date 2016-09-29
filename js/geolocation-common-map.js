@@ -17,10 +17,11 @@
 /**
  * @name CommonMapSettings
  * @property {Object} settings
- * @property {CommonMapUpdateSettings} settings.dynamic_map
+ * @property {CommonMapUpdateSettings} dynamic_map
  * @property {GoogleMapSettings} settings.google_map_settings
  * @property {String} client_location.enable
  * @property {String} client_location.update_map
+ * @property {Boolean} showRawLocations
  */
 
 /**
@@ -94,7 +95,12 @@
 
       // Hide the graceful-fallback HTML list; map will propably work now.
       // Map-container is not hidden by default in case of graceful-fallback.
-      map.children('.geolocation-common-map-locations').hide();
+      if (typeof mapSettings.showRawLocations === 'undefined') {
+        map.children('.geolocation-common-map-locations').hide();
+      }
+      else if (!mapSettings.showRawLocations) {
+        map.children('.geolocation-common-map-locations').hide();
+      }
 
       /**
        * @type {GeolocationMap}
