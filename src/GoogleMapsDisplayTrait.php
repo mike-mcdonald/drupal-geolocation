@@ -53,6 +53,7 @@ trait GoogleMapsDisplayTrait {
         'height' => '400px',
         'width' => '100%',
         'info_auto_display' => TRUE,
+        'disableAutoPan' => TRUE,
         'style' => '',
       ],
     ];
@@ -200,6 +201,11 @@ trait GoogleMapsDisplayTrait {
       '#type' => 'checkbox',
       '#title' => $this->t('Automatically show info text'),
       '#default_value' => $settings['google_map_settings']['info_auto_display'],
+    ];
+    $form['google_map_settings']['disableAutoPan'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Disable automatic panning of map when info bubble is opened.'),
+      '#default_value' => $settings['google_map_settings']['disableAutoPan'],
     ];
 
     return $form;

@@ -98,6 +98,9 @@ views.style.maps_common:
         info_auto_display:
           type: integer
           label: 'Display info'
+        disableAutoPan:
+          type: integer
+          label: 'Disable automatic panning for info window'
         style:
           type: string
           label: 'JSON encoded style'
@@ -260,6 +263,9 @@ field.formatter.settings.geolocation_map:
         info_auto_display:
           type: integer
           label: 'Display info'
+        disableAutoPan:
+          type: integer
+          label: 'Disable automatic panning for info window'
         style:
           type: string
           label: 'JSON encoded style'
@@ -323,6 +329,9 @@ field.widget.settings.geolocation_googlegeocoder:
         info_auto_display:
           type: integer
           label: 'Display info'
+        disableAutoPan:
+          type: integer
+          label: 'Disable automatic panning for info window'
         style:
           type: string
           label: 'JSON encoded style'

@@ -258,7 +258,8 @@
 
       // Set the info popup text.
       map.infowindow = new google.maps.InfoWindow({
-        content: map.settings.info_text
+        content: map.settings.info_text,
+        disableAutoPan: map.settings.disableAutoPan
       });
 
       // Add the marker to the map.
