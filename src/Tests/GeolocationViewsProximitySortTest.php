@@ -10,7 +10,7 @@ use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 
 /**
- * Tests the grid style plugin.
+ * Tests the proximity views sort.
  *
  * @group views
  */

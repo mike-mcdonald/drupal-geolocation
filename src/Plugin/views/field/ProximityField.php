@@ -24,11 +24,12 @@ class ProximityField extends NumericField {
       'proximity_source' => ['default' => 'direct_input'],
       'proximity_lat' => ['default' => ''],
       'proximity_lng' => ['default' => ''],
-      'units' => ['default' => 'km'],
+      'proximity_units' => ['default' => 'km'],
       'proximity_filter' => ['default' => ''],
       'proximity_argument' => ['default' => ''],
       'entity_id_argument' => ['default' => ''],
       'entity_id_argument_units' => ['default' => ''],
+      'boundary_filter' => ['default' => ''],
     ] + parent::defineOptions();
   }
 
@@ -82,10 +83,10 @@ class ProximityField extends NumericField {
         ],
       ],
     ];
-    $form['units'] = [
+    $form['proximity_units'] = [
       '#type' => 'select',
       '#title' => $this->t('Units'),
-      '#default_value' => !empty($this->options['units']) ? $this->options['units'] : '',
+      '#default_value' => !empty($this->options['proximity_units']) ? $this->options['proximity_units'] : '',
       '#weight' => 40,
       '#fieldset' => 'proximity_group',
       '#options' => [
@@ -94,7 +95,13 @@ class ProximityField extends NumericField {
       ],
       '#states' => [
         'visible' => [
-          'select[name="options[proximity_source]"]' => ['value' => 'direct_input'],
+          [
+            ['select[name="options[proximity_source]"]' => ['value' => 'direct_input']],
+            'or',
+            ['select[name="options[proximity_source]"]' => ['value' => 'boundary_filter']],
+            'or',
+            ['select[name="options[proximity_source]"]' => ['value' => 'entity_id_argument']],
+          ],
         ],
       ],
     ];
@@ -126,7 +133,7 @@ class ProximityField extends NumericField {
         ],
       ];
 
-      $form['proximity_source']['#options']['filter'] = $this->t('Proximity Filters');
+      $form['proximity_source']['#options']['filter'] = $this->t('Proximity Filter');
     }
 
     /*
@@ -160,6 +167,36 @@ class ProximityField extends NumericField {
     }
 
     /*
+     * Available boundary filters form elements.
+     */
+    $boundary_filters = [];
+
+    /** @var \Drupal\views\Plugin\views\filter\FilterPluginBase $filter */
+    foreach ($this->displayHandler->getHandlers('filter') as $delta => $filter) {
+      if ($filter->pluginId === 'geolocation_filter_boundary') {
+        $boundary_filters[$delta] = $filter->adminLabel();
+      }
+    }
+
+    if (!empty($boundary_filters)) {
+      $form['boundary_filter'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Select filter.'),
+        '#description' => $this->t('Select the boundary filter to use as the starting point for calculating proximity.'),
+        '#options' => $boundary_filters,
+        '#default_value' => $this->options['boundary_filter'],
+        '#fieldset' => 'proximity_group',
+        '#states' => [
+          'visible' => [
+            'select[name="options[proximity_source]"]' => ['value' => 'boundary_filter'],
+          ],
+        ],
+      ];
+
+      $form['proximity_source']['#options']['boundary_filter'] = $this->t('Boundary Filter');
+    }
+
+    /*
      * Entity ID contextual filter form elements.
      */
     $entity_id_arguments = [];
@@ -190,21 +227,6 @@ class ProximityField extends NumericField {
           ],
         ],
       ];
-      $form['entity_id_argument_units'] = [
-        '#type' => 'select',
-        '#title' => $this->t('Select the type of unit for this field.'),
-        '#options' => [
-          'km' => $this->t('Kilometers'),
-          'mile' => $this->t('Miles'),
-        ],
-        '#default_value' => $this->options['entity_id_argument_units'],
-        '#fieldset' => 'proximity_group',
-        '#states' => [
-          'visible' => [
-            'select[name="options[proximity_source]"]' => ['value' => 'entity_id_argument'],
-          ],
-        ],
-      ];
 
       $form['proximity_source']['#options']['entity_id_argument'] = $this->t('Entity ID Contextual Filter');
     }
@@ -221,17 +243,30 @@ class ProximityField extends NumericField {
     switch ($this->options['proximity_source']) {
       case 'filter':
         $filter = $this->view->filter[$this->options['proximity_filter']];
-        $lat = $filter->value['lat'];
-        $lgn = $filter->value['lng'];
+        $latitude = $filter->value['lat'];
+        $longitude = $filter->value['lng'];
         $units = $filter->value['units'];
+        break;
+
+      case 'boundary_filter':
+        $filter = $this->view->filter[$this->options['boundary_filter']];
+
+        // See documentation at
+        // http://tubalmartin.github.io/spherical-geometry-php/#LatLngBounds
+        $latitude = ($filter->value['lat_south_west'] + $filter->value['lat_north_east']) / 2;
+        $longitude = ($filter->value['lng_south_west'] + $filter->value['lng_north_east']) / 2;
+        if ($filter->value['lng_south_west'] > $filter->value['lng_north_east']) {
+          $longitude = $longitude == 0 ? 180 : fmod((fmod((($longitude + 180) - -180), 360) + 360), 360) + -180;
+        }
+        $units = $this->options['proximity_units'];
         break;
 
       case 'argument':
         /** @var \Drupal\geolocation\Plugin\views\argument\ProximityArgument $argument */
         $argument = $this->view->argument[$this->options['proximity_argument']];
         $values = $argument->getParsedReferenceLocation();
-        $lat = $values['lat'];
-        $lgn = $values['lng'];
+        $latitude = $values['lat'];
+        $longitude = $values['lng'];
         $units = $values['units'];
         break;
 
@@ -255,22 +290,22 @@ class ProximityField extends NumericField {
           return;
         }
         $values = reset($values);
-        $lat = $values['lat'];
-        $lgn = $values['lng'];
-        $units = $this->options['entity_id_argument_units'];
+        $latitude = $values['lat'];
+        $longitude = $values['lng'];
+        $units = $this->options['proximity_units'];
         break;
 
       default:
-        $lat = $this->options['proximity_lat'];
-        $lgn = $this->options['proximity_lng'];
-        $units = $this->options['units'];
+        $latitude = $this->options['proximity_lat'];
+        $longitude = $this->options['proximity_lng'];
+        $units = $this->options['proximity_units'];
     }
 
     // Get the earth radius from the units.
     $earth_radius = $units === 'mile' ? GeolocationCore::EARTH_RADIUS_MILE : GeolocationCore::EARTH_RADIUS_KM;
 
     // Build the query expression.
-    $expression = \Drupal::service('geolocation.core')->getProximityQueryFragment($this->ensureMyTable(), $this->realField, $lat, $lgn, $earth_radius);
+    $expression = \Drupal::service('geolocation.core')->getProximityQueryFragment($this->ensureMyTable(), $this->realField, $latitude, $longitude, $earth_radius);
 
     // Get a placeholder for this query and save the field_alias for it.
     $placeholder = $this->placeholder();

@@ -34,7 +34,7 @@ class GeolocationLatlngWidget extends WidgetBase {
       '#required' => $this->fieldDefinition->isRequired(),
     );
     if (!empty($element['lat']['#default_value'])) {
-      $element['lat']['#description'] = $this->t('<span>Sexagesimal/DMS notation value: %sexagesimal</span>', ['%sexagesimal' => GeolocationCore::DecimalToSexagesimal($element['lat']['#default_value'])]);
+      $element['lat']['#description'] = $this->t('<span>Sexagesimal/DMS notation value: %sexagesimal</span>', ['%sexagesimal' => GeolocationCore::decimalToSexagesimal($element['lat']['#default_value'])]);
     }
 
     $element['lng'] = array(
@@ -46,7 +46,7 @@ class GeolocationLatlngWidget extends WidgetBase {
       '#required' => $this->fieldDefinition->isRequired(),
     );
     if (!empty($element['lng']['#default_value'])) {
-      $element['lng']['#description'] = $this->t('<span>Sexagesimal/DMS notation value: %sexagesimal</span>', ['%sexagesimal' => GeolocationCore::DecimalToSexagesimal($element['lng']['#default_value'])]);
+      $element['lng']['#description'] = $this->t('<span>Sexagesimal/DMS notation value: %sexagesimal</span>', ['%sexagesimal' => GeolocationCore::decimalToSexagesimal($element['lng']['#default_value'])]);
     }
 
     return $element;
@@ -62,8 +62,8 @@ class GeolocationLatlngWidget extends WidgetBase {
         !empty($geolocation['lat'])
         && !empty($geolocation['lng'])
       ) {
-        $latitude = GeolocationCore::SexagesimalToDecimal($values[$index]['lat']);
-        $longitude = GeolocationCore::SexagesimalToDecimal($values[$index]['lng']);
+        $latitude = GeolocationCore::sexagesimalToDecimal($values[$index]['lat']);
+        $longitude = GeolocationCore::sexagesimalToDecimal($values[$index]['lng']);
 
         if (!empty($latitude) && !empty($longitude)) {
           $values[$index]['lat'] = $latitude;

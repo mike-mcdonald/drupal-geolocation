@@ -122,10 +122,10 @@ display:
           proximity_source: entity_id_argument
           proximity_lat: '20'
           proximity_lng: '20'
+          proximity_units: mile
           proximity_filter: ''
           proximity_argument: field_geolocation_proximity
           entity_id_argument: nid
-          entity_id_argument_units: mile
           id: field_geolocation_proximity
           table: node__field_geolocation
           field: field_geolocation_proximity

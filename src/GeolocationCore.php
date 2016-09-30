@@ -294,12 +294,12 @@ class GeolocationCore {
    * Sexagesimal means a string like - X° Y' Z"
    *
    * @param string $sexagesimal
-   *  String in DMS notation.
+   *   String in DMS notation.
    *
-   * @return float|FALSE
-   *  The regular float notation or FALSE if not sexagesimal.
+   * @return float|false
+   *   The regular float notation or FALSE if not sexagesimal.
    */
-  public static function SexagesimalToDecimal($sexagesimal = '') {
+  public static function sexagesimalToDecimal($sexagesimal = '') {
     $pattern = "/(?<degree>-?\d{1,3})°[ ]?((?<minutes>\d{1,2})')?[ ]?((?<seconds>(\d{1,2}|\d{1,2}\.\d+))\")?/";
     preg_match($pattern, $sexagesimal, $gps_matches);
     if (
@@ -325,12 +325,12 @@ class GeolocationCore {
    * Sexagesimal means a string like - X° Y' Z"
    *
    * @param float|string $decimal
-   *  Either float or float-castable location.
+   *   Either float or float-castable location.
    *
-   * @return string|FALSE
-   *  The sexagesimal notation or FALSE on error.
+   * @return string|false
+   *   The sexagesimal notation or FALSE on error.
    */
-  public static function DecimalToSexagesimal($decimal = '') {
+  public static function decimalToSexagesimal($decimal = '') {
     $decimal = (float) $decimal;
 
     $degrees = floor($decimal);

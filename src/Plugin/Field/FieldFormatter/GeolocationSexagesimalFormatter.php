@@ -29,8 +29,8 @@ class GeolocationSexagesimalFormatter extends FormatterBase {
     foreach ($items as $delta => $item) {
       $element[$delta] = array(
         '#theme' => 'geolocation_sexagesimal_formatter',
-        '#lat' => GeolocationCore::DecimalToSexagesimal($item->lat),
-        '#lng' => GeolocationCore::DecimalToSexagesimal($item->lng),
+        '#lat' => GeolocationCore::decimalToSexagesimal($item->lat),
+        '#lng' => GeolocationCore::decimalToSexagesimal($item->lng),
       );
     }
 
