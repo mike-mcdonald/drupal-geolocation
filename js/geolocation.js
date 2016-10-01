@@ -72,7 +72,7 @@
  * @property InfoWindow
  *
  * @function
- * @property {Object} Marker
+ * @property {function():Object} Marker
  * @property {Function} Marker.setPosition
  * @property {Function} Marker.setMap
  * @property {Function} Marker.setIcon
@@ -95,7 +95,7 @@
 /**
  * @name google
  * @object
- * @property {GoogleMap[]} maps
+ * @property {GoogleMap} maps
  * @property {GoogleMapEvent[]} events
  */
 
