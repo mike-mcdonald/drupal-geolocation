@@ -308,10 +308,9 @@ class ProximityField extends NumericField {
     $expression = \Drupal::service('geolocation.core')->getProximityQueryFragment($this->ensureMyTable(), $this->realField, $latitude, $longitude, $earth_radius);
 
     // Get a placeholder for this query and save the field_alias for it.
-    $placeholder = $this->placeholder();
-    $this->field_alias = substr($placeholder, 1);
-    // We use having to be able to reuse the query on field handlers.
-    $query->addField(NULL, $expression, $this->field_alias);
+    // Remove the initial ':' from the placeholder and avoid collision with
+    // original field name.
+    $this->field_alias = $query->addField(NULL, $expression, substr($this->placeholder(), 1));
   }
 
 }
