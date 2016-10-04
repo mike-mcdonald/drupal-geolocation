@@ -39,6 +39,7 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
     $settings['title'] = '';
     $settings += parent::defaultSettings();
     $settings['info_text'] = '';
+    $settings['use_overridden_map_settings'] = FALSE;
     $settings += self::getGoogleMapDefaultSettings();
 
     return $settings;
@@ -55,6 +56,13 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
       '#title' => $this->t('Hover title'),
       '#description' => $this->t('The hover title is a tool tip that will be displayed when the mouse is paused over the map marker.'),
       '#default_value' => $settings['title'],
+    ];
+
+    $element['use_overridden_map_settings'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Use custom map settings if provided'),
+      '#description' => $this->t('The Geolocation GoogleGeocoder widget optionally allows to define custom map settings to use here.'),
+      '#default_value' => $settings['use_overridden_map_settings'],
     ];
 
     $element += $this->getGoogleMapsSettingsForm($settings);
@@ -125,6 +133,14 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
         'field' => $items,
         $this->fieldDefinition->getTargetEntityTypeId() => $items->getEntity(),
       ];
+
+      if (
+        $field_settings['use_overridden_map_settings']
+        && !empty($item->getValue()['data']['google_map_settings'])
+        && is_array($item->getValue()['data']['google_map_settings'])
+      ) {
+        $field_settings['google_map_settings'] = array_replace($field_settings['google_map_settings'], $item->getValue()['data']['google_map_settings']);
+      }
 
       $uniqueue_id = uniqid("map-canvas-");
 

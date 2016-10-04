@@ -121,6 +121,7 @@ trait GoogleMapsDisplayTrait {
    *   A form array to be integrated in whatever.
    */
   public function getGoogleMapsSettingsForm($settings = []) {
+    $settings['google_map_settings'] += self::getGoogleMapDefaultSettings()['google_map_settings'];
     $form = [
       'google_map_settings' => [
         '#type' => 'details',

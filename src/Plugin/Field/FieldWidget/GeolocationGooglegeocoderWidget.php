@@ -46,6 +46,7 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
       'default_latitude' => NULL,
       'auto_client_location' => FALSE,
       'auto_client_location_marker' => FALSE,
+      'allow_override_map_settings' => FALSE,
     ];
     $settings += parent::defaultSettings();
     $settings += self::getGoogleMapDefaultSettings();
@@ -124,6 +125,11 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
       ];
     }
 
+    $element['allow_override_map_settings'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Allow override the map settings when create/edit an content.'),
+      '#default_value' => $settings['allow_override_map_settings'],
+    ];
     $element += $this->getGoogleMapsSettingsForm($settings);
 
     return $element;
@@ -150,6 +156,10 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
 
     if (!empty($settings['populate_address_field'])) {
       $summary[] = t('Geocoded address will be stored in @field', ['@field' => $settings['target_address_field']]);
+    }
+
+    if (!empty($settings['allow_override_map_settings'])) {
+      $summary[] = t('Users will be allowed to override the map settings for each content.');
     }
 
     $summary = array_merge($summary, $this->getGoogleMapsSettingsSummary($settings));
@@ -260,6 +270,18 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
       }
     }
 
+    if ($settings['allow_override_map_settings']) {
+      if (!empty($items[$delta]->data['google_map_settings'])) {
+        $map_settings = [
+          'google_map_settings' => $items[$delta]->data['google_map_settings'],
+        ];
+      }
+      else {
+        $map_settings = $settings;
+      }
+      $element += $this->getGoogleMapsSettingsForm($map_settings);
+    }
+
     // Wrap the whole form in a container.
     $element += [
       '#type' => 'fieldset',
@@ -270,6 +292,23 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
     ];
 
     return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
+    $values = parent::massageFormValues($values, $form, $form_state);
+
+    if ($this->settings['allow_override_map_settings']) {
+      foreach ($values as $delta => $item_values) {
+        if (!empty($item_values['google_map_settings'])) {
+          $values[$delta]['data']['google_map_settings'] = $item_values['google_map_settings'];
+        }
+      }
+    }
+
+    return $values;
   }
 
 }

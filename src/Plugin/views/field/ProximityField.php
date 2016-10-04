@@ -281,6 +281,9 @@ class ProximityField extends NumericField {
         }
         /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
         $entity = \Drupal::entityTypeManager()->getStorage($this->getEntityType())->load($entity_id);
+        if (!$entity->hasField($this->realField)) {
+          return;
+        }
         $field = $entity->get($this->realField);
         if (empty($field)) {
           return;

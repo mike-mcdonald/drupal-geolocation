@@ -235,6 +235,9 @@ field.formatter.settings.geolocation_map:
     info_text:
       type: string
       label: 'Info Text'
+    use_overridden_map_settings:
+      type: integer
+      label: 'Use overriden map settings optionally set by GoogleGeocoderWidget.'
     google_map_settings:
       type: mapping
       label: 'Google Map settings'
@@ -304,6 +307,9 @@ field.widget.settings.geolocation_googlegeocoder:
     target_address_field:
       type: string
       label: 'Target address field name'
+    allow_override_map_settings:
+      type: integer
+      label: 'Allow override map settings.'
     google_map_settings:
       type: mapping
       label: 'Google Map settings'

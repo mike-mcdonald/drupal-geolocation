@@ -17,7 +17,6 @@ use Zumba\GastonJS\Exception\JavascriptError;
  * @group geolocation
  */
 class GeolocationJavascriptTest extends JavascriptTestBase {
-
   /**
    * {@inheritdoc}
    */
@@ -43,7 +42,7 @@ class GeolocationJavascriptTest extends JavascriptTestBase {
    * @param mixed $path
    *   Path to get.
    *
-   * @return string Return what drupal would.
+   * @return string
    *   Return what drupal would.
    *
    * @throws \Zumba\GastonJS\Exception\JavascriptError
@@ -90,12 +89,18 @@ class GeolocationJavascriptTest extends JavascriptTestBase {
     EntityFormDisplay::load('node.article.default')
       ->setComponent('field_geolocation_test', [
         'type' => 'geolocation_googlegeocoder',
+        'settings' => [
+          'allow_override_map_settings' => TRUE,
+        ],
       ])
       ->save();
 
     EntityViewDisplay::load('node.article.default')
       ->setComponent('field_geolocation_test', [
         'type' => 'geolocation_map',
+        'settings' => [
+          'use_overridden_map_settings' => TRUE,
+        ],
         'weight' => 1,
       ])
       ->save();
@@ -135,6 +140,22 @@ class GeolocationJavascriptTest extends JavascriptTestBase {
         'lng' => 49,
       ],
     ])->save();
+    $entity_test_storage->create([
+      'id' => 4,
+      'title' => 'Custom map settings',
+      'body' => 'This content tests if the custom map settings are respected',
+      'type' => 'article',
+      'field_geolocation_test' => [
+        'lat' => 54,
+        'lng' => 49,
+        'data' => [
+          'google_map_settings' => [
+            'height' => '376px',
+            'width' => '229px',
+          ],
+        ],
+      ],
+    ])->save();
   }
 
   /**
@@ -159,7 +180,6 @@ class GeolocationJavascriptTest extends JavascriptTestBase {
     $this->drupalGetFilterGoogleKey('node/3');
     $this->assertSession()->statusCodeEquals(200);
 
-
     $this->assertSession()->elementExists('css', '.geolocation-google-map');
 
     // If Google works, either gm-style or gm-err-container will be present.
@@ -183,6 +203,47 @@ class GeolocationJavascriptTest extends JavascriptTestBase {
 
     // If Google works, either gm-style or gm-err-container will be present.
     $this->assertSession()->elementExists('css', '.geolocation-map-canvas [class^="gm-"]');
+  }
+
+  /**
+   * Tests the GoogleMap formatter.
+   */
+  public function testGoogleMapFormatterCustomSettings() {
+    $this->drupalGetFilterGoogleKey('node/4');
+    $this->assertSession()->statusCodeEquals(200);
+
+    $this->assertSession()->elementExists('css', '.geolocation-google-map');
+    $this->assertSession()->elementAttributeContains('css', '.geolocation-google-map', 'style', 'height: 376px');
+
+    // If Google works, either gm-style or gm-err-container will be present.
+    $this->assertSession()->elementExists('css', '.geolocation-google-map [class^="gm-"]');
+
+    // TODO: Create node with custom settings and test it.
+    $admin_user = $this->drupalCreateUser([
+      'bypass node access',
+      'administer nodes',
+    ]);
+    $this->drupalLogin($admin_user);
+    // Display creation form.
+    $this->drupalGetFilterGoogleKey('node/4/edit');
+
+    $this->assertSession()->fieldExists("field_geolocation_test[0][google_map_settings][height]");
+
+    $edit = array(
+      'title[0][value]' => $this->randomMachineName(),
+      'field_geolocation_test[0][google_map_settings][height]' => '273px',
+    );
+
+    $this->drupalPostForm(NULL, $edit, t('Save'));
+
+    $this->drupalGetFilterGoogleKey('node/4');
+    $this->assertSession()->statusCodeEquals(200);
+
+    $this->assertSession()->elementExists('css', '.geolocation-google-map');
+    $this->assertSession()->elementAttributeContains('css', '.geolocation-google-map', 'style', 'height: 273px;');
+
+    // If Google works, either gm-style or gm-err-container will be present.
+    $this->assertSession()->elementExists('css', '.geolocation-google-map [class^="gm-"]');
   }
 
 }
