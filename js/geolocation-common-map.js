@@ -318,7 +318,7 @@
                 && mapSettings.client_location.update_map === true
                 && typeof mapSettings.dynamic_map !== 'undefined'
               ) {
-                googleMap.updateDrupalView(mapSettings.dynamic_map, true);
+                googleMap.updateDrupalView(mapSettings.dynamic_map);
               }
             });
           }

@@ -301,10 +301,7 @@ class CommonMap extends StylePluginBase {
             'enable' => TRUE,
           ];
 
-          if (
-            !empty($option['settings']['update_map'])
-            && !empty($option['settings']['update_map_option'])
-          ) {
+          if ($option['settings']['update_map']) {
             $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['client_location']['update_map'] = TRUE;
           }
           break;
