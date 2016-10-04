@@ -57,6 +57,8 @@ class BoundaryFilter extends FilterPluginBase {
   protected function defineOptions() {
     $options = parent::defineOptions();
 
+    $options['expose']['contains']['override_by_geocoding_widget'] = ['default' => FALSE];
+
     $options['value']['contains'] = [
       'lat_north_east' => ['default' => ''],
       'lng_north_east' => ['default' => ''],
@@ -65,6 +67,64 @@ class BoundaryFilter extends FilterPluginBase {
     ];
 
     return $options;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function defaultExposeOptions() {
+    parent::defaultExposeOptions();
+
+    $this->options['expose']['override_by_geocoding_widget'] = FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildExposeForm(&$form, FormStateInterface $form_state) {
+    $form['expose']['override_by_geocoding_widget'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Use Google Geocoding Widget instead of boundary value form'),
+      '#default_value' => $this->options['expose']['override_by_geocoding_widget'],
+    ];
+
+    parent::buildExposeForm($form, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildExposedForm(&$form, FormStateInterface $form_state) {
+    parent::buildExposedForm($form, $form_state);
+
+    if (
+      $this->options['expose']['override_by_geocoding_widget']
+      && !empty($form[$this->field])
+    ) {
+      $form[$this->field]['lat_north_east']['#type'] = 'hidden';
+      $form[$this->field]['lng_north_east']['#type'] = 'hidden';
+      $form[$this->field]['lat_south_west']['#type'] = 'hidden';
+      $form[$this->field]['lng_south_west']['#type'] = 'hidden';
+
+      $form[$this->field]['boundary_geocoding_widget'] = [
+        '#type' => 'textfield',
+        '#title' => $this->options['expose']['label'],
+        '#description' => $this->t('Enter an address to filter results.'),
+        '#attributes' => [
+          'class' => [
+            'form-autocomplete',
+            'geolocation-views-filter-geocoder',
+          ],
+          'data-geolocation-filter-identifier' => $this->options['expose']['identifier'],
+          'data-geolocation-filter-type' => 'boundary',
+        ],
+        '#attached' => [
+          'library' => [
+            'geolocation/geolocation.views.filter.geocoder',
+          ],
+        ],
+      ];
+    }
   }
 
   /**

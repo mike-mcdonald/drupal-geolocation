@@ -124,7 +124,33 @@
       }
 
       if (typeof googleMap !== 'undefined' && googleMap !== null) {
-        // Nothing to do right now.
+        if (map.data('centre-lat') && map.data('centre-lng')) {
+          var newCenter = {
+            lat: map.data('centre-lat'),
+            lng: map.data('centre-lng')
+          };
+
+          if (!googleMap.getCenter().equals(newCenter)) {
+            googleMap.setCenter(newCenter);
+          }
+        }
+        else if (
+            map.data('centre-lat-north-east')
+            && map.data('centre-lng-north-east')
+            && map.data('centre-lat-south-west')
+            && map.data('centre-lng-south-west')
+        ) {
+          var newBounds = {
+            north: map.data('centre-lat-north-east'),
+            east: map.data('centre-lng-north-east'),
+            south: map.data('centre-lat-south-west'),
+            west: map.data('centre-lng-south-west')
+          };
+
+          if (!googleMap.getBounds().equals(newBounds)) {
+            googleMap.fitBounds(newBounds);
+          }
+        }
       }
       else if (map.data('centre-lat') && map.data('centre-lng')) {
         geolocationMap.lat = map.data('centre-lat');
@@ -138,9 +164,12 @@
         && map.data('centre-lat-south-west')
         && map.data('centre-lng-south-west')
       ) {
-        var centerBounds = new google.maps.LatLngBounds();
-        centerBounds.extend(new google.maps.LatLng(map.data('centre-lat-north-east'), map.data('centre-lng-north-east')));
-        centerBounds.extend(new google.maps.LatLng(map.data('centre-lat-south-west'), map.data('centre-lng-south-west')));
+        var centerBounds = {
+          north: map.data('centre-lat-north-east'),
+          east: map.data('centre-lng-north-east'),
+          south: map.data('centre-lat-south-west'),
+          west: map.data('centre-lng-south-west')
+        };
 
         geolocationMap.lat = geolocationMap.lng = 0;
         googleMap = Drupal.geolocation.addMap(geolocationMap);

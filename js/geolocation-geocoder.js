@@ -3,20 +3,6 @@
  *   Javascript for the Google geocoder function.
  */
 
-/**
- * @name AddressComponent
- * @property {String} long_name - Long component name
- * @property {String} short_name - Short component name
- * @property {String[]} types - Compontent type
- * @property {Object} geometry
- * @property {Object} geometry.location
- */
-
-/**
- * @name GoogleAddress
- * @property {AddressComponent[]} address_components - Compontents
- */
-
 (function ($, Drupal, _) {
   'use strict';
 
@@ -29,7 +15,7 @@
   Drupal.geolocation.geocoder = Drupal.geolocation.geocoder || {};
 
   /**
-   * Load google maps and set a callback to run when it's ready.
+   * Attach geocoder form and functionality to existing map.
    *
    * @param {object} map - The Google Map object
    */

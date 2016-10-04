@@ -32,8 +32,8 @@
 
 /**
  * @name GoogleMapBounds
- * @property {Function} getNorthEast
- * @property {Function} getSouthWest
+ * @property {function():GoogleMapLatLng} getNorthEast
+ * @property {function():GoogleMapLatLng} getSouthWest
  */
 
 /**
@@ -45,6 +45,27 @@
 /**
  * @name GoogleMapEvent
  * @property {Function} addDomListener
+ */
+
+/**
+ * @name AddressComponent
+ * @property {String} long_name - Long component name
+ * @property {String} short_name - Short component name
+ * @property {String[]} types - Compontent type
+ * @property {GoogleGeometry} geometry
+ */
+
+/**
+ * @name GoogleAddress
+ * @property {AddressComponent[]} address_components - Components
+ */
+
+/**
+ * @name GoogleGeometry
+ * @property {GoogleMapLatLng} location - Location
+ * @property {String} location_type - Location type
+ * @property {GoogleMapBounds} viewport - Viewport
+ * @property {GoogleMapBounds} bounds - Bounds (optionally)
  */
 
 /**

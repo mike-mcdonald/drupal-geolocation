@@ -18,6 +18,15 @@ geolocation.geocoder:
     - geolocation/geolocation.core
     - core/jquery.ui.autocomplete
 
+# Geolocation views filter geocoder function.
+geolocation.views.filter.geocoder:
+  version: 8.x-1.x
+  js:
+    js/geolocation-views-filter-geocoder.js: {}
+  dependencies:
+    - geolocation/geolocation.core
+    - core/jquery.ui.autocomplete
+
 # Google maps display formatter.
 geolocation.formatter.googlemap:
   version: 8.x-1.x

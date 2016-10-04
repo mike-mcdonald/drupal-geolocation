@@ -255,13 +255,21 @@ class CommonMap extends StylePluginBase {
         continue;
       }
 
-      // Ignore if fitBounds is enabled, as it will supersede any other option.
+      // Break if fitBounds is enabled, as it will supersede any other option.
       if ($fitbounds) {
         break;
       }
-
-      // Ignore if center is already set.
-      if (isset($centre['lat']) && isset($centre['lng'])) {
+      // Break if center is already set.
+      elseif (isset($centre['lat']) && isset($centre['lng'])) {
+        break;
+      }
+      // Break if center bounds are already set.
+      elseif (
+        isset($centre['lat_north_east'])
+        && isset($centre['lng_north_east'])
+        && isset($centre['lat_south_west'])
+        && isset($centre['lng_south_west'])
+      ) {
         break;
       }
 
