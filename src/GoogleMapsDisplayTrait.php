@@ -3,18 +3,91 @@
 namespace Drupal\geolocation;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 
 /**
- * Trait GoogleMapsDisplayTrait.
+ * Class GoogleMapsDisplayTrait.
  *
- * @package \Drupal\geolocation
+ * @package Drupal\geolocation
  */
 trait GoogleMapsDisplayTrait {
 
+  /**
+   * Google map style - Roadmap.
+   *
+   * @var string
+   */
   public static $ROADMAP = 'ROADMAP';
+
+  /**
+   * Google map style - Satellite.
+   *
+   * @var string
+   */
   public static $SATELLITE = 'SATELLITE';
+
+  /**
+   * Google map style - Hybrid.
+   *
+   * @var string
+   */
   public static $HYBRID = 'HYBRID';
+
+  /**
+   * Google map style - Terrain.
+   *
+   * @var string
+   */
   public static $TERRAIN = 'TERRAIN';
+
+  /**
+   * Google maps url with default parameters.
+   *
+   * @var string
+   */
+  public static $GOOGLEMAPSAPIURL = 'https://maps.googleapis.com/maps/api/js';
+
+  /**
+   * Return all module and custom defined parameters.
+   *
+   * @return array
+   *   Parameters
+   */
+  public function getGoogleMapsApiParameters() {
+    $config = \Drupal::config('geolocation.settings');
+    $geolocation_parameters = [
+      'callback' => 'Drupal.geolocation.googleCallback',
+      'key' => $config->get('google_map_api_key'),
+    ];
+    $module_parameters = \Drupal::moduleHandler()->invokeAll('hook_geolocation_google_maps_parameters') ?: [];
+    $custom_parameters = $config->get('google_map_custom_url_parameters') ?: [];
+
+    $parameters = array_replace_recursive($custom_parameters, $module_parameters, $geolocation_parameters);
+
+    if (!empty($parameters['client'])) {
+      unset($parameters['key']);
+    }
+
+    return $parameters;
+  }
+
+  /**
+   * Return the fully build URL to load Google Maps API.
+   *
+   * @return string
+   *   Google Maps API url
+   */
+  public function getGoogleMapsApiUrl() {
+    $parameters = [];
+    foreach ($this->getGoogleMapsApiParameters() as $parameter => $value) {
+      $parameters[$parameter] = is_array($value) ? implode(',', $value) : $value;
+    }
+    $url = Url::fromUri(static::$GOOGLEMAPSAPIURL, [
+      'query' => $parameters,
+      'https' => TRUE,
+    ]);
+    return $url->toString();
+  }
 
   /**
    * An array of all available map types.

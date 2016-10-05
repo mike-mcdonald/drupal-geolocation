@@ -5,9 +5,28 @@ geolocation.settings:
     google_map_api_key:
       type: string
       label: 'Google Maps API Key'
-    google_map_additional_parameters:
-      type: string
+    google_map_custom_url_parameters:
+      type: mapping
       label: 'Additional Google Maps API parameters'
+      mapping:
+        region:
+          type: string
+          label: 'Region'
+        language:
+          type: string
+          label: 'languae'
+        v:
+          type: string
+          label: 'Version'
+        client:
+          type: string
+          label: 'Client ID'
+        libraries:
+          type: sequence
+          label: 'Libraries'
+          sequence:
+            type: string
+            label: 'Library name'
 
 views.style.maps_common:
   type: views_style

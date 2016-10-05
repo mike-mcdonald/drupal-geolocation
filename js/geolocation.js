@@ -6,8 +6,7 @@
 /**
  * @param {Object} drupalSettings
  * @param {Object} drupalSettings.geolocation
- * @param {String} drupalSettings.geolocation.google_map_api_key
- * @param {String} drupalSettings.geolocation.google_map_additional_parameters
+ * @param {String} drupalSettings.geolocation.google_map_url
  */
 
 /**
@@ -221,24 +220,15 @@
       Drupal.geolocation.maps_api_loading = true;
       // Google maps isn't loaded so lazy load google maps.
 
-      // Default script path.
-      var scriptPath = '//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&callback=Drupal.geolocation.googleCallback';
-
-      // If a Google API key is set, use it.
-      if (typeof drupalSettings.geolocation.google_map_api_key !== 'undefined') {
-        scriptPath += '&key=' + drupalSettings.geolocation.google_map_api_key;
+      if (typeof drupalSettings.geolocation.google_map_url !== 'undefined') {
+        $.getScript(drupalSettings.geolocation.google_map_url)
+          .done(function () {
+            Drupal.geolocation.maps_api_loading = false;
+          });
       }
-
-      // If additional Google API parameters are set, use them.
-      if (typeof drupalSettings.geolocation.google_map_additional_parameters !== 'undefined') {
-        scriptPath += '&' + drupalSettings.geolocation.google_map_additional_parameters;
+      else {
+        alert('Geolocation - Google map url not set.');
       }
-
-      $.getScript(scriptPath)
-        .done(function () {
-          Drupal.geolocation.maps_api_loading = false;
-        });
-
     }
     else {
       // Google maps loaded. Run callback.
