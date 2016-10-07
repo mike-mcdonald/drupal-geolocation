@@ -350,4 +350,33 @@ class GeolocationCore {
     return $value;
   }
 
+  /**
+   * Attach default geocder library & setting.
+   *
+   * @param array $render_array
+   *   Drupal render array to extend.
+   */
+  public function attachGeocoder(&$render_array) {
+    /** @var \Drupal\Core\Config\Config $config */
+    $config = \Drupal::service('config.factory')->getEditable('geolocation.settings');
+
+    /** @var \Drupal\geolocation\GeocoderManager $geocoder_manager */
+    $geocoder_manager = \Drupal::service('plugin.manager.geolocation.geocoder');
+    /** @var \Drupal\geolocation\GeocoderInterface $geocoder_plugin */
+    $geocoder_plugin = $geocoder_manager->createInstance($config->get('default_geocoder'));
+
+    $render_array = array_merge_recursive($render_array, [
+      '#attached' => [
+        'library' => [
+          $geocoder_plugin->getLibraryId(),
+        ],
+        'drupalSettings' => [
+          'geolocation' => [
+            'default_geocoder' => $geocoder_plugin->getObjectName(),
+          ],
+        ],
+      ],
+    ]);
+  }
+
 }

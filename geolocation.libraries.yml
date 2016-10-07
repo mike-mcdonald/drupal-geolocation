@@ -18,6 +18,14 @@ geolocation.geocoder:
     - geolocation/geolocation.core
     - core/jquery.ui.autocomplete
 
+# Google maps geocoder function.
+geolocation.geocoder.googlegeocodingapi:
+  version: 8.x-1.x
+  js:
+    js/geolocation-google-geocoding-api-geocoder.js: {}
+  dependencies:
+    - geolocation/geolocation.geocoder
+
 # Geolocation views filter geocoder function.
 geolocation.views.filter.geocoder:
   version: 8.x-1.x

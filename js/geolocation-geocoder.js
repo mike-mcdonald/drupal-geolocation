@@ -3,6 +3,21 @@
  *   Javascript for the Google geocoder function.
  */
 
+/**
+ * Callback for geocoded results in autocomplete field.
+ *
+ * @callback GeolocationGeocoderAutocompleteCallback
+ * @param {GoogleAddress[]} results - Retrieved geocoded results for autocomplete use.
+ */
+
+/**
+ * Callback for geocoded results in autocomplete field.
+ *
+ * @callback GeolocationGeocoderGeocodeCallback
+ * @param {(GoogleAddress|boolean)} result - Retrieved geocoded result or false.
+ */
+
+
 (function ($, Drupal, _) {
   'use strict';
 
@@ -15,13 +30,46 @@
   Drupal.geolocation.geocoder = Drupal.geolocation.geocoder || {};
 
   /**
+   * Generic autocomplete support with geocoded results.
+   *
+   * @param {String} location - Single string address to retrieve results for
+   * @param {GeolocationGeocoderAutocompleteCallback} callback - callback to execute when done
+   */
+  Drupal.geolocation.geocoder.autocomplete = function (location, callback) {
+    if (typeof drupalSettings.geolocation.default_geocoder !== 'undefined') {
+      // Fallback
+      drupalSettings.geolocation.default_geocoder = 'googleGeocodingAPI';
+    }
+
+    if (typeof Drupal.geolocation.geocoder[drupalSettings.geolocation.default_geocoder] !== 'undefined') {
+      Drupal.geolocation.geocoder[drupalSettings.geolocation.default_geocoder].autocomplete(location, callback);
+    }
+  };
+
+  /**
+   * Generic autocomplete support with geocoded results.
+   *
+   * @param {String} location - Single string address to retrieve results for
+   * @param {GeolocationGeocoderGeocodeCallback} callback - execute when done.
+   */
+  Drupal.geolocation.geocoder.geocode = function (location, callback) {
+    if (typeof drupalSettings.geolocation.default_geocoder !== 'undefined') {
+      // Fallback
+      drupalSettings.geolocation.default_geocoder = 'googleGeocodingAPI';
+    }
+
+    if (typeof Drupal.geolocation.geocoder[drupalSettings.geolocation.default_geocoder] !== 'undefined') {
+      Drupal.geolocation.geocoder[drupalSettings.geolocation.default_geocoder].geocode(location, callback);
+    }
+  };
+
+
+  /**
    * Attach geocoder form and functionality to existing map.
    *
    * @param {object} map - The Google Map object
    */
   Drupal.geolocation.geocoder.add = function (map) {
-    map.geocoder = new google.maps.Geocoder();
-
     map.controls = $('<form class="geocode-controls-wrapper" />')
       .append($('<input id="geocoder-input-' + map.id + '" type="text" class="input" placeholder="Enter a location" />'))
       // Create submit button
@@ -36,18 +84,7 @@
     map.controls.children('input.input').first().autocomplete({
       autoFocus: true,
       source: function (request, response) {
-        var responseData = [];
-        map.geocoder.geocode({address: request.term}, function (results, status) {
-          if (status === google.maps.GeocoderStatus.OK) {
-            $.each(results, function (index, item) {
-              responseData.push({
-                value: item.formatted_address,
-                address: item
-              });
-            });
-          }
-          response(responseData);
-        });
+        Drupal.geolocation.geocoder.autocomplete(request.term, response);
       },
       select: function (event, ui) {
         // Set the map viewport.
@@ -60,16 +97,12 @@
 
     map.controls.submit(function (e) {
       e.preventDefault();
-      map.geocoder.geocode({address: $(this).children('input.input').val()}, function (results, status) {
-        if (status === google.maps.GeocoderStatus.OK) {
-          map.googleMap.fitBounds(results[0].geometry.viewport);
+      Drupal.geolocation.geocoder.geocode($(this).children('input.input').val(), function (result) {
+        if (result) {
+          map.googleMap.fitBounds(result.geometry.viewport);
           // Set the map marker.
-          Drupal.geolocation.geocoder.setMapMarker(results[0].geometry.location, map);
-          Drupal.geolocation.geocoder.resultCallback(results[0]);
-        }
-        else {
-          // Alert of the error geocoding.
-          alert(Drupal.t('Geocode was not successful for the following reason: ') + status);
+          Drupal.geolocation.geocoder.setMapMarker(result.geometry.location, map);
+          Drupal.geolocation.geocoder.resultCallback(result);
         }
       });
     });

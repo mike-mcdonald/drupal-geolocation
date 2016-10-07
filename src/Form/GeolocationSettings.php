@@ -30,6 +30,21 @@ class GeolocationSettings extends ConfigFormBase {
       '#description' => $this->t('Google requires users to use a valid API key. Using the <a href="https://console.developers.google.com/apis">Google API Manager</a>, you can enable the <em>Google Maps JavaScript API</em>. That will create (or reuse) a <em>Browser key</em> which you can paste here.'),
     ];
 
+    /** @var \Drupal\geolocation\GeocoderManager $geocoder_manager */
+    $geocoder_manager = \Drupal::service('plugin.manager.geolocation.geocoder');
+    $geocoder_options = [];
+    foreach ($geocoder_manager->getDefinitions() as $geocoder_id => $geocoder) {
+      $geocoder_options[$geocoder_id] = $geocoder['name'];
+    }
+
+    $form['default_geocoder'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Default Geocoder'),
+      '#options' => $geocoder_options,
+      '#description' => $this->t('Select which Geocoder to use in autocomplete fields.'),
+      '#default_value' => $config->get('default_geocoder'),
+    ];
+
     $custom_parameters = $config->get('google_map_custom_url_parameters');
     $form['parameters'] = [
       '#type' => 'details',
@@ -148,18 +163,14 @@ class GeolocationSettings extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    parent::validateForm($form, $form_state);
-    $parameters = $form_state->getValue('parameters');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     /** @var \Drupal\Core\Config\Config $config */
     $config = \Drupal::service('config.factory')->getEditable('geolocation.settings');
     $config->set('google_map_api_key', $form_state->getValue('google_map_api_key'));
+
+    if (!empty($form_state->getValue('default_geocoder'))) {
+      $config->set('default_geocoder', $form_state->getValue('default_geocoder'));
+    }
 
     $parameters = $form_state->getValue('parameters');
     unset($parameters['libraries']['add']);
@@ -170,8 +181,8 @@ class GeolocationSettings extends ConfigFormBase {
       }
     }
     $parameters['libraries'] = array_values($parameters['libraries']);
-
     $config->set('google_map_custom_url_parameters', $parameters);
+
     $config->save();
   }
 

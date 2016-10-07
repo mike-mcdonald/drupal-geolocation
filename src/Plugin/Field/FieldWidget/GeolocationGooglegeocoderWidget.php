@@ -214,9 +214,6 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
       '#attributes' => ['class' => ['geolocation-hidden-lng']],
     ];
 
-    // Add Google API key to js.
-    $config = \Drupal::config('geolocation.settings');
-
     // Add the map container.
     $element['map_canvas'] = [
       '#type' => 'html_tag',
@@ -249,6 +246,8 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
         ],
       ],
     ];
+    \Drupal::service('geolocation.core')->attachGeocoder($element);
+
     if ($settings['populate_address_field']) {
       $element['map_canvas']['#attached']['drupalSettings']['geolocation']['widgetSettings'][$canvas_id]['addressFieldTarget'] = $settings['target_address_field'];
 

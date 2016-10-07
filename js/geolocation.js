@@ -7,6 +7,7 @@
  * @param {Object} drupalSettings
  * @param {Object} drupalSettings.geolocation
  * @param {String} drupalSettings.geolocation.google_map_url
+ * @param {String} drupalSettings.geolocation.default_geocoder
  */
 
 /**
@@ -50,13 +51,15 @@
  * @name AddressComponent
  * @property {String} long_name - Long component name
  * @property {String} short_name - Short component name
- * @property {String[]} types - Compontent type
+ * @property {String[]} types - Component type
  * @property {GoogleGeometry} geometry
  */
 
 /**
  * @name GoogleAddress
  * @property {AddressComponent[]} address_components - Components
+ * @property {String} formatted_address - Formatted address
+ * @property {GoogleGeometry} geometry - Geometry
  */
 
 /**
@@ -207,7 +210,6 @@
    * @param {geolocationCallback} callback - The callback
    */
   Drupal.geolocation.loadGoogle = function (callback) {
-
     // Add the callback.
     Drupal.geolocation.addCallback(callback);
 

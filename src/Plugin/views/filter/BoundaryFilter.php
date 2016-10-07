@@ -57,7 +57,7 @@ class BoundaryFilter extends FilterPluginBase {
   protected function defineOptions() {
     $options = parent::defineOptions();
 
-    $options['expose']['contains']['override_by_geocoding_widget'] = ['default' => FALSE];
+    $options['expose']['contains']['input_by_geocoding_widget'] = ['default' => FALSE];
 
     $options['value']['contains'] = [
       'lat_north_east' => ['default' => ''],
@@ -75,17 +75,17 @@ class BoundaryFilter extends FilterPluginBase {
   public function defaultExposeOptions() {
     parent::defaultExposeOptions();
 
-    $this->options['expose']['override_by_geocoding_widget'] = FALSE;
+    $this->options['expose']['input_by_geocoding_widget'] = FALSE;
   }
 
   /**
    * {@inheritdoc}
    */
   public function buildExposeForm(&$form, FormStateInterface $form_state) {
-    $form['expose']['override_by_geocoding_widget'] = [
+    $form['expose']['input_by_geocoding_widget'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Use Google Geocoding Widget instead of boundary value form'),
-      '#default_value' => $this->options['expose']['override_by_geocoding_widget'],
+      '#default_value' => $this->options['expose']['input_by_geocoding_widget'],
     ];
 
     parent::buildExposeForm($form, $form_state);
@@ -98,7 +98,7 @@ class BoundaryFilter extends FilterPluginBase {
     parent::buildExposedForm($form, $form_state);
 
     if (
-      $this->options['expose']['override_by_geocoding_widget']
+      $this->options['expose']['input_by_geocoding_widget']
       && !empty($form[$this->field])
     ) {
       $form[$this->field]['lat_north_east']['#type'] = 'hidden';
@@ -124,6 +124,8 @@ class BoundaryFilter extends FilterPluginBase {
           ],
         ],
       ];
+
+      \Drupal::service('geolocation.core')->attachGeocoder($form[$this->field]['boundary_geocoding_widget']);
     }
   }
 

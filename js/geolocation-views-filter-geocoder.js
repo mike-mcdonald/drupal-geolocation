@@ -3,12 +3,8 @@
  *   Javascript for the Google geocoder function, specifically the views filter.
  */
 
-
-
 (function ($, Drupal) {
   'use strict';
-
-  /* global google */
 
   /**
    * @namespace
@@ -26,66 +22,54 @@
    */
   Drupal.behaviors.geolocationViewsFilterGeocoder = {
     attach: function (context) {
-      var geocoder = new google.maps.Geocoder();
 
-      $('input.geolocation-views-filter-geocoder', context)
-        .autocomplete({
+      $('input.geolocation-views-filter-geocoder', context).each(function (index, input) {
+        input = $(input);
+        input.autocomplete({
           autoFocus: true,
           source: function (request, response) {
-            var responseData = [];
-            geocoder.geocode({address: request.term}, function (results, status) {
-              if (status === google.maps.GeocoderStatus.OK) {
-                $.each(results, function (index, item) {
-                  responseData.push({
-                    value: item.formatted_address,
-                    address: item
-                  });
-                });
-              }
-              response(responseData);
-            });
+            Drupal.geolocation.geocoder.autocomplete(request.term, response);
           },
+
+          /**
+           * Option form autocomplete selected.
+           *
+           * @param {Object} event - See jquery doc
+           * @param {Object} ui - See jquery doc
+           * @param {Object} ui.item - See jquery doc
+           * @param {GoogleAddress} ui.item.address - Google address compatible
+           */
           select: function (event, ui) {
-            setGeolocationFilterValues(ui.item.address.geometry, $(this), context);
+            setGeolocationFilterValues(ui.item.address.geometry, input, context);
           }
         })
         .change(function () {
-          var $input = $(this);
-          geocoder.geocode({address: $input.val()}, function (results, status) {
-            if (status === google.maps.GeocoderStatus.OK) {
-              setGeolocationFilterValues(results[0].geometry, $input, context);
-            }
-            else {
-              // Alert of the error geocoding.
-              alert(Drupal.t('Geocode was not successful for the following reason: ') + status);
+          Drupal.geolocation.geocoder.geocode(input.val(), function (result) {
+            if (result) {
+              setGeolocationFilterValues(result.geometry, input, context);
             }
           });
         })
         .submit(function (e) {
-          var $input = $(this);
-          geocoder.geocode({address: $input.val()}, function (results, status) {
-            if (status === google.maps.GeocoderStatus.OK) {
-              setGeolocationFilterValues(results[0].geometry, $input, context);
-            }
-            else {
-              // Alert of the error geocoding.
-              e.preventDefault();
-              alert(Drupal.t('Geocode was not successful for the following reason: ') + status);
+          Drupal.geolocation.geocoder.geocode(input.val(), function (result) {
+            if (result) {
+              setGeolocationFilterValues(result.geometry, input, context);
             }
           });
         });
+      });
     }
   };
 
   /**
    * Depending on filter type, set values from google geometry.
    *
-   * @param {GoogleGeometry} geometry
-   * @param {jQuery} $input
-   * @param {HTMLElement} context
+   * @param {GoogleGeometry} geometry - retrieved geocoded geometry
+   * @param {jQuery} $input - input selector to fill
+   * @param {HTMLElement} context - context to work on
    */
   function setGeolocationFilterValues(geometry, $input, context) {
-    if ($input.data('geolocation-filter-type') == 'boundary') {
+    if ($input.data('geolocation-filter-type') === 'boundary') {
       var identifier = $input.data('geolocation-filter-identifier');
       $(context).find("input[name='" + identifier + "[lat_north_east]']").val(geometry.viewport.getNorthEast().lat);
       $(context).find("input[name='" + identifier + "[lng_north_east]']").val(geometry.viewport.getNorthEast().lng);
