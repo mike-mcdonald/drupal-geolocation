@@ -56,12 +56,19 @@
       // Get the map container.
       map.container = $('#' + map.id, context).first();
 
-      if (map.container.length && !map.container.hasClass('geolocation-processed')) {
+      if (
+        map.container.length
+        && !map.container.hasClass('geolocation-processed')
+        && map.container.data('lat')
+        && map.container.data('lng')
+      ) {
+        map.lat = map.container.data('lat');
+        map.lng = map.container.data('lng');
         // Add the map by ID with settings.
         map.googleMap = Drupal.geolocation.addMap(map);
 
         // Set the map marker.
-        if (map.lat !== '' && map.lng !== '') {
+        if (map.container.data('set-marker')) {
           Drupal.geolocation.setMapMarker(map.googleMap.getCenter(), map);
         }
 

@@ -248,6 +248,9 @@ field.formatter.settings.geolocation_map:
   type: mapping
   label: 'Geolocation Google Map Formatter'
   mapping:
+    set_marker:
+      type: string
+      label: 'Set marker at map center'
     title:
       type: string
       label: 'Title'

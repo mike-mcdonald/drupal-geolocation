@@ -37,8 +37,9 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
   public static function defaultSettings() {
     $settings = [];
     $settings['title'] = '';
-    $settings += parent::defaultSettings();
+    $settings['set_marker'] = TRUE;
     $settings['info_text'] = '';
+    $settings += parent::defaultSettings();
     $settings['use_overridden_map_settings'] = FALSE;
     $settings += self::getGoogleMapDefaultSettings();
 
@@ -51,46 +52,75 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $settings = $this->getSettings();
 
+    $element['set_marker'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Set map marker'),
+      '#description' => $this->t('The map will be centered on the stored location. Additionally a marker can be set at the exact location.'),
+      '#default_value' => $settings['set_marker'],
+    ];
+
     $element['title'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Hover title'),
-      '#description' => $this->t('The hover title is a tool tip that will be displayed when the mouse is paused over the map marker.'),
+      '#title' => $this->t('Marker title'),
+      '#description' => $this->t('When the cursor hovers on the marker, this title will be shown as description.'),
       '#default_value' => $settings['title'],
+      '#states' => [
+        'visible' => [
+          ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][set_marker]"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
-
-    $element['use_overridden_map_settings'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Use custom map settings if provided'),
-      '#description' => $this->t('The Geolocation GoogleGeocoder widget optionally allows to define custom map settings to use here.'),
-      '#default_value' => $settings['use_overridden_map_settings'],
-    ];
-
-    $element += $this->getGoogleMapsSettingsForm($settings);
 
     $element['info_text'] = [
       '#type' => 'textarea',
-      '#title' => $this->t('Info text'),
-      '#description' => $this->t('This text will be displayed in an "Info'
-        . ' window" above the map marker. The "Info window" will be displayed by'
-        . ' default unless the "Automatically show info text" format setting'
-        . ' is unchecked. Leave blank if you do not wish to display an "Info'
-        . ' window". See "REPLACEMENT PATTERNS" below for available replacements.'),
+      '#title' => $this->t('Marker info text'),
+      '#description' => $this->t('When the marker is clicked, this text will be shown in a popup above it. Leave blank to not display. Token replacement supported.'),
       '#default_value' => $settings['info_text'],
+      '#states' => [
+        'visible' => [
+          ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][set_marker]"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
+
 
     $element['replacement_patterns'] = [
       '#type' => 'details',
       '#title' => 'Replacement patterns',
       '#description' => $this->t('The following replacement patterns are available for the "Info text" and the "Hover title" settings.'),
+      '#states' => [
+        'visible' => [
+          ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][set_marker]"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
     $element['replacement_patterns']['native'] = [
       '#markup' => $this->t('<h4>Geolocation field data:</h4><ul><li>Latitude (%lat) or (:lat)</li><li>Longitude (%lng) or (:lng)</li></ul>'),
+      '#states' => [
+        'visible' => [
+          ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][set_marker]"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
     // Add the token UI from the token module if present.
     $element['replacement_patterns']['token_help'] = [
       '#theme' => 'token_tree_link',
       '#prefix' => $this->t('<h4>Tokens:</h4>'),
       '#token_types' => [$this->fieldDefinition->getTargetEntityTypeId()],
+      '#states' => [
+        'visible' => [
+          ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][set_marker]"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+
+    $element += $this->getGoogleMapsSettingsForm($settings);
+
+    $element['use_overridden_map_settings'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Use custom map settings if provided'),
+      '#description' => $this->t('The Geolocation GoogleGeocoder widget optionally allows to define custom map settings to use here.'),
+      '#default_value' => $settings['use_overridden_map_settings'],
     ];
 
     return $element;
@@ -103,11 +133,14 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
     $settings = $this->getSettings();
 
     $summary = [];
-    $summary[] = $this->t('Hover Title: @type', ['@type' => $settings['title']]);
+    $summary[] = $this->t('Marker set: @marker', ['@marker' => $settings['set_marker'] ? $this->t('Yes') : $this->t('No')]);
+    if ($settings['set_marker']) {
+      $summary[] = $this->t('Marker Title: @type', ['@type' => $settings['title']]);
+      $summary[] = $this->t('Marker Info Text: @type', [
+        '@type' => current(explode(chr(10), wordwrap($settings['info_text'], 30))),
+      ]);
+    }
     $summary = array_merge($summary, $this->getGoogleMapsSettingsSummary($settings));
-    $summary[] = $this->t('Info Text: @type', [
-      '@type' => current(explode(chr(10), wordwrap($settings['info_text'], 30))),
-    ]);
 
     return $summary;
   }
@@ -146,7 +179,7 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
 
       $elements[$delta] = [
         '#type' => 'markup',
-        '#markup' => '<div id="' . $uniqueue_id . '" class="geolocation-google-map"></div>',
+        '#markup' => '<div id="' . $uniqueue_id . '" class="geolocation-google-map" data-lat="' . (float) $item->lat . '" data-lng="' . (float) $item->lng . '" data-set-marker="' . $field_settings['set_marker'] . '"></div>',
         '#attached' => [
           'library' => ['geolocation/geolocation.formatter.googlemap'],
           'drupalSettings' => [
@@ -154,8 +187,6 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
               'maps' => [
                 $uniqueue_id => [
                   'id' => "{$uniqueue_id}",
-                  'lat' => (float) $item->lat,
-                  'lng' => (float) $item->lng,
                   'settings' => $field_settings,
                 ],
               ],
