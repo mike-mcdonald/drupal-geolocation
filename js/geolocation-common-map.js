@@ -434,37 +434,29 @@
    * @param {number} [status]
    *   The XMLHttpRequest status.
    */
-  var detachedMap = null;
   Drupal.AjaxCommands.prototype.geolocationCommonMapsUpdate = function (ajax, response, status) {
     // Get information from the response. If it is not there, default to our presets.
     var $wrapper = response.selector ? $(response.selector) : $(ajax.wrapper);
     var settings = response.settings || ajax.settings || drupalSettings;
-    var fitBounds = response.fitBounds ? true : false;
-    var $new_content_wrapped = $('<div></div>').html(response.data);
-    var $new_content = $new_content_wrapped.contents();
+    var $new_content = $(response.data);
 
     if ($new_content.length !== 1 || $new_content.get(0).nodeType !== 1) {
-      $new_content = $new_content_wrapped;
+      $new_content = $('<div></div>').html($new_content);
     }
 
     Drupal.detachBehaviors($wrapper.get(0), settings);
 
-    detachedMap = $wrapper.find('.geolocation-common-map-container').first().detach();
-    $new_content.find('.geolocation-common-map-container').first().replaceWith(detachedMap);
-    $new_content.find('.geolocation-common-map').data('geolocation-ajax-processed', 1);
+    // Retain existing map if possible, to avoid jumping and improve UX.
+    if (
+      $new_content.find('.geolocation-common-map-container').length > 0
+      && $wrapper.find('.geolocation-common-map-container').length > 0
+    ) {
+      var detachedMap = $wrapper.find('.geolocation-common-map-container').first().detach();
+      $new_content.find('.geolocation-common-map-container').first().replaceWith(detachedMap);
+      $new_content.find('.geolocation-common-map').data('geolocation-ajax-processed', 1);
+    }
 
     $wrapper.replaceWith($new_content);
-
-    /**
-     * @param {GoogleMap} item.googleMap
-     */
-    $.each(Drupal.geolocation.maps, function (index, item) {
-      if (item.container[0] === detachedMap[0]) {
-        if (fitBounds) {
-          $wrapper.find('.geolocation-common-map').data('map-reset', 1);
-        }
-      }
-    });
 
     // Attach all JavaScript behaviors to the new content, if it was
     // successfully added to the page, this if statement allows
