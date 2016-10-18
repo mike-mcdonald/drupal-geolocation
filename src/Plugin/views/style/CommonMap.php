@@ -152,6 +152,7 @@ class CommonMap extends StylePluginBase {
       $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['dynamic_map'] = [
         'enable' => TRUE,
         'hide_form' => $this->options['dynamic_map']['hide_form'],
+        'views_refresh_delay' => $this->options['dynamic_map']['views_refresh_delay'],
       ];
 
       if (!empty($update_dom_id)) {
@@ -327,9 +328,13 @@ class CommonMap extends StylePluginBase {
             $handler = $this->displayHandler->getHandler('filter', $filter_id);
             if (
               isset($handler->value['lat_north_east'])
+              && $handler->value['lat_north_east'] !== ""
               && isset($handler->value['lng_north_east'])
+              && $handler->value['lng_north_east'] !== ""
               && isset($handler->value['lat_south_west'])
+              && $handler->value['lat_south_west'] !== ""
               && isset($handler->value['lng_south_west'])
+              && $handler->value['lng_south_west'] !== ""
             ) {
               $centre = [
                 'lat_north_east' => (float) $handler->value['lat_north_east'],
@@ -363,10 +368,12 @@ class CommonMap extends StylePluginBase {
     $options['title_field'] = ['default' => ''];
     $options['icon_field'] = ['default' => ''];
     $options['dynamic_map'] = [
-      'default' => TRUE,
-      'enabled' => ['default' => 0],
-      'update_handler' => ['default' => ''],
-      'hide_form' => ['default' => 0],
+      'contains' => [
+        'enabled' => ['default' => 0],
+        'update_handler' => ['default' => ''],
+        'hide_form' => ['default' => 0],
+        'views_refresh_delay' => ['default' => '1200'],
+      ],
     ];
     $options['centre'] = ['default' => ''];
 
@@ -499,6 +506,19 @@ class CommonMap extends StylePluginBase {
         ],
       ];
 
+      $form['dynamic_map']['views_refresh_delay'] = [
+        '#title' => $this->t('Minimum idle time in milliseconds required to trigger views refresh'),
+        '#description' => $this->t('Once the view refresh is triggered, any further change of the map bounds will have no effect until the map update is finished. User interactions like scrolling in and out or dragging the map might trigger the map idle event, before the user is finished interacting. This setting adds a delay before the view is refreshed to allow further map interactions.'),
+        '#type' => 'number',
+        '#min' => 0,
+        '#default_value' => $this->options['dynamic_map']['views_refresh_delay'],
+        '#states' => [
+          'visible' => [
+            ':input[name="style_options[dynamic_map][enabled]"]' => ['checked' => TRUE],
+          ],
+        ],
+      ];
+
       if ($this->displayHandler->getPluginId() !== 'page') {
         $update_targets = [
           $this->displayHandler->display['id'] => t('- This display -'),
@@ -506,7 +526,7 @@ class CommonMap extends StylePluginBase {
         foreach ($this->view->displayHandlers->getInstanceIds() as $instance_id) {
           $display_instance = $this->view->displayHandlers->get($instance_id);
           if ($display_instance->getPluginId() == 'page') {
-            $update_targets[$instance_id] = $display_instance->getPluginDefinition()['admin'];
+            $update_targets[$instance_id] = $display_instance->display['display_title'];
           }
         }
         if (!empty($update_targets)) {

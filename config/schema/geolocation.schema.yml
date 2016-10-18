@@ -60,6 +60,9 @@ views.style.maps_common:
         hide_form:
           type: integer
           label: 'Hide form'
+        views_refresh_delay:
+          type: string
+          label: 'Views fresh delay in ms'
         update_handler:
           type: string
           label: 'Filter or agurment name'
@@ -67,8 +70,8 @@ views.style.maps_common:
           type: string
           label: 'Display to update'
         update_dom_id:
-                  type: string
-                  label: 'Display to update'
+          type: string
+          label: 'Display to update'
     centre:
       type: sequence
       label: 'Centre Option'

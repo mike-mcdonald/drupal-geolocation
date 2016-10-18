@@ -7,6 +7,7 @@
  * @name CommonMapUpdateSettings
  * @property {String} enable
  * @property {String} hide_form
+ * @property {number} views_refresh_delay
  * @property {String} update_dom_id
  * @property {String} update_view_id
  * @property {String} update_view_display_id
@@ -35,7 +36,8 @@
 
   var bubble; // Keep track if a bubble is currently open.
   var currentMarkers = []; // Keep track of all currently attached markers.
-  var lastMapBounds = null; // Keep track of all currently attached markers.
+  var lastMapBounds = null; // Keep track of last set map bounds.
+  var skipMapUpdate = false; // Setting to true will skip the next triggered map related viewsRefresh.
 
   /**
    * @namespace
@@ -131,6 +133,7 @@
           };
 
           if (!googleMap.getCenter().equals(newCenter)) {
+            skipMapUpdate = true;
             googleMap.setCenter(newCenter);
           }
         }
@@ -148,6 +151,7 @@
           };
 
           if (!googleMap.getBounds().equals(newBounds)) {
+            skipMapUpdate = true;
             googleMap.fitBounds(newBounds);
           }
         }
@@ -205,6 +209,10 @@
         googleMap.updateDrupalView = function (settings, mapReset) {
           var currentBounds = googleMap.getBounds();
           var update_path = '';
+          if (skipMapUpdate === true) {
+            skipMapUpdate = false;
+            return;
+          }
 
           if (
             typeof settings.boundary_filter !== 'undefined'
@@ -397,7 +405,7 @@
         }
 
         if (map.data('geolocationAjaxProcessed') !== 1) {
-
+          var geolocationMapIdleTimer;
           googleMap.addListener('idle', function () {
             var currentMapBounds = googleMap.getBounds();
             if (
@@ -408,8 +416,11 @@
               lastMapBounds = currentMapBounds;
               return;
             }
-            lastMapBounds = currentMapBounds;
-            googleMap.updateDrupalView(mapSettings.dynamic_map);
+            clearTimeout(geolocationMapIdleTimer);
+            geolocationMapIdleTimer = setTimeout(function() {
+              lastMapBounds = currentMapBounds;
+              googleMap.updateDrupalView(mapSettings.dynamic_map);
+            }, mapSettings.dynamic_map.views_refresh_delay);
           });
         }
       }
