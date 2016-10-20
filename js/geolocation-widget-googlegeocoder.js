@@ -113,14 +113,16 @@
           }
         }
 
-        Drupal.geolocation.geocoder.addResultCallback(function (address) {
-          Drupal.geolocation.geocoderWidget.setHiddenInputFields(address.geometry.location, map);
+        Drupal.geolocation.geocoder.addResultCallback(function (address, modifiedMap) {
+          if (map.id === modifiedMap.id) {
+            Drupal.geolocation.geocoderWidget.setHiddenInputFields(address.geometry.location, map);
+          }
         });
 
         if (typeof drupalSettings.geolocation.widgetSettings[widget_id].addressFieldTarget !== 'undefined') {
           var targetField = drupalSettings.geolocation.widgetSettings.addressFieldTarget;
 
-          Drupal.geolocation.geocoder.addResultCallback(function (address) {
+          Drupal.geolocation.geocoder.addResultCallback(function (address, modifiedMap) {
             var addressField = $('.field--type-address.field--widget-address-default.field--name-' + targetField.replace(/_/g, '-'), context);
 
             var addressLine1 = '';

@@ -91,7 +91,7 @@
         map.googleMap.fitBounds(ui.item.address.geometry.viewport);
         // Set the map marker.
         Drupal.geolocation.geocoder.setMapMarker(ui.item.address.geometry.location, map);
-        Drupal.geolocation.geocoder.resultCallback(ui.item.address);
+        Drupal.geolocation.geocoder.resultCallback(ui.item.address, map);
       }
     });
 
@@ -102,7 +102,7 @@
           map.googleMap.fitBounds(result.geometry.viewport);
           // Set the map marker.
           Drupal.geolocation.geocoder.setMapMarker(result.geometry.location, map);
-          Drupal.geolocation.geocoder.resultCallback(result);
+          Drupal.geolocation.geocoder.resultCallback(result, map);
         }
       });
     });
@@ -141,11 +141,12 @@
    * Provides the callback that is called when geocoded results are found loads.
    *
    * @param {object} result - first returned address
+   * @param {Object} map - The settings object that contains all of the necessary metadata for this map.
    */
-  Drupal.geolocation.geocoder.resultCallback = function (result) {
+  Drupal.geolocation.geocoder.resultCallback = function (result, map) {
     // Ensure callbacks array;
     Drupal.geolocation.geocoder.resultCallbacks = Drupal.geolocation.geocoder.resultCallbacks || [];
-    _.invoke(Drupal.geolocation.geocoder.resultCallbacks, 'callback', result);
+    _.invoke(Drupal.geolocation.geocoder.resultCallbacks, 'callback', result, map);
   };
 
   /**
