@@ -107,6 +107,14 @@ class CommonMap extends StylePluginBase {
       $icon_field = $this->options['icon_field'];
     }
 
+    if (
+      !empty($this->options['marker_scroll_to_result'])
+      && !empty($this->options['id_field'])
+      && $this->options['id_field'] != 'none'
+    ) {
+      $id_field = $this->options['id_field'];
+    }
+
     $map_id = $this->view->dom_id;
 
     $build = [
@@ -182,12 +190,12 @@ class CommonMap extends StylePluginBase {
     foreach ($this->view->result as $row) {
       if (!empty($title_field)) {
         $title_field_handler = $this->view->field[$title_field];
-        $title_build = array(
+        $title_build = [
           '#theme' => $title_field_handler->themeFunctions(),
           '#view' => $title_field_handler->view,
           '#field' => $title_field_handler,
           '#row' => $row,
-        );
+        ];
       }
 
       if ($this->view->field[$geo_field] instanceof GeolocationField) {
@@ -197,6 +205,15 @@ class CommonMap extends StylePluginBase {
       }
       else {
         return $build;
+      }
+
+      if (!empty($id_field)) {
+        $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['markerScrollToResult'] = TRUE;
+        /** @var \Drupal\views\Plugin\views\field\Field $id_field_handler */
+        $id_field_handler = $this->view->field[$id_field];
+        if (!empty($id_field_handler)) {
+          $location_id = $id_field_handler->getValue($row);
+        }
       }
 
       if (!empty($icon_field)) {
@@ -232,6 +249,9 @@ class CommonMap extends StylePluginBase {
 
         if (!empty($icon_url)) {
           $location['#icon'] = $icon_url;
+        }
+        if (!empty($location_id)) {
+          $location['#location_id'] = $location_id;
         }
 
         $build['#locations'][] = $location;
@@ -367,6 +387,8 @@ class CommonMap extends StylePluginBase {
     $options['geolocation_field'] = ['default' => ''];
     $options['title_field'] = ['default' => ''];
     $options['icon_field'] = ['default' => ''];
+    $options['marker_scroll_to_result'] = ['default' => 0];
+    $options['id_field'] = ['default' => ''];
     $options['dynamic_map'] = [
       'contains' => [
         'enabled' => ['default' => 0],
@@ -396,6 +418,7 @@ class CommonMap extends StylePluginBase {
     $geo_options = [];
     $title_options = [];
     $icon_options = [];
+    $id_options = [];
 
     $fields = $this->displayHandler->getOption('fields');
     foreach ($fields as $field_name => $field) {
@@ -422,6 +445,10 @@ class CommonMap extends StylePluginBase {
 
       if (!empty($field['type']) && $field['type'] == 'string') {
         $title_options[$field_name] = $labels[$field_name];
+      }
+
+      if (!empty($field['type']) && $field['type'] == 'number_integer') {
+        $id_options[$field_name] = $labels[$field_name];
       }
     }
 
@@ -463,6 +490,25 @@ class CommonMap extends StylePluginBase {
       '#description' => $this->t("Optional image (field) to use as icon."),
       '#options' => $icon_options,
       '#empty_value' => 'none',
+    ];
+
+    $form['marker_scroll_to_result'] = [
+      '#title' => $this->t('On clicking marker scroll to result instead of opening marker bubble.'),
+      '#type' => 'checkbox',
+      '#default_value' => $this->options['marker_scroll_to_result'],
+    ];
+    $form['id_field'] = [
+      '#title' => $this->t('ID source field'),
+      '#type' => 'select',
+      '#default_value' => $this->options['id_field'],
+      '#description' => $this->t("Unique location ID used as scrolling target. If not targeting the raw location output, either add a class structured as 'geolocation-location-id-[ID]' or an attribute 'data-location-id=\"[ID]\"' to the target element."),
+      '#options' => $id_options,
+      '#empty_value' => 'none',
+      '#states' => [
+        'visible' => [
+          ':input[name="style_options[marker_scroll_to_result]"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
 
     $map_update_target_options = $this->getMapUpdateOptions();

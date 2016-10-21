@@ -97,6 +97,12 @@ views.style.maps_common:
     icon_field:
       type: string
       label: 'Icon Field'
+    marker_scroll_to_result:
+      type: integer
+      label: 'Scroll instead of open bubble'
+    id_field:
+      type: string
+      label: 'ID field'
     dynamic_map:
       type: mapping
       label: 'Dynamic map settings'

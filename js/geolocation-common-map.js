@@ -23,6 +23,7 @@
  * @property {String} client_location.enable
  * @property {String} client_location.update_map
  * @property {Boolean} showRawLocations
+ * @property {Boolean} markerScrollToResult
  */
 
 /**
@@ -65,11 +66,11 @@
 
   function initialize(settings, context) {
     // Their could be several maps/views present. Go over each entry.
-    /**
-     * @param {String} mapId
-     * @param {CommonMapSettings} mapSettings
-     */
     $.each(settings.commonMap, function (mapId, mapSettings) {
+      /**
+       * @param {String} mapId
+       * @param {CommonMapSettings} mapSettings
+       */
 
       var ajaxViewsEnabled = false;
       if (
@@ -360,14 +361,31 @@
         currentMarkers.push(marker);
 
         marker.addListener('click', function () {
-          if (bubble) {
-            bubble.close();
+          if (mapSettings.markerScrollToResult === true) {
+            var target = $('[data-location-id="' + location.data('location-id') + '"]:visible').first();
+
+            // Alternatively select by class.
+            if (target.length === 0) {
+              target = $('.geolocation-location-id-' + location.data('location-id') + ':visible').first();
+            }
+
+            if (target.length === 1) {
+              $('html, body').animate({
+                scrollTop: target.offset().top
+              }, 'slow');
+            }
           }
-          bubble = new google.maps.InfoWindow({
-            content: marker.content,
-            maxWidth: 200
-          });
-          bubble.open(googleMap, marker);
+          else {
+            if (bubble) {
+              bubble.close();
+            }
+            bubble = new google.maps.InfoWindow({
+              content: marker.content,
+              maxWidth: 200,
+              disableAutoPan: mapSettings.settings.google_map_settings.disableAutoPan
+            });
+            bubble.open(googleMap, marker);
+          }
         });
       });
 
