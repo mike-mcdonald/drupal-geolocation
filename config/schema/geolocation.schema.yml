@@ -1,3 +1,50 @@
+geolocation.google_map_settings:
+  type: mapping
+  label: 'Google Map settings'
+  mapping:
+    type:
+      type: string
+      label: 'Google map type'
+    zoom:
+      type: string
+      label: 'Zoom level'
+    mapTypeControl:
+      type: integer
+      label: 'Map controls'
+    streetViewControl:
+      type: integer
+      label: 'Street view'
+    zoomControl:
+      type: integer
+      label: 'Zoom control'
+    scrollwheel:
+      type: integer
+      label: 'Scrool wheel'
+    disableDoubleClickZoom:
+      type: integer
+      label: 'Disable double click zoom'
+    draggable:
+      type: integer
+      label: 'Draggable'
+    height:
+      type: string
+      label: 'Height value'
+    width:
+      type: string
+      label: 'Width value'
+    info_auto_display:
+      type: integer
+      label: 'Display info'
+    disableAutoPan:
+      type: integer
+      label: 'Disable automatic panning for info window'
+    style:
+      type: string
+      label: 'JSON encoded style'
+    preferScrollingToZooming:
+      type: integer
+      label: 'Require user to click map before zooming'
+
 geolocation.settings:
   type: config_object
   label: 'Geolocation settings'
@@ -90,51 +137,9 @@ views.style.maps_common:
             sequence:
               type: string
     google_map_settings:
-      type: mapping
-      label: 'Google Map settings'
-      mapping:
-        type:
-          type: string
-          label: 'Google map type'
-        zoom:
-          type: string
-          label: 'Zoom level'
-        mapTypeControl:
-          type: integer
-          label: 'Map controls'
-        streetViewControl:
-          type: integer
-          label: 'Street view'
-        zoomControl:
-          type: integer
-          label: 'Zoom control'
-        scrollwheel:
-          type: integer
-          label: 'Scrool wheel'
-        disableDoubleClickZoom:
-          type: integer
-          label: 'Disable double click zoom'
-        draggable:
-          type: integer
-          label: 'Draggable'
-        height:
-          type: string
-          label: 'Height value'
-        width:
-          type: string
-          label: 'Width value'
-        info_auto_display:
-          type: integer
-          label: 'Display info'
-        disableAutoPan:
-          type: integer
-          label: 'Disable automatic panning for info window'
-        style:
-          type: string
-          label: 'JSON encoded style'
-        preferScrollingToZooming:
-          type: integer
-          label: 'Require user to click map before zooming'
+      type: geolocation.google_map_settings
+      label: 'Google map settings'
+
 
 views.field.geolocation_field:
   type: views.field.field
@@ -267,51 +272,8 @@ field.formatter.settings.geolocation_map:
       type: integer
       label: 'Use overriden map settings optionally set by GoogleGeocoderWidget.'
     google_map_settings:
-      type: mapping
-      label: 'Google Map settings'
-      mapping:
-        type:
-          type: string
-          label: 'Google map type'
-        zoom:
-          type: string
-          label: 'Zoom level'
-        mapTypeControl:
-          type: integer
-          label: 'Map controls'
-        streetViewControl:
-          type: integer
-          label: 'Street view'
-        zoomControl:
-          type: integer
-          label: 'Zoom control'
-        scrollwheel:
-          type: integer
-          label: 'Scrool wheel'
-        disableDoubleClickZoom:
-          type: integer
-          label: 'Disable double click zoom'
-        draggable:
-          type: integer
-          label: 'Draggable'
-        height:
-          type: string
-          label: 'Height value'
-        width:
-          type: string
-          label: 'Width value'
-        info_auto_display:
-          type: integer
-          label: 'Display info'
-        disableAutoPan:
-          type: integer
-          label: 'Disable automatic panning for info window'
-        style:
-          type: string
-          label: 'JSON encoded style'
-        preferScrollingToZooming:
-          type: integer
-          label: 'Require user to click map before zooming'
+      type: geolocation.google_map_settings
+      label: 'Google map settings'
 
 field.widget.settings.geolocation_googlegeocoder:
   type: mapping
@@ -339,48 +301,5 @@ field.widget.settings.geolocation_googlegeocoder:
       type: integer
       label: 'Allow override map settings.'
     google_map_settings:
-      type: mapping
-      label: 'Google Map settings'
-      mapping:
-        type:
-          type: string
-          label: 'Google map type'
-        zoom:
-          type: string
-          label: 'Zoom level'
-        mapTypeControl:
-          type: integer
-          label: 'Map controls'
-        streetViewControl:
-          type: integer
-          label: 'Street view'
-        zoomControl:
-          type: integer
-          label: 'Zoom control'
-        scrollwheel:
-          type: integer
-          label: 'Scrool wheel'
-        disableDoubleClickZoom:
-          type: integer
-          label: 'Disable double click zoom'
-        draggable:
-          type: integer
-          label: 'Draggable'
-        height:
-          type: string
-          label: 'Height value'
-        width:
-          type: string
-          label: 'Width value'
-        info_auto_display:
-          type: integer
-          label: 'Display info'
-        disableAutoPan:
-          type: integer
-          label: 'Disable automatic panning for info window'
-        style:
-          type: string
-          label: 'JSON encoded style'
-        preferScrollingToZooming:
-          type: integer
-          label: 'Require user to click map before zooming'
+      type: geolocation.google_map_settings
+      label: 'Google map settings'
