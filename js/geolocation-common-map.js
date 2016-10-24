@@ -389,14 +389,9 @@
         });
       });
 
-      if (
-        (
-          map.data('fitbounds') === 1
-          && map.data('geolocationAjaxProcessed') !== 1
-        )
-        || map.data('mapReset') === 1
-      ) {
+      if (map.data('fitbounds') === 1 || map.data('mapReset') === 1) {
         // Fit map center and zoom to all currently loaded markers.
+        skipMapUpdate = true;
         googleMap.fitBounds(bounds);
       }
 
