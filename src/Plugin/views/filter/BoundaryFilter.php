@@ -48,7 +48,7 @@ class BoundaryFilter extends FilterPluginBase {
    * {@inheritdoc}
    */
   public function adminSummary() {
-    return t("Boundary filter");
+    return $this->t("Boundary filter");
   }
 
   /**

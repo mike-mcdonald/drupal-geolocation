@@ -567,7 +567,7 @@ class CommonMap extends StylePluginBase {
 
       if ($this->displayHandler->getPluginId() !== 'page') {
         $update_targets = [
-          $this->displayHandler->display['id'] => t('- This display -'),
+          $this->displayHandler->display['id'] => $this->t('- This display -'),
         ];
         foreach ($this->view->displayHandlers->getInstanceIds() as $instance_id) {
           $display_instance = $this->view->displayHandlers->get($instance_id);
@@ -608,11 +608,11 @@ class CommonMap extends StylePluginBase {
       '#type' => 'table',
       '#prefix' => $this->t('<h3>Centre options</h3>Please note: Each option will, if it can be applied, supersede any following option.'),
       '#header' => [
-        t('Enable'),
-        t('Option'),
-        t('settings'),
+        $this->t('Enable'),
+        $this->t('Option'),
+        $this->t('settings'),
         [
-          'data' => t('Settings'),
+          'data' => $this->t('Settings'),
           'colspan' => '1',
         ],
       ],
@@ -643,7 +643,7 @@ class CommonMap extends StylePluginBase {
       $form['centre'][$id]['#attributes']['class'][] = 'draggable';
       $form['centre'][$id]['weight'] = [
         '#type' => 'weight',
-        '#title' => t('Weight for @option', ['@option' => $label]),
+        '#title' => $this->t('Weight for @option', ['@option' => $label]),
         '#title_display' => 'invisible',
         '#size' => 4,
         '#default_value' => $weight,
@@ -670,14 +670,14 @@ class CommonMap extends StylePluginBase {
       '#type' => 'container',
       'latitude' => [
         '#type' => 'textfield',
-        '#title' => t('Latitude'),
+        '#title' => $this->t('Latitude'),
         '#default_value' => isset($this->options['centre']['fixed_value']['settings']['latitude']) ? $this->options['centre']['fixed_value']['settings']['latitude'] : '',
         '#size' => 60,
         '#maxlength' => 128,
       ],
       'longitude' => [
         '#type' => 'textfield',
-        '#title' => t('Longitude'),
+        '#title' => $this->t('Longitude'),
         '#default_value' => isset($this->options['centre']['fixed_value']['settings']['longitude']) ? $this->options['centre']['fixed_value']['settings']['longitude'] : '',
         '#size' => 60,
         '#maxlength' => 128,

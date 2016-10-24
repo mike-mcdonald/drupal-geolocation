@@ -113,7 +113,7 @@ class GeolocationCore {
       $data[$table_name][$args['@field_name'] . '_proximity'] = [
         'group' => $target_entity_type->getLabel(),
         'title' => $this->t('Proximity (@field_name)', $args),
-        'title short' => isset($field_coordinates_table_data['title short']) ? $field_coordinates_table_data['title short'] . t(":proximity") : '',
+        'title short' => isset($field_coordinates_table_data['title short']) ? $field_coordinates_table_data['title short'] . $this->t(":proximity") : '',
         'help' => isset($field_coordinates_table_data['help']) ? $field_coordinates_table_data['help'] : '',
         'argument' => [
           'id' => 'geolocation_argument_proximity',
@@ -178,7 +178,7 @@ class GeolocationCore {
       $data[$table_name][$args['@field_name'] . '_boundary'] = [
         'group' => $target_entity_type->getLabel(),
         'title' => $this->t('Boundary (@field_name)', $args),
-        'title short' => isset($field_coordinates_table_data['title short']) ? $field_coordinates_table_data['title short'] . t(":boundary") : '',
+        'title short' => isset($field_coordinates_table_data['title short']) ? $field_coordinates_table_data['title short'] . $this->t(":boundary") : '',
         'help' => isset($field_coordinates_table_data['help']) ? $field_coordinates_table_data['help'] : '',
         'filter' => [
           'id' => 'geolocation_filter_boundary',

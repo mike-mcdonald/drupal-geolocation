@@ -34,17 +34,17 @@ class GeolocationRawFormatter extends FormatterBase {
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $element['value'] = array(
-      '#title' => t('Raw value'),
+      '#title' => $this->t('Raw value'),
       '#type' => 'radios',
       '#options' => array(
-        'lat' => t('Latitude'),
-        'lng' => t('Longitude'),
-        'lat_sin' => t('Precalculated latitude sine'),
-        'lat_cos' => t('Precalculated latitude cosine'),
-        'lng_rad' => t('Precalculated radian longitude'),
+        'lat' => $this->t('Latitude'),
+        'lng' => $this->t('Longitude'),
+        'lat_sin' => $this->t('Precalculated latitude sine'),
+        'lat_cos' => $this->t('Precalculated latitude cosine'),
+        'lng_rad' => $this->t('Precalculated radian longitude'),
       ),
       '#default_value' => $this->getSetting('value'),
-      '#description' => t('Renders a single raw value.'),
+      '#description' => $this->t('Renders a single raw value.'),
       '#required' => TRUE,
     );
     return $element;
@@ -55,7 +55,7 @@ class GeolocationRawFormatter extends FormatterBase {
    */
   public function settingsSummary() {
     $summary = array();
-    $summary[] = t('Raw value: @item', array('@item' => $this->getSetting('value')));
+    $summary[] = $this->t('Raw value: @item', array('@item' => $this->getSetting('value')));
     return $summary;
   }
 
