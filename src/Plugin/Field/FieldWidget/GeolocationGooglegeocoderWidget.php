@@ -29,7 +29,7 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
   public function flagErrors(FieldItemListInterface $items, ConstraintViolationListInterface $violations, array $form, FormStateInterface $form_state) {
     foreach ($violations as $offset => $violation) {
       if ($violation->getMessageTemplate() == 'This value should not be null.') {
-        $form_state->setErrorByName($items->getName(), t('No location has been selected yet for required field %field.', ['%field' => $items->getFieldDefinition()->getLabel()]));
+        $form_state->setErrorByName($items->getName(), $this->t('No location has been selected yet for required field %field.', ['%field' => $items->getFieldDefinition()->getLabel()]));
       }
     }
     parent::flagErrors($items, $violations, $form, $form_state);
@@ -142,24 +142,24 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
     $summary = [];
     $settings = $this->getSettings();
 
-    $summary[] = t('Default center longitude @default_longitude and latitude @default_latitude', [
+    $summary[] = $this->t('Default center longitude @default_longitude and latitude @default_latitude', [
       '@default_longitude' => $settings['default_longitude'],
       '@default_latitude' => $settings['default_latitude'],
     ]);
 
     if (!empty($settings['auto_client_location'])) {
-      $summary[] = t('Will use client location automatically by default');
+      $summary[] = $this->t('Will use client location automatically by default');
       if (!empty($settings['auto_client_location_marker'])) {
-        $summary[] = t('Will set client location marker automatically by default');
+        $summary[] = $this->t('Will set client location marker automatically by default');
       }
     }
 
     if (!empty($settings['populate_address_field'])) {
-      $summary[] = t('Geocoded address will be stored in @field', ['@field' => $settings['target_address_field']]);
+      $summary[] = $this->t('Geocoded address will be stored in @field', ['@field' => $settings['target_address_field']]);
     }
 
     if (!empty($settings['allow_override_map_settings'])) {
-      $summary[] = t('Users will be allowed to override the map settings for each content.');
+      $summary[] = $this->t('Users will be allowed to override the map settings for each content.');
     }
 
     $summary = array_merge($summary, $this->getGoogleMapsSettingsSummary($settings));
