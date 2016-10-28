@@ -6,6 +6,8 @@ use Drupal\geolocation\GeolocationCore;
 use Drupal\views\Plugin\views\argument\Formula;
 use Drupal\views\Plugin\views\query\Sql;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Argument handler for geolocation proximity.
@@ -17,10 +19,47 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @ViewsArgument("geolocation_argument_proximity")
  */
-class ProximityArgument extends Formula {
+class ProximityArgument extends Formula implements ContainerFactoryPluginInterface {
 
   protected $operator = '<';
   protected $proximity = '';
+
+  /**
+   * The GeolocationCore object.
+   *
+   * @var \Drupal\geolocation\GeolocationCore
+   */
+  protected $geolocationCore;
+
+  /**
+   * Constructs a Handler object.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\geolocation\GeolocationCore $geolocation_core
+   *   The GeolocationCore object.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, GeolocationCore $geolocation_core) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+
+    $this->geolocationCore = $geolocation_core;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('geolocation.core')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -41,7 +80,7 @@ class ProximityArgument extends Formula {
       // Get the earth radius in from the units.
       $earth_radius = $values['units'] === 'mile' ? GeolocationCore::EARTH_RADIUS_MILE : GeolocationCore::EARTH_RADIUS_KM;
       // Build a formula for the where clause.
-      $formula = \Drupal::service('geolocation.core')->getProximityQueryFragment($this->tableAlias, $this->realField, $values['lat'], $values['lng'], $earth_radius);
+      $formula = $this->geolocationCore->getProximityQueryFragment($this->tableAlias, $this->realField, $values['lat'], $values['lng'], $earth_radius);
       // Set the operator and value for the query.
       $this->proximity = $values['distance'];
       $this->operator = $values['operator'];

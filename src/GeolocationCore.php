@@ -6,13 +6,16 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\field\FieldStorageConfigInterface;
+use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class GeolocationCore.
  *
  * @package Drupal\geolocation
  */
-class GeolocationCore {
+class GeolocationCore implements ContainerInjectionInterface {
   use StringTranslationTrait;
 
   const EARTH_RADIUS_KM = 6371;
@@ -32,16 +35,49 @@ class GeolocationCore {
   protected $entityManager;
 
   /**
+   * The required configuration object.
+   *
+   * @var \Drupal\Core\Config\Config
+   */
+  protected $config;
+
+  /**
+   * The GeocoderManager object.
+   *
+   * @var \Drupal\geolocation\GeocoderManager
+   */
+
+  protected $geocoderManager;
+
+  /**
    * Constructor.
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   A module handler.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_manager
    *   An EntityTypeManager instance.
+   * @param \Drupal\Core\Config\ConfigFactory $config
+   *   The factory for configuration objects.
+   * @param \Drupal\geolocation\GeocoderManager $geocoder_manager
+   *   The GeocoderManager object.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_manager) {
+  public function __construct(ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_manager, ConfigFactory $config, GeocoderManager $geocoder_manager) {
     $this->moduleHandler = $module_handler;
     $this->entityManager = $entity_manager;
+    $this->config = $config->get('geolocation.settings');
+    $this->geocoderManager = $geocoder_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('module_handler'),
+      $container->get('entity_type.manager'),
+      $container->get('config.factory'),
+      $container->get('plugin.manager.geolocation.geocoder')
+    );
   }
 
   /**
@@ -98,7 +134,7 @@ class GeolocationCore {
 
       $field_coordinates_table_data = [];
       $entity_type_id = $field_storage->getTargetEntityTypeId();
-      $target_entity_type = \Drupal::entityTypeManager()->getDefinition($field_storage->getTargetEntityTypeId());
+      $target_entity_type = $this->entityManager->getDefinition($field_storage->getTargetEntityTypeId());
 
       if (array_key_exists($target_entity_type->getBaseTable() . '__' . $field_storage->getName(), $data)) {
         $field_coordinates_table_data = $data[$target_entity_type->getBaseTable() . '__' . $field_storage->getName()][$field_storage->getName()];
@@ -356,14 +392,8 @@ class GeolocationCore {
    * @param array $render_array
    *   Drupal render array to extend.
    */
-  public function attachGeocoder(&$render_array) {
-    /** @var \Drupal\Core\Config\Config $config */
-    $config = \Drupal::service('config.factory')->getEditable('geolocation.settings');
-
-    /** @var \Drupal\geolocation\GeocoderManager $geocoder_manager */
-    $geocoder_manager = \Drupal::service('plugin.manager.geolocation.geocoder');
-    /** @var \Drupal\geolocation\GeocoderInterface $geocoder_plugin */
-    $geocoder_plugin = $geocoder_manager->createInstance($config->get('default_geocoder'));
+  public function attachGeocoder(array &$render_array) {
+    $geocoder_plugin = $this->geocoderManager->createInstance($this->config->get('default_geocoder'));
 
     $render_array = array_merge_recursive($render_array, [
       '#attached' => [

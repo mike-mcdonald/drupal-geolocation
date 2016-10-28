@@ -19,7 +19,7 @@ class GeolocationSettings extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = \Drupal::config('geolocation.settings');
+    $config = $this->configFactory->get('geolocation.settings');
 
     $form['#tree'] = TRUE;
 

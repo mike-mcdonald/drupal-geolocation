@@ -7,6 +7,9 @@ use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\filter\FilterPluginBase;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\query\Sql;
+use Drupal\geolocation\GeolocationCore;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Filter handler for search keywords.
@@ -15,7 +18,7 @@ use Drupal\views\Plugin\views\query\Sql;
  *
  * @ViewsFilter("geolocation_filter_boundary")
  */
-class BoundaryFilter extends FilterPluginBase {
+class BoundaryFilter extends FilterPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * {@inheritdoc}
@@ -33,6 +36,43 @@ class BoundaryFilter extends FilterPluginBase {
    * @var string
    */
   protected $fieldAlias;
+
+  /**
+   * The GeolocationCore object.
+   *
+   * @var \Drupal\geolocation\GeolocationCore
+   */
+  protected $geolocationCore;
+
+  /**
+   * Constructs a Handler object.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\geolocation\GeolocationCore $geolocation_core
+   *   The GeolocationCore object.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, GeolocationCore $geolocation_core) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+
+    $this->geolocationCore = $geolocation_core;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('geolocation.core')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -125,7 +165,7 @@ class BoundaryFilter extends FilterPluginBase {
         ],
       ];
 
-      \Drupal::service('geolocation.core')->attachGeocoder($form[$this->field]['boundary_geocoding_widget']);
+      $this->geolocationCore->attachGeocoder($form[$this->field]['boundary_geocoding_widget']);
     }
   }
 
@@ -193,7 +233,7 @@ class BoundaryFilter extends FilterPluginBase {
 
     $this->query->addWhereExpression(
       $this->options['group'],
-      \Drupal::service('geolocation.core')->getBoundaryQueryFragment($this->ensureMyTable(), $this->realField, $lat_north_east, $lng_north_east, $lat_south_west, $lng_south_west)
+      $this->geolocationCore->getBoundaryQueryFragment($this->ensureMyTable(), $this->realField, $lat_north_east, $lng_north_east, $lat_south_west, $lng_south_west)
     );
   }
 

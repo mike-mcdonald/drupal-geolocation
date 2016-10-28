@@ -7,6 +7,11 @@ use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\geolocation\GoogleMapsDisplayTrait;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\geolocation\GeolocationCore;
 
 /**
  * Plugin implementation of the 'geolocation_googlegeocoder' widget.
@@ -19,9 +24,63 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  *   }
  * )
  */
-class GeolocationGooglegeocoderWidget extends WidgetBase {
+class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFactoryPluginInterface {
 
   use GoogleMapsDisplayTrait;
+
+  /**
+   * The entity field manager.
+   *
+   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   */
+  protected $entityFieldManager;
+
+  /**
+   * The GeolocationCore object.
+   *
+   * @var \Drupal\geolocation\GeolocationCore
+   */
+  protected $geolocationCore;
+
+  /**
+   * Constructs a WidgetBase object.
+   *
+   * @param array $plugin_id
+   *   The plugin_id for the widget.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   *   The definition of the field to which the widget is associated.
+   * @param array $settings
+   *   The widget settings.
+   * @param array $third_party_settings
+   *   Any third party settings.
+   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   *   The entity field manager.
+   * @param \Drupal\geolocation\GeolocationCore $geolocation_core
+   *   The GeolocationCore object.
+   */
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityFieldManagerInterface $entity_field_manager, GeolocationCore $geolocation_core) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
+
+    $this->entityFieldManager = $entity_field_manager;
+    $this->geolocationCore = $geolocation_core;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $plugin_id,
+      $plugin_definition,
+      $configuration['field_definition'],
+      $configuration['settings'],
+      $configuration['third_party_settings'],
+      $container->get('entity_field.manager'),
+      $container->get('geolocation.core')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -91,11 +150,8 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
       ],
     ];
 
-    /** @var \Drupal\Core\Entity\EntityFieldManager $field_manager */
-    $field_manager = \Drupal::service('entity_field.manager');
-
     /** @var \Drupal\Core\Field\FieldDefinitionInterface[] $field_definitions */
-    $field_definitions = $field_manager->getFieldDefinitions($this->fieldDefinition->getTargetEntityTypeId(), $this->fieldDefinition->getTargetBundle());
+    $field_definitions = $this->entityFieldManager->getFieldDefinitions($this->fieldDefinition->getTargetEntityTypeId(), $this->fieldDefinition->getTargetBundle());
 
     $address_fields = [];
     foreach ($field_definitions as $field_definition) {
@@ -246,7 +302,7 @@ class GeolocationGooglegeocoderWidget extends WidgetBase {
         ],
       ],
     ];
-    \Drupal::service('geolocation.core')->attachGeocoder($element);
+    $this->geolocationCore->attachGeocoder($element);
 
     if ($settings['populate_address_field']) {
       $element['map_canvas']['#attached']['drupalSettings']['geolocation']['widgetSettings'][$canvas_id]['addressFieldTarget'] = $settings['target_address_field'];
