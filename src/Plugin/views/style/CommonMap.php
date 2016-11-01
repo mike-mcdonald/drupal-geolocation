@@ -229,6 +229,9 @@ class CommonMap extends StylePluginBase {
             if (!empty($style)) {
               $icon_url = $style->buildUrl($item->entity->getFileUri());
             }
+            else {
+              $icon_url = file_create_url($item->entity->getFileUri());
+            }
           }
         }
       }
