@@ -339,8 +339,8 @@ class CommonMap extends StylePluginBase {
             $handler = $this->displayHandler->getHandler('filter', $filter_id);
             if (isset($handler->value['lat']) && isset($handler->value['lng'])) {
               $centre = [
-                'lat' => (float) $handler->value['lat'],
-                'lng' => (float) $handler->value['lng'],
+                'lat' => (float) $handler->getLatitudeValue(),
+                'lng' => (float) $handler->getLongitudeValue(),
               ];
             }
             break;
