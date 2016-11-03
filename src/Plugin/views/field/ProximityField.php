@@ -280,10 +280,11 @@ class ProximityField extends NumericField implements ContainerFactoryPluginInter
     $query = $this->query;
     switch ($this->options['proximity_source']) {
       case 'filter':
+        /** @var \Drupal\geolocation\Plugin\views\filter\ProximityFilter $filter */
         $filter = $this->view->filter[$this->options['proximity_filter']];
-        $latitude = $filter->value['lat'];
-        $longitude = $filter->value['lng'];
-        $units = $filter->value['units'];
+        $latitude = $filter->getLatitudeValue();
+        $longitude = $filter->getLongitudeValue();
+        $units = $filter->getProximityUnit();
         break;
 
       case 'boundary_filter':

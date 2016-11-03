@@ -25,6 +25,13 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
   protected $geolocationCore;
 
   /**
+   * Current proximity center.
+   *
+   * @var array
+   */
+  protected $currentProximityCenter;
+
+  /**
    * Constructs a Handler object.
    *
    * @param array $configuration
@@ -487,7 +494,7 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
    * @return float|null
    *   Latitude value.
    */
-  protected function getLatitudeValue() {
+  public function getLatitudeValue() {
     $proximity_center = $this->getProximityCenterBySource();
     if (!is_null($proximity_center['latitude'])) {
       return $proximity_center['latitude'];
@@ -501,7 +508,7 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
    * @return float|null
    *   Longitude value.
    */
-  protected function getLongitudeValue() {
+  public function getLongitudeValue() {
     $proximity_center = $this->getProximityCenterBySource();
     if (!is_null($proximity_center['longitude'])) {
       return $proximity_center['longitude'];
@@ -516,6 +523,10 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
    *   Proximity Center data.
    */
   protected function getProximityCenterBySource() {
+    if (!empty($this->currentProximityCenter)) {
+      return $this->currentProximityCenter;
+    }
+
     switch ($this->options['proximity_source']) {
       case 'boundary_filter':
         $filter = $this->view->filter[$this->options['boundary_filter']];
@@ -588,6 +599,8 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
         ];
     }
 
+    $this->currentProximityCenter = $proximity_center;
+
     return $proximity_center;
   }
 
@@ -597,7 +610,7 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
    * @return string
    *   Proximity unit.
    */
-  protected function getProximityUnit() {
+  public function getProximityUnit() {
     switch ($this->options['proximity_units']) {
       case 'exposed':
         if (!empty($this->value['units'])) {
