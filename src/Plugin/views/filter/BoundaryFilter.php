@@ -31,13 +31,6 @@ class BoundaryFilter extends FilterPluginBase implements ContainerFactoryPluginI
   protected $alwaysMultiple = TRUE;
 
   /**
-   * The field alias.
-   *
-   * @var string
-   */
-  protected $fieldAlias;
-
-  /**
    * The GeolocationCore object.
    *
    * @var \Drupal\geolocation\GeolocationCore
@@ -72,16 +65,6 @@ class BoundaryFilter extends FilterPluginBase implements ContainerFactoryPluginI
       $plugin_definition,
       $container->get('geolocation.core')
     );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
-    parent::init($view, $display, $options);
-
-    // Set the field alias.
-    $this->fieldAlias = $this->options['id'] . '_filter';
   }
 
   /**

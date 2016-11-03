@@ -67,7 +67,6 @@ class ProximityField extends NumericField implements ContainerFactoryPluginInter
       'proximity_filter' => ['default' => ''],
       'proximity_argument' => ['default' => ''],
       'entity_id_argument' => ['default' => ''],
-      'entity_id_argument_units' => ['default' => ''],
       'boundary_filter' => ['default' => ''],
     ] + parent::defineOptions();
   }

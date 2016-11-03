@@ -146,13 +146,12 @@ views.style.maps_common:
       type: geolocation.google_map_settings
       label: 'Google map settings'
 
-
 views.field.geolocation_field:
   type: views.field.field
   label: 'Geolocation Field'
 
 views.field.geolocation_field_proximity:
-  type: views.field.field
+  type: views.field.numeric
   label: 'Geolocation Proximity Field'
   mapping:
     proximity_source:
@@ -179,34 +178,9 @@ views.field.geolocation_field_proximity:
     entity_id_argument:
       type: string
       label: 'Proximity Entity ID argument'
-    # Inherit from views
-    set_precision:
-      type: boolean
-      label: 'Round'
-    precision:
-      type: integer
-      label: 'Precision'
-    decimal:
-      type: string
-      label: 'Decimal point'
-    separator:
-      type: string
-      label: 'Thousands marker'
-    format_plural:
-      type: boolean
-      label: 'Format plural'
-    format_plural_string:
-      type: plural_label
-      label: 'Plural variants'
-    prefix:
-      type: label
-      label: 'Prefix'
-    suffix:
-      type: label
-      label: 'Suffix'
 
 views.filter.geolocation_filter_boundary:
-  type: views.filter.filter
+  type: views_filter
   label: 'Geolocation Boundary Filter'
   mapping:
     value:
@@ -227,31 +201,36 @@ views.filter.geolocation_filter_boundary:
            label: 'North East Longitude'
 
 views.filter.geolocation_filter_proximity:
-  type: views.filter.filter
+  type: views_filter
   label: 'Geolocation Proximity Filter'
   mapping:
+    proximity_source:
+      type: string
+      label: 'Proximity Field Source'
+    proximity_lat:
+      type: string
+      label: 'Proximity Latitude'
+    proximity_lng:
+      type: string
+      label: 'Proximity Longitude'
+    proximity_argument:
+      type: string
+      label: 'Proximity Argument'
+    boundary_filter:
+      type: string
+      label: 'Boundary Filter'
+    entity_id_argument:
+      type: string
+      label: 'Proximity Entity ID argument'
+    proximity_units:
+      type: string
+      label: 'Proximity Units'
+    client_location:
+      type: boolean
+      label: 'Ask client for location first'
     value:
-      type: mapping
+      type: views.filter_value.numeric
       label: 'Proximity Value'
-      mapping:
-        min:
-          type: string
-          label: 'Minimum Distance'
-        max:
-          type: string
-          label: 'Maximum Distance'
-        value:
-          type: string
-          label: 'Value'
-        lat:
-          type: string
-          label: 'Latitude'
-        lng:
-          type: string
-          label: 'Longitude'
-        units:
-          type: string
-          label: 'Units'
 
 views.sort.geolocation_sort_proximity:
   type: views_sort

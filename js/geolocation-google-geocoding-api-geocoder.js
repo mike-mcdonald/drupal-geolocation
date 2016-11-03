@@ -6,13 +6,22 @@
 (function ($, Drupal) {
   'use strict';
 
-  /* global google */
-
   if (typeof Drupal.geolocation.geocoder === 'undefined') {
     return false;
   }
 
   Drupal.geolocation.geocoder.googleGeocodingAPI = {};
+
+  if (typeof Drupal.geolocation.loadGoogle === 'function') {
+    // First load the library from google.
+    Drupal.geolocation.loadGoogle(function () {
+      console.log("Google loaded");
+    });
+  }
+
+  if (typeof google === 'undefined') {
+    return false;
+  }
 
   /**
    * Retrieve geocoded results for autocomplete.
