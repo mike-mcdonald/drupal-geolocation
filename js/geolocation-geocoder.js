@@ -36,12 +36,12 @@
    * @param {GeolocationGeocoderAutocompleteCallback} callback - callback to execute when done
    */
   Drupal.geolocation.geocoder.autocomplete = function (location, callback) {
-    if (typeof drupalSettings.geolocation.default_geocoder !== 'undefined') {
+    if (typeof drupalSettings.geolocation.default_geocoder === 'undefined') {
       // Fallback
       drupalSettings.geolocation.default_geocoder = 'googleGeocodingAPI';
     }
 
-    if (typeof Drupal.geolocation.geocoder[drupalSettings.geolocation.default_geocoder] !== 'undefined') {
+    if (typeof Drupal.geolocation.geocoder[drupalSettings.geolocation.default_geocoder].autocomplete !== 'undefined') {
       Drupal.geolocation.geocoder[drupalSettings.geolocation.default_geocoder].autocomplete(location, callback);
     }
   };
@@ -53,12 +53,12 @@
    * @param {GeolocationGeocoderGeocodeCallback} callback - execute when done.
    */
   Drupal.geolocation.geocoder.geocode = function (location, callback) {
-    if (typeof drupalSettings.geolocation.default_geocoder !== 'undefined') {
+    if (typeof drupalSettings.geolocation.default_geocoder === 'undefined') {
       // Fallback
       drupalSettings.geolocation.default_geocoder = 'googleGeocodingAPI';
     }
 
-    if (typeof Drupal.geolocation.geocoder[drupalSettings.geolocation.default_geocoder] !== 'undefined') {
+    if (typeof Drupal.geolocation.geocoder[drupalSettings.geolocation.default_geocoder].geocode !== 'undefined') {
       Drupal.geolocation.geocoder[drupalSettings.geolocation.default_geocoder].geocode(location, callback);
     }
   };

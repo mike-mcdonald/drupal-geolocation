@@ -6,6 +6,8 @@
 (function ($, Drupal) {
   'use strict';
 
+  /* global google */
+
   if (typeof Drupal.geolocation.geocoder === 'undefined') {
     return false;
   }
@@ -14,13 +16,7 @@
 
   if (typeof Drupal.geolocation.loadGoogle === 'function') {
     // First load the library from google.
-    Drupal.geolocation.loadGoogle(function () {
-      console.log("Google loaded");
-    });
-  }
-
-  if (typeof google === 'undefined') {
-    return false;
+    Drupal.geolocation.loadGoogle(function () {});
   }
 
   /**
@@ -42,7 +38,6 @@
        *
        * @param {GoogleAddress[]} results - Returned results
        * @param {String} status - Whether geocoding was successful
-       * @return {Array} - Results readied for autocomplete
        */
       function (results, status) {
         if (status === google.maps.GeocoderStatus.OK) {

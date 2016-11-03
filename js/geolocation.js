@@ -229,7 +229,7 @@
           });
       }
       else {
-        alert('Geolocation - Google map url not set.');
+        console.error('Geolocation - Google map url not set.');
       }
     }
     else {

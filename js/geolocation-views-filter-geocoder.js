@@ -69,13 +69,22 @@
    * @param {HTMLElement} context - context to work on
    */
   function setGeolocationFilterValues(geometry, $input, context) {
-    if ($input.data('geolocation-filter-type') === 'boundary') {
-      var identifier = $input.data('geolocation-filter-identifier');
-      $(context).find("input[name='" + identifier + "[lat_north_east]']").val(geometry.viewport.getNorthEast().lat);
-      $(context).find("input[name='" + identifier + "[lng_north_east]']").val(geometry.viewport.getNorthEast().lng);
-      $(context).find("input[name='" + identifier + "[lat_south_west]']").val(geometry.viewport.getSouthWest().lat);
-      $(context).find("input[name='" + identifier + "[lng_south_west]']").val(geometry.viewport.getSouthWest().lng);
-      $input.toggleClass('geolocation-filters-set');
+    var identifier = $input.data('geolocation-filter-identifier');
+    switch ($input.data('geolocation-filter-type')) {
+      case 'boundary':
+
+        $(context).find("input[name='" + identifier + "[lat_north_east]']").val(geometry.viewport.getNorthEast().lat);
+        $(context).find("input[name='" + identifier + "[lng_north_east]']").val(geometry.viewport.getNorthEast().lng);
+        $(context).find("input[name='" + identifier + "[lat_south_west]']").val(geometry.viewport.getSouthWest().lat);
+        $(context).find("input[name='" + identifier + "[lng_south_west]']").val(geometry.viewport.getSouthWest().lng);
+        $input.toggleClass('geolocation-filters-set');
+        break;
+
+      case 'proximity':
+        $(context).find("input[name='" + identifier + "-lat']").val(geometry.location.lat);
+        $(context).find("input[name='" + identifier + "-lng']").val(geometry.location.lng);
+        $input.toggleClass('geolocation-filters-set');
+        break;
     }
   }
 

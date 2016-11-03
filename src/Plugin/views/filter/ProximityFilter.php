@@ -58,9 +58,8 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
    * {@inheritdoc}
    */
   protected function defineOptions() {
-
     // Add source, lat, lng and filter.
-    return [
+    $options = [
       'proximity_source' => ['default' => 'direct_input'],
       'proximity_lat' => ['default' => ''],
       'proximity_lng' => ['default' => ''],
@@ -70,6 +69,10 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
       'boundary_filter' => ['default' => ''],
       'client_location' => ['default' => 0],
     ] + parent::defineOptions();
+
+    $options['expose']['contains']['input_by_geocoding_widget'] = ['default' => FALSE];
+
+    return $options;
   }
 
   /**
@@ -79,6 +82,25 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
     parent::defaultExposeOptions();
 
     $this->options['expose']['label'] = $this->t('Distance in @units', ['@units' => $this->getProximityUnit() == 'km' ? 'kilometers' : 'miles']);
+    $this->options['expose']['input_by_geocoding_widget'] = FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildExposeForm(&$form, FormStateInterface $form_state) {
+    $form['expose']['input_by_geocoding_widget'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Use Google Geocoding Widget instead of proximity value form'),
+      '#default_value' => $this->options['expose']['input_by_geocoding_widget'],
+      '#states' => [
+        'visible' => [
+          'select[name="options[proximity_source]"]' => ['value' => 'exposed'],
+        ],
+      ],
+    ];
+
+    parent::buildExposeForm($form, $form_state);
   }
 
   /**
@@ -95,10 +117,10 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
     else {
       $value_element = &$form;
     }
-    $value_element['value']['#weight'] = 30;
+    $value_element[$this->field]['#weight'] = 30;
 
     if ($this->options['proximity_units'] == 'exposed') {
-      $form['units'] = [
+      $value_element[$this->options['expose']['identifier'] . '-units'] = [
         '#type' => 'select',
         '#default_value' => !empty($this->value['units']) ? $this->value['units'] : '',
         '#weight' => 40,
@@ -110,17 +132,46 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
     }
 
     if ($this->options['proximity_source'] == 'exposed') {
-      $form['lat'] = [
+      $value_element[$this->options['expose']['identifier'] . '-lat'] = [
         '#type' => 'textfield',
         '#title' => $this->t('Latitude'),
         '#weight' => 10,
       ];
 
-      $form['lng'] = [
+      $value_element[$this->options['expose']['identifier'] . '-lng'] = [
         '#type' => 'textfield',
         '#title' => $this->t('Longitude'),
         '#weight' => 20,
       ];
+
+      if (
+        $this->options['expose']['input_by_geocoding_widget']
+        && !empty($form[$this->field])
+      ) {
+        $value_element[$this->options['expose']['identifier'] . '-lat']['#type'] = 'hidden';
+        $value_element[$this->options['expose']['identifier'] . '-lng']['#type'] = 'hidden';
+
+        $value_element['proximity_geocoding_widget'] = [
+          '#type' => 'textfield',
+          '#title' => $this->t("Location"),
+          '#description' => $this->t('Enter an address to locate.'),
+          '#attributes' => [
+            'class' => [
+              'form-autocomplete',
+              'geolocation-views-filter-geocoder',
+            ],
+            'data-geolocation-filter-identifier' => $this->options['expose']['identifier'],
+            'data-geolocation-filter-type' => 'proximity',
+          ],
+          '#attached' => [
+            'library' => [
+              'geolocation/geolocation.views.filter.geocoder',
+            ],
+          ],
+        ];
+
+        $this->geolocationCore->attachGeocoder($value_element['proximity_geocoding_widget']);
+      }
     }
   }
 
@@ -135,23 +186,23 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
 
     if ($this->options['proximity_source'] == 'exposed') {
       if (
-        $input['lat'] == ''
-        || $input['lng'] == ''
+        $input[$this->options['expose']['identifier'] . '-lat'] == ''
+        || $input[$this->options['expose']['identifier'] . '-lng'] == ''
       ) {
         return FALSE;
       }
       else {
-        $this->value['lat'] = $input['lat'];
-        $this->value['lng'] = $input['lng'];
+        $this->value['lat'] = $input[$this->options['expose']['identifier'] . '-lat'];
+        $this->value['lng'] = $input[$this->options['expose']['identifier'] . '-lng'];
       }
     }
 
     if ($this->options['proximity_units'] == 'exposed') {
-      if ($input['units'] != 'km' && $input['units'] != 'mile') {
+      if ($input[$this->options['expose']['identifier'] . '-units'] != 'km' && $input[$this->options['expose']['identifier'] . '-units'] != 'mile') {
         return FALSE;
       }
       else {
-        $this->value['units'] = $input['units'];
+        $this->value['units'] = $input[$this->options['expose']['identifier'] . '-units'];
       }
     }
 

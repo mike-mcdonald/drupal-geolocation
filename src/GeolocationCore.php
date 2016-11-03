@@ -407,6 +407,10 @@ class GeolocationCore implements ContainerInjectionInterface {
         ],
       ],
     ]);
+
+    if (method_exists($geocoder_plugin, 'attachGeocoder')) {
+      $geocoder_plugin->attachGeocoder($render_array);
+    }
   }
 
 }
