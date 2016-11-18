@@ -443,6 +443,9 @@
   /**
    * Insert updated map contents into the document.
    *
+   * ATTENTION: This is a straight ripoff from misc/ajax.js ~line 1017 insert() function.
+   * Please read all code commentary there first!
+   *
    * @param {Drupal.Ajax} ajax
    *   {@link Drupal.Ajax} object created by {@link Drupal.ajax}.
    * @param {object} response
@@ -459,13 +462,15 @@
    *   The XMLHttpRequest status.
    */
   Drupal.AjaxCommands.prototype.geolocationCommonMapsUpdate = function (ajax, response, status) {
-    // Get information from the response. If it is not there, default to our presets.
+    // See function comment for code origin first before any changes!
     var $wrapper = response.selector ? $(response.selector) : $(ajax.wrapper);
     var settings = response.settings || ajax.settings || drupalSettings;
-    var $new_content = $(response.data);
+
+    var $new_content_wrapped = $('<div></div>').html(response.data);
+    var $new_content = $new_content_wrapped.contents();
 
     if ($new_content.length !== 1 || $new_content.get(0).nodeType !== 1) {
-      $new_content = $('<div></div>').html($new_content);
+      $new_content = $new_content.parent();
     }
 
     Drupal.detachBehaviors($wrapper.get(0), settings);
