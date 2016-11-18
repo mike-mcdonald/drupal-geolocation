@@ -107,7 +107,7 @@
 
         // Add the geocoder to the map.
         map.controls = $('<form class="geocode-controls-wrapper" />')
-            .append($('<input id="geocoder-input-' + map.id + '" type="text" class="input" placeholder="Enter a location" />'))
+            .append($('<input id="geocoder-input-' + map.id + '" type="text" class="input" placeholder="' + Drupal.t('Enter a location') + '" />'))
             // Create submit button
             .append($('<button class="submit" />'))
             // Create clear button
