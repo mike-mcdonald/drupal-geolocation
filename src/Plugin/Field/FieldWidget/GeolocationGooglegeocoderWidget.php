@@ -302,7 +302,6 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
         ],
       ],
     ];
-    $this->geolocationCore->attachGeocoder($element);
 
     if ($settings['populate_address_field']) {
       $element['map_canvas']['#attached']['drupalSettings']['geolocation']['widgetSettings'][$canvas_id]['addressFieldTarget'] = $settings['target_address_field'];
