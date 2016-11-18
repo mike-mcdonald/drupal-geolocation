@@ -82,10 +82,13 @@ class GeolocationItemTest extends FieldKernelTestBase {
     // Verify changing the field value.
     $new_lat = rand(-90, 90) - rand(0, 999999) / 1000000;
     $new_lng = rand(-180, 180) - rand(0, 999999) / 1000000;
+    $new_data = array('an_array');
     $entity->get('field_test')->lat = $new_lat;
     $entity->get('field_test')->lng = $new_lng;
+    $entity->get('field_test')->data = $new_data;
     $this->assertEquals($entity->get('field_test')->lat, $new_lat, "Lat {$entity->get('field_test')->lat} is equal to new lat {$new_lat}.");
     $this->assertEquals($entity->get('field_test')->lng, $new_lng, "Lng {$entity->get('field_test')->lng} is equal to new lng {$new_lng}.");
+    $this->assertEquals($entity->get('field_test')->data, $new_data, "Data is correctly updated to new data.");
 
     // Read changed entity and assert changed values.
     $entity->save();
@@ -97,7 +100,7 @@ class GeolocationItemTest extends FieldKernelTestBase {
     $this->assertEquals(round($entity->get('field_test')->lat_cos, 5), round(cos(deg2rad($new_lat)), 5), "Cosine for latitude calculated correctly after change.");
     $this->assertEquals(round($entity->get('field_test')->lng_rad, 5), round(deg2rad($new_lng), 5), "Radian value for longitude calculated correctly after change.");
 
-    $this->assertEquals($entity->get('field_test')->data, $data, "Data {$entity->get('field_test')->data} is equal to data {$data}.");
+    $this->assertEquals($entity->get('field_test')->data, $new_data, "Data is correctly updated to new data.");
   }
 
 }
