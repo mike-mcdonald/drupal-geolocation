@@ -19,6 +19,7 @@
  * @property {String} type
  * @property {Boolean} scrollwheel
  * @property {Boolean} preferScrollingToZooming
+ * @property {String} gestureHandling
  * @property {Boolean} panControl
  * @property {Boolean} mapTypeControl
  * @property {Boolean} scaleControl
@@ -175,7 +176,8 @@
         },
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         zoom: 2,
-        style: []
+        style: [],
+        gestureHandling: 'auto'
       }
     };
   };
@@ -270,7 +272,8 @@
       scrollwheel: map.settings.google_map_settings.scrollwheel,
       disableDoubleClickZoom: map.settings.google_map_settings.disableDoubleClickZoom,
       draggable: map.settings.google_map_settings.draggable,
-      styles: map.settings.google_map_settings.style
+      styles: map.settings.google_map_settings.style,
+      gestureHandling: map.settings.google_map_settings.gestureHandling
     });
 
     if (!Drupal.geolocation.hasOwnProperty('maps')) {

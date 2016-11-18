@@ -129,6 +129,7 @@ trait GoogleMapsDisplayTrait {
         'disableAutoPan' => TRUE,
         'style' => '',
         'preferScrollingToZooming' => FALSE,
+        'gestureHandling' => 'auto',
       ],
     ];
   }
@@ -240,6 +241,27 @@ trait GoogleMapsDisplayTrait {
       '#description' => $this->t('Allow the user to zoom the map using the scrollwheel.'),
       '#default_value' => $settings['google_map_settings']['scrollwheel'],
     ];
+    $form['google_map_settings']['gestureHandling'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Gesture Handling'),
+      '#default_value' => $this->getSetting('gestureHandling'),
+      '#description' => $this->t('Define how to handle interactions with map on mobile. Read the <a href=":introduction">introduction</a> for handling or the <a href=":details">details</a>, <i>available as of v3.27 / Nov. 2016</i>.', [
+        ':introduction' => 'https://googlegeodevelopers.blogspot.de/2016/11/smart-scrolling-comes-to-mobile-web-maps.html',
+        ':details' => 'https://developers.google.com/maps/documentation/javascript/3.exp/reference#MapOptions',
+      ]),
+      '#options' => [
+        'auto' => $this->t('auto (default)'),
+        'cooperative' => $this->t('cooperative'),
+        'greedy' => $this->t('greedy'),
+        'none' => $this->t('none'),
+      ],
+    ];
+    $form['google_map_settings']['draggable'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Draggable'),
+      '#description' => $this->t('Allow the user to change the field of view. <i>Deprecated as of v3.27 / Nov. 2016 in favor of gesture handling described above.</i>.'),
+      '#default_value' => $settings['google_map_settings']['draggable'],
+    ];
     $form['google_map_settings']['preferScrollingToZooming'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Require the user to click the map once to zoom, to ease scrolling behavior.'),
@@ -252,17 +274,13 @@ trait GoogleMapsDisplayTrait {
       '#description' => $this->t('Disables the double click zoom functionality.'),
       '#default_value' => $settings['google_map_settings']['disableDoubleClickZoom'],
     ];
-    $form['google_map_settings']['draggable'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Draggable'),
-      '#description' => $this->t('Allow the user to change the field of view.'),
-      '#default_value' => $settings['google_map_settings']['draggable'],
-    ];
     $form['google_map_settings']['style'] = [
       '#title' => $this->t('JSON styles'),
       '#type' => 'textarea',
       '#default_value' => $settings['google_map_settings']['style'],
-      '#description' => $this->t('A JSON encoded styles array to customize the presentation of the Google Map. See the <a href="https://developers.google.com/maps/documentation/javascript/styling">Styled Map</a> section of the Google Maps website for further information.'),
+      '#description' => $this->t('A JSON encoded styles array to customize the presentation of the Google Map. See the <a href=":styling">Styled Map</a> section of the Google Maps website for further information.', [
+        ':styling' => 'https://developers.google.com/maps/documentation/javascript/styling',
+      ]),
     ];
     $form['google_map_settings']['height'] = [
       '#type' => 'textfield',

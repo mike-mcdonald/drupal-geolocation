@@ -44,6 +44,9 @@ geolocation.google_map_settings:
     preferScrollingToZooming:
       type: integer
       label: 'Require user to click map before zooming'
+    gestureHandling:
+      type: string
+      label: 'Smart scrolling'
 
 geolocation.settings:
   type: config_object
