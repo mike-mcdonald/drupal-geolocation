@@ -59,7 +59,7 @@ trait GoogleMapsDisplayTrait {
       'callback' => 'Drupal.geolocation.googleCallback',
       'key' => $config->get('google_map_api_key'),
     ];
-    $module_parameters = \Drupal::moduleHandler()->invokeAll('hook_geolocation_google_maps_parameters') ?: [];
+    $module_parameters = \Drupal::moduleHandler()->invokeAll('geolocation_google_maps_parameters') ?: [];
     $custom_parameters = $config->get('google_map_custom_url_parameters') ?: [];
 
     $parameters = array_replace_recursive($custom_parameters, $module_parameters, $geolocation_parameters);
