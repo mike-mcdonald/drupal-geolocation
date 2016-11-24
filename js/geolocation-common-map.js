@@ -30,14 +30,13 @@
  * @property {CommonMapSettings[]} drupalSettings.geolocation.commonMap
  */
 
-(function ($, Drupal) {
+(function ($, window, Drupal, drupalSettings) {
   'use strict';
 
   /* global google */
 
   var bubble; // Keep track if a bubble is currently open.
   var currentMarkers = []; // Keep track of all currently attached markers.
-  var lastMapBounds = null; // Keep track of last set map bounds.
   var skipMapUpdate = false; // Setting to true will skip the next triggered map related viewsRefresh.
 
   /**
@@ -67,18 +66,11 @@
   function initialize(settings, context) {
     // Their could be several maps/views present. Go over each entry.
     $.each(settings.commonMap, function (mapId, mapSettings) {
+
       /**
        * @param {String} mapId
        * @param {CommonMapSettings} mapSettings
        */
-
-      var ajaxViewsEnabled = false;
-      if (
-        typeof Drupal.views !== 'undefined'
-        && typeof Drupal.views.ajaxView !== 'undefined'
-      ) {
-        ajaxViewsEnabled = true;
-      }
 
       // The DOM-node the map and everything else resides in.
       var map = $('#' + mapId, context);
@@ -86,14 +78,6 @@
       // If the map is not present, we can go to the next entry.
       if (!map.length) {
         return;
-      }
-
-      var exposedForm = $('.js-view-dom-id-' + mapId + ' form.views-exposed-form', context);
-      if (exposedForm.length) {
-        exposedForm = exposedForm.first();
-      }
-      else {
-        exposedForm = null;
       }
 
       // Hide the graceful-fallback HTML list; map will propably work now.
@@ -139,10 +123,10 @@
           }
         }
         else if (
-            map.data('centre-lat-north-east')
-            && map.data('centre-lng-north-east')
-            && map.data('centre-lat-south-west')
-            && map.data('centre-lng-south-west')
+          map.data('centre-lat-north-east')
+          && map.data('centre-lng-north-east')
+          && map.data('centre-lat-south-west')
+          && map.data('centre-lng-south-west')
         ) {
           var newBounds = {
             north: map.data('centre-lat-north-east'),
@@ -188,120 +172,100 @@
       }
 
       /**
-       * Update the view depending on settings and capability.
-       *
-       * One of several states might occur now. Possible state depends on whether:
-       * - view using AJAX is enabled
-       * - map view is the containing (page) view or an attachment
-       * - the exposed form is present and contains the boundary filter
-       * - map settings are consistent
-       *
-       * Given these factors, map boundary changes can be handled in one of three ways:
-       * - trigger the views AJAX "RefreshView" command
-       * - trigger the exposed form causing a regular POST reload
-       * - fully reload the website
-       *
-       * These possibilities are ordered by UX preference.
-       *
-       * @param {Object} settings The settings to update the map.
-       * @param {Boolean} mapReset Reset map values.
+       * Dynamic map handling aka "AirBnB mode".
        */
-      if (typeof googleMap.updateDrupalView === 'undefined') {
-        googleMap.updateDrupalView = function (settings, mapReset) {
-          var currentBounds = googleMap.getBounds();
-          var update_path = '';
-          if (skipMapUpdate === true) {
-            skipMapUpdate = false;
-            return;
+      if (
+        typeof mapSettings.dynamic_map !== 'undefined'
+        && mapSettings.dynamic_map.enable
+      ) {
+        var exposedForm = $('form#views-exposed-form-' + mapSettings.dynamic_map.update_view_id.replace(/_/g, '-') + '-' + mapSettings.dynamic_map.update_view_display_id.replace(/_/g, '-'));
+
+        /**
+         * Update the view depending on dynamic map settings and capability.
+         *
+         * One of several states might occur now. Possible state depends on whether:
+         * - view using AJAX is enabled
+         * - map view is the containing (page) view or an attachment
+         * - the exposed form is present and contains the boundary filter
+         * - map settings are consistent
+         *
+         * Given these factors, map boundary changes can be handled in one of three ways:
+         * - trigger the views AJAX "RefreshView" command
+         * - trigger the exposed form causing a regular POST reload
+         * - fully reload the website
+         *
+         * These possibilities are ordered by UX preference.
+         *
+         * @param {CommonMapUpdateSettings} dynamic_map_settings
+         *   The dynamic map settings to update the map.
+         */
+        if (typeof googleMap.updateDrupalView === 'undefined') {
+          googleMap.updateDrupalView = function (dynamic_map_settings) {
+
+            // Make sure to load current form DOM element, which will change after every AJAX operation.
+            exposedForm = $('form#views-exposed-form-' + dynamic_map_settings.update_view_id.replace(/_/g, '-') + '-' + dynamic_map_settings.update_view_display_id.replace(/_/g, '-'));
+
+            var currentBounds = googleMap.getBounds();
+            var update_path = '';
+            if (skipMapUpdate === true) {
+              skipMapUpdate = false;
+              return;
+            }
+
+            if (
+              typeof dynamic_map_settings.boundary_filter !== 'undefined'
+            ) {
+              if (exposedForm.length) {
+                exposedForm.find('input[name="' + dynamic_map_settings.parameter_identifier + '[lat_north_east]"]').val(currentBounds.getNorthEast().lat());
+                exposedForm.find('input[name="' + dynamic_map_settings.parameter_identifier + '[lng_north_east]"]').val(currentBounds.getNorthEast().lng());
+                exposedForm.find('input[name="' + dynamic_map_settings.parameter_identifier + '[lat_south_west]"]').val(currentBounds.getSouthWest().lat());
+                exposedForm.find('input[name="' + dynamic_map_settings.parameter_identifier + '[lng_south_west]"]').val(currentBounds.getSouthWest().lng());
+
+                $('input[type=submit], input[type=image]', exposedForm).not('[data-drupal-selector=edit-reset]').trigger('click');
+              }
+              // No AJAX, no form, just enforce a page reload with GET parameters set.
+              else {
+                if (window.location.search.length) {
+                  update_path = window.location.search + '&';
+                }
+                else {
+                  update_path = '?';
+                }
+                update_path += dynamic_map_settings.parameter_identifier + '[lat_north_east]=' + currentBounds.getNorthEast().lat();
+                update_path += '&' + dynamic_map_settings.parameter_identifier + '[lng_north_east]=' + currentBounds.getNorthEast().lng();
+                update_path += '&' + dynamic_map_settings.parameter_identifier + '[lat_south_west]=' + currentBounds.getSouthWest().lat();
+                update_path += '&' + dynamic_map_settings.parameter_identifier + '[lng_south_west]=' + currentBounds.getSouthWest().lng();
+
+                window.location = update_path;
+              }
+            }
+          };
+        }
+
+        if (
+          exposedForm.length
+          && mapSettings.dynamic_map.hide_form
+          && typeof mapSettings.dynamic_map.parameter_identifier !== 'undefined'
+        ) {
+          exposedForm.find('input[name^="' + mapSettings.dynamic_map.parameter_identifier + '"]').each(function (index, item) {
+            $(item).parent().hide();
+          });
+
+          // Hide entire form if it's empty now, except form-submit.
+          if (exposedForm.find('input:visible:not(.form-submit)').length === 0) {
+            exposedForm.hide();
           }
+        }
 
-          if (
-            typeof settings.boundary_filter !== 'undefined'
-          ) {
-            if (ajaxViewsEnabled === true) {
-              var update_dom_id = null;
-              if (typeof settings.update_dom_id !== 'undefined') {
-                update_dom_id = settings.update_dom_id;
-              }
-              else {
-                $.each(drupalSettings.views.ajaxViews, function (view_index, view_settings) {
-                  if (
-                    view_settings.view_name === settings.update_view_id
-                    && view_settings.view_display_id === settings.update_view_display_id
-                  ) {
-                    if ($('.js-view-dom-id-' + view_settings.view_dom_id).length > 0) {
-                      update_dom_id = view_settings.view_dom_id;
-                      // break
-                      return false;
-                    }
-                  }
-                });
-              }
-
-              var view = $('.js-view-dom-id-' + update_dom_id).first();
-
-              if (typeof Drupal.views.instances['views_dom_id:' + update_dom_id] === 'undefined') {
-                return;
-              }
-
-              if (mapReset === true) {
-                Drupal.views.instances['views_dom_id:' + update_dom_id].settings['geolocation_common_map_dynamic_map_reset'] = true;
-              }
-              else {
-
-                Drupal.views.instances['views_dom_id:' + update_dom_id].settings[settings.parameter_identifier + '[lat_north_east]'] = currentBounds.getNorthEast().lat();
-                Drupal.views.instances['views_dom_id:' + update_dom_id].settings[settings.parameter_identifier + '[lng_north_east]'] = currentBounds.getNorthEast().lng();
-                Drupal.views.instances['views_dom_id:' + update_dom_id].settings[settings.parameter_identifier + '[lat_south_west]'] = currentBounds.getSouthWest().lat();
-                Drupal.views.instances['views_dom_id:' + update_dom_id].settings[settings.parameter_identifier + '[lng_south_west]'] = currentBounds.getSouthWest().lng();
-
-                Drupal.views.instances['views_dom_id:' + update_dom_id].settings['geolocation_common_map_dynamic_map_reset'] = false;
-              }
-
-              view.trigger('RefreshView');
-
-              delete Drupal.views.instances['views_dom_id:' + update_dom_id].settings['geolocation_common_map_dynamic_map_reset'];
-
-              delete Drupal.views.instances['views_dom_id:' + update_dom_id].settings[settings.parameter_identifier + '[lat_north_east]'];
-              delete Drupal.views.instances['views_dom_id:' + update_dom_id].settings[settings.parameter_identifier + '[lng_north_east]'];
-              delete Drupal.views.instances['views_dom_id:' + update_dom_id].settings[settings.parameter_identifier + '[lat_south_west]'];
-              delete Drupal.views.instances['views_dom_id:' + update_dom_id].settings[settings.parameter_identifier + '[lng_south_west]'];
-            }
-            // AJAX disabled, form available. Set boundary values and trigger.
-            else if (exposedForm) {
-
-              if (mapReset === true) {
-                exposedForm.find('input[name="' + settings.parameter_identifier + '[lat_north_east]"]').val('');
-                exposedForm.find('input[name="' + settings.parameter_identifier + '[lng_north_east]"]').val('');
-                exposedForm.find('input[name="' + settings.parameter_identifier + '[lat_south_west]"]').val('');
-                exposedForm.find('input[name="' + settings.parameter_identifier + '[lng_south_west]"]').val('');
-              }
-              else {
-                exposedForm.find('input[name="' + settings.parameter_identifier + '[lat_north_east]"]').val(currentBounds.getNorthEast().lat());
-                exposedForm.find('input[name="' + settings.parameter_identifier + '[lng_north_east]"]').val(currentBounds.getNorthEast().lng());
-                exposedForm.find('input[name="' + settings.parameter_identifier + '[lat_south_west]"]').val(currentBounds.getSouthWest().lat());
-                exposedForm.find('input[name="' + settings.parameter_identifier + '[lng_south_west]"]').val(currentBounds.getSouthWest().lng());
-              }
-
-              exposedForm.find('.form-submit').trigger('click');
-            }
-            // No AJAX, no form, just enforce a page reload with GET parameters set.
-            else {
-              if (window.location.search.length) {
-                update_path = window.location.search + '&';
-              }
-              else {
-                update_path = '?';
-              }
-              if (mapReset !== true) {
-                update_path += settings.parameter_identifier + '[lat_north_east]=' + currentBounds.getNorthEast().lat();
-                update_path += '&' + settings.parameter_identifier + '[lng_north_east]=' + currentBounds.getNorthEast().lng();
-                update_path += '&' + settings.parameter_identifier + '[lat_south_west]=' + currentBounds.getSouthWest().lat();
-                update_path += '&' + settings.parameter_identifier + '[lng_south_west]=' + currentBounds.getSouthWest().lng();
-              }
-              window.location = update_path;
-            }
-          }
-        };
+        if (map.data('geolocationAjaxProcessed') !== 1) {
+          var geolocationMapIdleTimer;
+          googleMap.addListener('idle', function () {
+            clearTimeout(geolocationMapIdleTimer);
+            geolocationMapIdleTimer = setTimeout(function () {
+              googleMap.updateDrupalView(mapSettings.dynamic_map);
+            }, mapSettings.dynamic_map.views_refresh_delay);
+          });
+        }
       }
 
       if (typeof map.data('clientlocation') !== 'undefined') {
@@ -389,53 +353,10 @@
         });
       });
 
-      if (map.data('fitbounds') === 1 || map.data('mapReset') === 1) {
-        // Fit map center and zoom to all currently loaded markers.
+      if (map.data('fitbounds') === 1) {
         skipMapUpdate = true;
+        // Fit map center and zoom to all currently loaded markers.
         googleMap.fitBounds(bounds);
-      }
-
-      /**
-       * Dynamic map handling aka "AirBnB mode".
-       */
-      if (
-        typeof mapSettings.dynamic_map !== 'undefined'
-        && mapSettings.dynamic_map.enable
-      ) {
-        if (
-          exposedForm
-          && mapSettings.dynamic_map.hide_form
-          && typeof mapSettings.dynamic_map.parameter_identifier !== 'undefined'
-        ) {
-          exposedForm.find('input[name^="' + mapSettings.dynamic_map.parameter_identifier + '"]').each(function (index, item) {
-            $(item).parent().hide();
-          });
-
-          // Hide entire form if it's empty now, except form-submit.
-          if (exposedForm.find('input:visible:not(.form-submit)').length === 0) {
-            exposedForm.hide();
-          }
-        }
-
-        if (map.data('geolocationAjaxProcessed') !== 1) {
-          var geolocationMapIdleTimer;
-          googleMap.addListener('idle', function () {
-            var currentMapBounds = googleMap.getBounds();
-            if (
-              typeof lastMapBounds === 'undefined'
-              || lastMapBounds === null
-              || lastMapBounds.equals(currentMapBounds)
-            ) {
-              lastMapBounds = currentMapBounds;
-              return;
-            }
-            clearTimeout(geolocationMapIdleTimer);
-            geolocationMapIdleTimer = setTimeout(function() {
-              lastMapBounds = currentMapBounds;
-              googleMap.updateDrupalView(mapSettings.dynamic_map);
-            }, mapSettings.dynamic_map.views_refresh_delay);
-          });
-        }
       }
     });
   }
@@ -491,8 +412,9 @@
     // successfully added to the page, this if statement allows
     // `#ajax['wrapper']` to be optional.
     if ($new_content.parents('html').length > 0) {
+      // Apply any settings from the returned JSON if available.
       Drupal.attachBehaviors($new_content.get(0), settings);
     }
   };
 
-})(jQuery, Drupal);
+})(jQuery, window, Drupal, drupalSettings);
