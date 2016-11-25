@@ -146,14 +146,13 @@ class CommonMap extends StylePluginBase {
      */
     if (!empty($this->options['dynamic_map']['enabled'])) {
 
-      if (!empty($this->options['dynamic_map']['update_target']) && $this->view->displayHandlers->has($this->options['dynamic_map']['update_target'])) {
-        $update_view_id = $this->view->id();
+      if (
+        !empty($this->options['dynamic_map']['update_target'])
+        && $this->view->displayHandlers->has($this->options['dynamic_map']['update_target'])
+      ) {
         $update_view_display_id = $this->options['dynamic_map']['update_target'];
-        $update_dom_id = NULL;
       }
       else {
-        $update_dom_id = $this->view->dom_id;
-        $update_view_id = $this->view->id();
         $update_view_display_id = $this->view->current_display;
       }
 
@@ -161,17 +160,9 @@ class CommonMap extends StylePluginBase {
         'enable' => TRUE,
         'hide_form' => $this->options['dynamic_map']['hide_form'],
         'views_refresh_delay' => $this->options['dynamic_map']['views_refresh_delay'],
+        'update_view_id' => $this->view->id(),
+        'update_view_display_id' => $update_view_display_id,
       ];
-
-      if (!empty($update_dom_id)) {
-        $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['dynamic_map']['update_dom_id'] = $update_dom_id;
-      }
-      else {
-        $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['dynamic_map'] += [
-          'update_view_id' => $update_view_id,
-          'update_view_display_id' => $update_view_display_id,
-        ];
-      }
 
       if (substr($this->options['dynamic_map']['update_handler'], 0, strlen('boundary_filter_')) === 'boundary_filter_') {
         $filter_id = substr($this->options['dynamic_map']['update_handler'], strlen('boundary_filter_'));
@@ -396,6 +387,7 @@ class CommonMap extends StylePluginBase {
       'contains' => [
         'enabled' => ['default' => 0],
         'update_handler' => ['default' => ''],
+        'update_target' => ['default' => ''],
         'hide_form' => ['default' => 0],
         'views_refresh_delay' => ['default' => '1200'],
       ],

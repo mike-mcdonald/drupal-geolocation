@@ -8,7 +8,6 @@
  * @property {String} enable
  * @property {String} hide_form
  * @property {number} views_refresh_delay
- * @property {String} update_dom_id
  * @property {String} update_view_id
  * @property {String} update_view_display_id
  * @property {String} boundary_filter
@@ -71,6 +70,26 @@
        * @param {String} mapId
        * @param {CommonMapSettings} mapSettings
        */
+
+      if (
+        typeof mapSettings.dynamic_map !== 'undefined'
+        && mapSettings.dynamic_map.enable
+        && mapSettings.dynamic_map.hide_form
+        && typeof mapSettings.dynamic_map.parameter_identifier !== 'undefined'
+      ) {
+        var exposedForm = $('form#views-exposed-form-' + mapSettings.dynamic_map.update_view_id.replace(/_/g, '-') + '-' + mapSettings.dynamic_map.update_view_display_id.replace(/_/g, '-'));
+
+        if (exposedForm.length === 1) {
+          exposedForm.find('input[name^="' + mapSettings.dynamic_map.parameter_identifier + '"]').each(function (index, item) {
+            $(item).parent().hide();
+          });
+
+          // Hide entire form if it's empty now, except form-submit.
+          if (exposedForm.find('input:visible:not(.form-submit)').length === 0) {
+            exposedForm.hide();
+          }
+        }
+      }
 
       // The DOM-node the map and everything else resides in.
       var map = $('#' + mapId, context);
@@ -178,7 +197,6 @@
         typeof mapSettings.dynamic_map !== 'undefined'
         && mapSettings.dynamic_map.enable
       ) {
-        var exposedForm = $('form#views-exposed-form-' + mapSettings.dynamic_map.update_view_id.replace(/_/g, '-') + '-' + mapSettings.dynamic_map.update_view_display_id.replace(/_/g, '-'));
 
         /**
          * Update the view depending on dynamic map settings and capability.
@@ -240,21 +258,6 @@
               }
             }
           };
-        }
-
-        if (
-          exposedForm.length
-          && mapSettings.dynamic_map.hide_form
-          && typeof mapSettings.dynamic_map.parameter_identifier !== 'undefined'
-        ) {
-          exposedForm.find('input[name^="' + mapSettings.dynamic_map.parameter_identifier + '"]').each(function (index, item) {
-            $(item).parent().hide();
-          });
-
-          // Hide entire form if it's empty now, except form-submit.
-          if (exposedForm.find('input:visible:not(.form-submit)').length === 0) {
-            exposedForm.hide();
-          }
         }
 
         if (map.data('geolocationAjaxProcessed') !== 1) {

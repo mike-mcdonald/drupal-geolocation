@@ -118,11 +118,8 @@ views.style.maps_common:
           label: 'Views fresh delay in ms'
         update_handler:
           type: string
-          label: 'Filter or agurment name'
+          label: 'Filter or argument name'
         update_target:
-          type: string
-          label: 'Display to update'
-        update_dom_id:
           type: string
           label: 'Display to update'
     centre:

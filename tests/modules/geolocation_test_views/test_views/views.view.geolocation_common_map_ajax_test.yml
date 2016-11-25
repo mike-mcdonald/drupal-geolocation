@@ -356,6 +356,7 @@ display:
             update_handler: boundary_filter_field_geolocation_boundary
             hide_form: 0
             update_target: page_1
+            views_refresh_delay: 1200
           centre:
             fit_bounds:
               enable: true
