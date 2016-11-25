@@ -129,7 +129,11 @@
         });
       }
 
+      // Skip initial map set.
+      skipMapUpdate = true;
+
       if (typeof googleMap !== 'undefined' && googleMap !== null) {
+        skipMapUpdate = false;
         if (map.data('centre-lat') && map.data('centre-lng')) {
           var newCenter = new google.maps.LatLng({
             lat: map.data('centre-lat'),
@@ -137,7 +141,6 @@
           });
 
           if (!googleMap.getCenter().equals(newCenter)) {
-            skipMapUpdate = true;
             googleMap.setCenter(newCenter);
           }
         }
@@ -155,7 +158,6 @@
           };
 
           if (!googleMap.getBounds().equals(newBounds)) {
-            skipMapUpdate = true;
             googleMap.fitBounds(newBounds);
           }
         }
@@ -357,7 +359,6 @@
       });
 
       if (map.data('fitbounds') === 1) {
-        skipMapUpdate = true;
         // Fit map center and zoom to all currently loaded markers.
         googleMap.fitBounds(bounds);
       }
