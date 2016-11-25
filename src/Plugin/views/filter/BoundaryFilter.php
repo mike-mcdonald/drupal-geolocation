@@ -297,6 +297,10 @@ class BoundaryFilter extends FilterPluginBase implements ContainerFactoryPluginI
       return;
     }
 
+    if (empty($this->value)) {
+      return;
+    }
+
     // Get the field alias.
     $lat_north_east = $this->value['lat_north_east'];
     $lng_north_east = $this->value['lng_north_east'];
