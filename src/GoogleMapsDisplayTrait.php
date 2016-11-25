@@ -244,7 +244,7 @@ trait GoogleMapsDisplayTrait {
     $form['google_map_settings']['gestureHandling'] = [
       '#type' => 'select',
       '#title' => $this->t('Gesture Handling'),
-      '#default_value' => $this->getSetting('gestureHandling'),
+      '#default_value' => $settings['google_map_settings']['gestureHandling'],
       '#description' => $this->t('Define how to handle interactions with map on mobile. Read the <a href=":introduction">introduction</a> for handling or the <a href=":details">details</a>, <i>available as of v3.27 / Nov. 2016</i>.', [
         ':introduction' => 'https://googlegeodevelopers.blogspot.de/2016/11/smart-scrolling-comes-to-mobile-web-maps.html',
         ':details' => 'https://developers.google.com/maps/documentation/javascript/3.exp/reference#MapOptions',
