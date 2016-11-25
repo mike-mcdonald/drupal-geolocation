@@ -4,10 +4,8 @@
  */
 
 /**
- * @param {Object} drupalSettings
  * @param {Object} drupalSettings.geolocation
  * @param {String} drupalSettings.geolocation.google_map_url
- * @param {String} drupalSettings.geolocation.default_geocoder
  */
 
 /**
@@ -32,24 +30,24 @@
  */
 
 /**
- * @name GoogleMapBounds
+ * @typedef {Object} GoogleMapBounds
  * @property {function():GoogleMapLatLng} getNorthEast
  * @property {function():GoogleMapLatLng} getSouthWest
  */
 
 /**
- * @name GoogleMapLatLng
- * @property {Function} lat
- * @property {Function} lng
+ * @typedef {Object} GoogleMapLatLng
+ * @property {function():float} lat
+ * @property {function():float} lng
  */
 
 /**
- * @name GoogleMapEvent
+ * @typedef {Object} GoogleMapEvent
  * @property {Function} addDomListener
  */
 
 /**
- * @name AddressComponent
+ * @typedef {Object} AddressComponent
  * @property {String} long_name - Long component name
  * @property {String} short_name - Short component name
  * @property {String[]} types - Component type
@@ -57,14 +55,14 @@
  */
 
 /**
- * @name GoogleAddress
+ * @typedef {Object} GoogleAddress
  * @property {AddressComponent[]} address_components - Components
  * @property {String} formatted_address - Formatted address
  * @property {GoogleGeometry} geometry - Geometry
  */
 
 /**
- * @name GoogleGeometry
+ * @typedef {Object} GoogleGeometry
  * @property {GoogleMapLatLng} location - Location
  * @property {String} location_type - Location type
  * @property {GoogleMapBounds} viewport - Viewport
@@ -72,7 +70,7 @@
  */
 
 /**
- * @name GoogleMap
+ * @typedef {Object} GoogleMap
  * @property {Object} ZoomControlStyle
  * @property {String} ZoomControlStyle.LARGE
  *
@@ -82,9 +80,6 @@
  *
  * @property {Object} MapTypeId
  * @property {String} MapTypeId.ROADMAP
- *
- * @property {Object} GeocoderStatus
- * @property {String} GeocoderStatus.OK
  *
  * @property {Function} LatLng
  * @property {Function} LatLngBounds
@@ -101,10 +96,6 @@
  * @property {Function} Marker.setMap
  * @property {Function} Marker.setIcon
  *
- * @function
- * @property {function():Object} Geocoder
- * @property {Function} Geocoder.geocode
- *
  * @property {Function} fitBounds
  *
  * @property {Function} setCenter
@@ -117,14 +108,13 @@
  */
 
 /**
- * @name google
- * @object
+ * @typedef {Object} google
  * @property {GoogleMap} maps
  * @property {GoogleMapEvent[]} events
  */
 
 /**
- * @name GeolocationMap
+ * @typedef {Object} GeolocationMap
  * @property {GoogleMapSettings} settings
  * @property {GoogleMap} googleMap
  * @property {Number} lat

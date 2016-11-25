@@ -78,6 +78,12 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
     ] + parent::defineOptions();
 
     $options['expose']['contains']['input_by_geocoding_widget'] = ['default' => FALSE];
+    $options['expose']['contains']['geocoder_plugin_settings'] = [
+      'default' => [
+        'plugin_id' => '',
+        'settings' => [],
+      ],
+    ];
 
     return $options;
   }
@@ -89,23 +95,82 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
     parent::defaultExposeOptions();
 
     $this->options['expose']['label'] = $this->t('Distance in @units', ['@units' => $this->getProximityUnit() == 'km' ? 'kilometers' : 'miles']);
-    $this->options['expose']['input_by_geocoding_widget'] = FALSE;
   }
 
   /**
    * {@inheritdoc}
    */
   public function buildExposeForm(&$form, FormStateInterface $form_state) {
-    $form['expose']['input_by_geocoding_widget'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Use Google Geocoding Widget instead of proximity value form'),
-      '#default_value' => $this->options['expose']['input_by_geocoding_widget'],
-      '#states' => [
-        'visible' => [
-          'select[name="options[proximity_source]"]' => ['value' => 'exposed'],
+
+    $geocoder_definitions = $this->geolocationCore->getGeocoderManager()->getLocationCapableGeocoders();
+
+    if ($geocoder_definitions) {
+      $form['expose']['input_by_geocoding_widget'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Use geocoding widget to retrieve location values'),
+        '#default_value' => $this->options['expose']['input_by_geocoding_widget'],
+        '#states' => [
+          'visible' => [
+            'select[name="options[proximity_source]"]' => ['value' => 'exposed'],
+          ],
         ],
-      ],
-    ];
+      ];
+
+      $geocoder_options = [];
+      foreach ($geocoder_definitions as $id => $definition) {
+        $geocoder_options[$id] = $definition['name'];
+      }
+
+      $form['expose']['geocoder_plugin_settings'] = [
+        '#type' => 'container',
+        '#states' => [
+          'visible' => [
+            'input[name="options[expose][input_by_geocoding_widget]"]' => ['checked' => TRUE],
+          ],
+        ],
+      ];
+
+      $geocoder_container = &$form['expose']['geocoder_plugin_settings'];
+
+      $geocoder_container['plugin_id'] = [
+        '#type' => 'select',
+        '#options' => $geocoder_options,
+        '#title' => $this->t('Geocoder plugin'),
+        '#default_value' => $this->options['expose']['geocoder_plugin_settings']['plugin_id'],
+        '#ajax' => [
+          'callback' => [get_class($this->geolocationCore->getGeocoderManager()), 'addGeocoderSettingsFormAjax'],
+          'wrapper' => 'geocoder-plugin-settings',
+          'effect' => 'fade',
+        ],
+      ];
+
+      if (!empty($this->options['expose']['geocoder_plugin_settings']['plugin_id'])) {
+        $geocoder_plugin = $this->geolocationCore->getGeocoderManager()->getGeocoder(
+          $this->options['expose']['geocoder_plugin_settings']['plugin_id'],
+          $this->options['expose']['geocoder_plugin_settings']['settings']
+        );
+        if ($geocoder_plugin) {
+          $geocoder_settings_form = $geocoder_plugin->getOptionsForm();
+          if ($geocoder_settings_form) {
+            $geocoder_container['settings'] = $geocoder_settings_form;
+          }
+        }
+      }
+
+      if (empty($geocoder_container['settings'])) {
+        $geocoder_container['settings'] = [
+          '#type' => 'html_tag',
+          '#tag' => 'span',
+          '#value' => $this->t("No settings available."),
+        ];
+      }
+
+      $geocoder_container['settings'] = array_replace_recursive($geocoder_container['settings'], [
+        '#flatten' => TRUE,
+        '#prefix' => '<div id="geocoder-plugin-settings">',
+        '#suffix' => '</div>',
+      ]);
+    }
 
     parent::buildExposeForm($form, $form_state);
   }
@@ -114,8 +179,9 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
    * {@inheritdoc}
    */
   public function buildExposedForm(&$form, FormStateInterface $form_state) {
-
     parent::buildExposedForm($form, $form_state);
+
+    $identifier = $this->options['expose']['identifier'];
 
     // Get the value element.
     if (isset($form['value']['#tree'])) {
@@ -153,31 +219,46 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
 
       if (
         $this->options['expose']['input_by_geocoding_widget']
-        && !empty($form[$this->field])
+        && !empty($form[$identifier])
+        && !empty($this->options['expose']['geocoder_plugin_settings'])
       ) {
-        $value_element[$this->options['expose']['identifier'] . '-lat']['#type'] = 'hidden';
-        $value_element[$this->options['expose']['identifier'] . '-lng']['#type'] = 'hidden';
 
-        $value_element['proximity_geocoding_widget'] = [
-          '#type' => 'textfield',
-          '#title' => $this->t("Location"),
-          '#description' => $this->t('Enter an address to locate.'),
-          '#attributes' => [
-            'class' => [
-              'form-autocomplete',
-              'geolocation-views-filter-geocoder',
-            ],
-            'data-geolocation-filter-identifier' => $this->options['expose']['identifier'],
-            'data-geolocation-filter-type' => 'proximity',
-          ],
+        $geocoder_configuration = $this->options['expose']['geocoder_plugin_settings']['settings'];
+        $geocoder_configuration['label'] = $this->options['expose']['label'];
+
+        /** @var \Drupal\geolocation\GeocoderInterface $geocoder_plugin */
+        $geocoder_plugin = $this->geolocationCore->getGeocoderManager()->getGeocoder(
+          $this->options['expose']['geocoder_plugin_settings']['plugin_id'],
+          $geocoder_configuration
+        );
+
+        if (empty($geocoder_plugin)) {
+          return;
+        }
+
+        $form[$identifier . '-lat']['#type'] = 'hidden';
+        $form[$identifier . '-lng']['#type'] = 'hidden';
+
+        $geocoder_plugin->formAttachGeocoder($form, $identifier);
+
+        $form = array_merge_recursive($form, [
           '#attached' => [
             'library' => [
               'geolocation/geolocation.views.filter.geocoder',
             ],
+            'drupalSettings' => [
+              'geolocation' => [
+                'geocoder' => [
+                  'viewsFilterGeocoder' => [
+                    $identifier => [
+                      'type' => 'proximity',
+                    ],
+                  ],
+                ],
+              ],
+            ],
           ],
-        ];
-
-        $this->geolocationCore->attachGeocoder($value_element['proximity_geocoding_widget']);
+        ]);
       }
     }
   }
@@ -193,14 +274,37 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
 
     if ($this->options['proximity_source'] == 'exposed') {
       if (
-        $input[$this->options['expose']['identifier'] . '-lat'] == ''
-        || $input[$this->options['expose']['identifier'] . '-lng'] == ''
+        $this->options['expose']['input_by_geocoding_widget']
+        && !empty($this->options['expose']['geocoder_plugin_settings']['plugin_id'])
       ) {
-        return FALSE;
-      }
-      else {
-        $this->value['lat'] = $input[$this->options['expose']['identifier'] . '-lat'];
-        $this->value['lng'] = $input[$this->options['expose']['identifier'] . '-lng'];
+        $geocoder_configuration = $this->options['expose']['geocoder_plugin_settings']['settings'];
+        /** @var \Drupal\geolocation\GeocoderInterface $geocoder_plugin */
+        $geocoder_plugin = $this->geolocationCore->getGeocoderManager()->getGeocoder(
+          $this->options['expose']['geocoder_plugin_settings']['plugin_id'],
+          $geocoder_configuration
+        );
+
+        if (!empty($geocoder_plugin)) {
+          $location_data = $geocoder_plugin->formProcessInput($input, $this->options['expose']['identifier']);
+
+          // No location found at all.
+          if (!$location_data) {
+            $this->value = [];
+            return FALSE;
+          }
+          else {
+            // Location geocoded server-side. Add to input for later processing.
+            if (!empty($location_data['location'])) {
+              $this->value[$this->options['expose']['identifier'] . '-lat'] = $location_data['location']['lat'];
+              $this->value[$this->options['expose']['identifier'] . '-lng'] = $location_data['location']['lng'];
+            }
+            // Location geocoded client-side. Assign to handler value.
+            else {
+              $this->value[$this->options['expose']['identifier'] . '-lat'] = $input[$this->options['expose']['identifier'] . '-lat'];
+              $this->value[$this->options['expose']['identifier'] . '-lng'] = $input[$this->options['expose']['identifier'] . '-lng'];
+            }
+          }
+        }
       }
     }
 
@@ -341,18 +445,18 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
       $entity_id_arguments[$delta] = $argument->adminLabel();
     }
 
-    $entity_type_label = \Drupal::entityTypeManager()
+    $entity_type_label = (string) \Drupal::entityTypeManager()
       ->getDefinition($this->getEntityType())
       ->getLabel();
     if (!empty($entity_id_arguments)) {
       $form['entity_id_argument'] = [
         '#type' => 'select',
-        '#title' => $this->t('Select a contextual filter returning the !entity_type ID to base proximity on.', ['!entity_type' => $entity_type_label]),
+        '#title' => $this->t('Select a contextual filter returning the @entity_type ID to base proximity on.', ['@entity_type' => $entity_type_label]),
         '#description' => $this->t(
-          'The value of the !field_name field of this !entity_type will be used as center for distance values.',
+          'The value of the @field_name field of this @entity_type will be used as center for distance values.',
           [
-            '!entity_type' => $entity_type_label,
-            '!field_name' => $this->field,
+            '@entity_type' => $entity_type_label,
+            '@field_name' => $this->field,
           ]
         ),
         '#options' => $entity_id_arguments,
@@ -587,8 +691,8 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
       case 'client_location':
       case 'exposed':
         $proximity_center = [
-          'latitude' => $this->value['lat'],
-          'longitude' => $this->value['lng'],
+          'latitude' => $this->value[$this->options['expose']['identifier'] . '-lat'],
+          'longitude' => $this->value[$this->options['expose']['identifier'] . '-lng'],
         ];
         break;
 

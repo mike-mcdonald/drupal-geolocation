@@ -199,16 +199,14 @@
           }
         }
 
-        Drupal.geolocation.geocoder.addResultCallback(function (address, modifiedMap) {
-          if (map.id === modifiedMap.id) {
-            Drupal.geolocation.geocoderWidget.setHiddenInputFields(address.geometry.location, map);
-          }
-        });
+        Drupal.geolocation.geocoder.addResultCallback(function (address) {
+          Drupal.geolocation.geocoderWidget.setHiddenInputFields(address.geometry.location, map);
+        }, widget_id);
 
         if (typeof drupalSettings.geolocation.widgetSettings[widget_id].addressFieldTarget !== 'undefined') {
           var targetField = drupalSettings.geolocation.widgetSettings.addressFieldTarget;
 
-          Drupal.geolocation.geocoder.addResultCallback(function (address, modifiedMap) {
+          Drupal.geolocation.geocoder.addResultCallback(function (address) {
             var addressField = $('.field--type-address.field--widget-address-default.field--name-' + targetField.replace(/_/g, '-'), context);
 
             var addressLine1 = '';
@@ -254,10 +252,7 @@
               }
             });
 
-            if (addressField.length === 0) {
-              // TODO: Widget is hidden. Store values now in form and save them in Drupal later.
-            }
-            else {
+            if (addressField.length > 0) {
               // Set the country.
               addressField.find('.country.form-select').val(countryCode).trigger('change');
 
@@ -285,7 +280,7 @@
                 }
               });
             }
-          });
+          }, widget_id);
         }
 
         google.maps.event.addDomListener($(map.controls).children('button.clear')[0], 'click', function (e) {
@@ -366,6 +361,5 @@
         .text(Drupal.t('Latitude') + ': ' + latLng.lat() + ' ' + Drupal.t('Longitude') + ': ' + latLng.lng())
         .addClass('has-location');
   };
-
 
 })(jQuery, Drupal, drupalSettings);

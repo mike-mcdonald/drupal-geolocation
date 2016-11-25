@@ -4,24 +4,14 @@
  */
 
 /**
- * Callback for geocoded results in autocomplete field.
+ * Callback for results in autocomplete field.
  *
- * @callback GeolocationGeocoderAutocompleteCallback
- * @param {GoogleAddress[]} results - Retrieved geocoded results for autocomplete use.
+ * @callback geolocationGeocoderResultCallback
+ * @param {GoogleAddress} address - Google address.
  */
 
-/**
- * Callback for geocoded results in autocomplete field.
- *
- * @callback GeolocationGeocoderGeocodeCallback
- * @param {(GoogleAddress|boolean)} result - Retrieved geocoded result or false.
- */
-
-
-(function ($, Drupal, _) {
+(function ($, Drupal) {
   'use strict';
-
-  /* global google */
 
   /**
    * @namespace
@@ -29,78 +19,50 @@
   Drupal.geolocation = Drupal.geolocation || {};
   Drupal.geolocation.geocoder = Drupal.geolocation.geocoder || {};
 
-  /**
-   * Generic autocomplete support with geocoded results.
-   *
-   * @param {String} location - Single string address to retrieve results for
-   * @param {GeolocationGeocoderAutocompleteCallback} callback - callback to execute when done
-   */
-  Drupal.geolocation.geocoder.autocomplete = function (location, callback) {
-    if (typeof drupalSettings.geolocation.default_geocoder === 'undefined') {
-      // Fallback
-      drupalSettings.geolocation.default_geocoder = 'googleGeocodingAPI';
-    }
-
-    if (typeof Drupal.geolocation.geocoder[drupalSettings.geolocation.default_geocoder].autocomplete !== 'undefined') {
-      Drupal.geolocation.geocoder[drupalSettings.geolocation.default_geocoder].autocomplete(location, callback);
-    }
-  };
-
-  /**
-   * Generic autocomplete support with geocoded results.
-   *
-   * @param {String} location - Single string address to retrieve results for
-   * @param {GeolocationGeocoderGeocodeCallback} callback - execute when done.
-   */
-  Drupal.geolocation.geocoder.geocode = function (location, callback) {
-    if (typeof drupalSettings.geolocation.default_geocoder === 'undefined') {
-      // Fallback
-      drupalSettings.geolocation.default_geocoder = 'googleGeocodingAPI';
-    }
-
-    if (typeof Drupal.geolocation.geocoder[drupalSettings.geolocation.default_geocoder].geocode !== 'undefined') {
-      Drupal.geolocation.geocoder[drupalSettings.geolocation.default_geocoder].geocode(location, callback);
-    }
-  };
+  drupalSettings.geolocation.geocoder = drupalSettings.geolocation.geocoder || {};
 
   /**
    * Provides the callback that is called when geocoded results are found loads.
    *
-   * @param {object} result - first returned address
-   * @param {Object} map - The settings object that contains all of the necessary metadata for this map.
+   * @param {GoogleAddress} result - first returned address
+   * @param {string} elementId - Source ID.
    */
-  Drupal.geolocation.geocoder.resultCallback = function (result, map) {
+  Drupal.geolocation.geocoder.resultCallback = function (result, elementId) {
     // Ensure callbacks array;
     Drupal.geolocation.geocoder.resultCallbacks = Drupal.geolocation.geocoder.resultCallbacks || [];
-    _.invoke(Drupal.geolocation.geocoder.resultCallbacks, 'callback', result, map);
+    $.each(Drupal.geolocation.geocoder.resultCallbacks, function (index, callbackContainer) {
+      if (callbackContainer.elementId === elementId) {
+        callbackContainer.callback(result);
+      }
+    });
   };
 
   /**
    * Adds a callback that will be called when results are found.
    *
-   * @param {geolocationCallback} callback - The callback
-   * @param {string} [id] - Identify the callback
+   * @param {geolocationGeocoderResultCallback} callback - The callback
+   * @param {string} elementId - Identify source of result by its element ID.
    */
-  Drupal.geolocation.geocoder.addResultCallback = function (callback, id) {
-    if (typeof id === 'undefined') {
-      id = 'none';
+  Drupal.geolocation.geocoder.addResultCallback = function (callback, elementId) {
+    if (typeof elementId === 'undefined') {
+      return;
     }
     Drupal.geolocation.geocoder.resultCallbacks = Drupal.geolocation.geocoder.resultCallbacks || [];
-    Drupal.geolocation.geocoder.resultCallbacks.push({callback: callback, id: id});
+    Drupal.geolocation.geocoder.resultCallbacks.push({callback: callback, elementId: elementId});
   };
 
   /**
    * Remove a callback that will be called when results are found.
    *
-   * @param {string} id - Identify the callback
+   * @param {string} elementId - Identify the source
    */
-  Drupal.geolocation.geocoder.removeResultCallback = function (id) {
+  Drupal.geolocation.geocoder.removeResultCallback = function (elementId) {
     Drupal.geolocation.geocoder.resultCallbacks = Drupal.geolocation.geocoder.resultCallbacks || [];
     $.each(Drupal.geolocation.geocoder.resultCallbacks, function (index, callback) {
-      if (callback.id !== 'none' && callback.id === id) {
+      if (callback.elementId === elementId) {
         Drupal.geolocation.geocoder.resultCallbacks.splice(index, 1);
       }
     });
   };
 
-})(jQuery, Drupal, _);
+})(jQuery, Drupal);

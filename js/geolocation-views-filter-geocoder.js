@@ -3,6 +3,10 @@
  *   Javascript for the Google geocoder function, specifically the views filter.
  */
 
+/**
+ * @param {String} drupalSettings.geolocation.geocoder.viewsFilterGeocoder
+ */
+
 (function ($, Drupal) {
   'use strict';
 
@@ -22,70 +26,59 @@
    */
   Drupal.behaviors.geolocationViewsFilterGeocoder = {
     attach: function (context) {
+      $.each(drupalSettings.geolocation.geocoder.viewsFilterGeocoder, function (elementId, settings) {
 
-      $('input.geolocation-views-filter-geocoder', context).each(function (index, input) {
-        input = $(input);
-        input.autocomplete({
-          autoFocus: true,
-          source: function (request, response) {
-            Drupal.geolocation.geocoder.autocomplete(request.term, response);
-          },
-
-          /**
-           * Option form autocomplete selected.
-           *
-           * @param {Object} event - See jquery doc
-           * @param {Object} ui - See jquery doc
-           * @param {Object} ui.item - See jquery doc
-           * @param {GoogleAddress} ui.item.address - Google address compatible
-           */
-          select: function (event, ui) {
-            setGeolocationFilterValues(ui.item.address.geometry, input, context);
+        /**
+         * @param {GoogleAddress} address - Google address object.
+         */
+        Drupal.geolocation.geocoder.addResultCallback(function (address) {
+          if (typeof address.geometry.location === 'undefined') {
+            return false;
           }
-        })
-        .change(function () {
-          Drupal.geolocation.geocoder.geocode(input.val(), function (result) {
-            if (result) {
-              setGeolocationFilterValues(result.geometry, input, context);
-            }
-          });
-        })
-        .submit(function (e) {
-          Drupal.geolocation.geocoder.geocode(input.val(), function (result) {
-            if (result) {
-              setGeolocationFilterValues(result.geometry, input, context);
-            }
-          });
-        });
+
+          if (typeof address.geometry.viewport === 'undefined') {
+            address.geometry.viewport = {
+              getNorthEast: function () {
+                return {
+                  lat: function () {
+                    return address.geometry.location.lat();
+                  },
+                  lng: function () {
+                    return address.geometry.location.lng();
+                  }
+                };
+              },
+              getSouthWest: function () {
+                return {
+                  lat: function () {
+                    return address.geometry.location.lat();
+                  },
+                  lng: function () {
+                    return address.geometry.location.lng();
+                  }
+                };
+              }
+            };
+          }
+
+          switch (settings.type) {
+            case 'boundary':
+              $(context).find("input[name='" + elementId + "[lat_north_east]']").val(address.geometry.viewport.getNorthEast().lat());
+              $(context).find("input[name='" + elementId + "[lng_north_east]']").val(address.geometry.viewport.getNorthEast().lng());
+              $(context).find("input[name='" + elementId + "[lat_south_west]']").val(address.geometry.viewport.getSouthWest().lat());
+              $(context).find("input[name='" + elementId + "[lng_south_west]']").val(address.geometry.viewport.getSouthWest().lng());
+              break;
+
+            case 'proximity':
+              $(context).find("input[name='" + elementId + "-lat']").val(address.geometry.location.lat());
+              $(context).find("input[name='" + elementId + "-lng']").val(address.geometry.location.lng());
+              break;
+          }
+        }, elementId);
+
+        delete drupalSettings.geolocation.geocoder.viewsFilterGeocoder[elementId];
       });
     }
   };
-
-  /**
-   * Depending on filter type, set values from google geometry.
-   *
-   * @param {GoogleGeometry} geometry - retrieved geocoded geometry
-   * @param {jQuery} $input - input selector to fill
-   * @param {HTMLElement} context - context to work on
-   */
-  function setGeolocationFilterValues(geometry, $input, context) {
-    var identifier = $input.data('geolocation-filter-identifier');
-    switch ($input.data('geolocation-filter-type')) {
-      case 'boundary':
-
-        $(context).find("input[name='" + identifier + "[lat_north_east]']").val(geometry.viewport.getNorthEast().lat);
-        $(context).find("input[name='" + identifier + "[lng_north_east]']").val(geometry.viewport.getNorthEast().lng);
-        $(context).find("input[name='" + identifier + "[lat_south_west]']").val(geometry.viewport.getSouthWest().lat);
-        $(context).find("input[name='" + identifier + "[lng_south_west]']").val(geometry.viewport.getSouthWest().lng);
-        $input.toggleClass('geolocation-filters-set');
-        break;
-
-      case 'proximity':
-        $(context).find("input[name='" + identifier + "-lat']").val(geometry.location.lat);
-        $(context).find("input[name='" + identifier + "-lng']").val(geometry.location.lng);
-        $input.toggleClass('geolocation-filters-set');
-        break;
-    }
-  }
 
 })(jQuery, Drupal);

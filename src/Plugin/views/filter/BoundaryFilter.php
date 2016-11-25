@@ -3,9 +3,7 @@
 namespace Drupal\geolocation\Plugin\views\filter;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\filter\FilterPluginBase;
-use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\query\Sql;
 use Drupal\geolocation\GeolocationCore;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -81,12 +79,12 @@ class BoundaryFilter extends FilterPluginBase implements ContainerFactoryPluginI
     $options = parent::defineOptions();
 
     $options['expose']['contains']['input_by_geocoding_widget'] = ['default' => FALSE];
-
-    $options['value']['contains'] = [
-      'lat_north_east' => ['default' => ''],
-      'lng_north_east' => ['default' => ''],
-      'lat_south_west' => ['default' => ''],
-      'lng_south_west' => ['default' => ''],
+    $options['expose']['contains']['input_by_geocoding_widget'] = ['default' => FALSE];
+    $options['expose']['contains']['geocoder_plugin_settings'] = [
+      'default' => [
+        'plugin_id' => '',
+        'settings' => [],
+      ],
     ];
 
     return $options;
@@ -95,21 +93,71 @@ class BoundaryFilter extends FilterPluginBase implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
-  public function defaultExposeOptions() {
-    parent::defaultExposeOptions();
-
-    $this->options['expose']['input_by_geocoding_widget'] = FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function buildExposeForm(&$form, FormStateInterface $form_state) {
-    $form['expose']['input_by_geocoding_widget'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Use Google Geocoding Widget instead of boundary value form'),
-      '#default_value' => $this->options['expose']['input_by_geocoding_widget'],
-    ];
+    $geocoder_definitions = $this->geolocationCore->getGeocoderManager()->getBoundaryCapableGeocoders();
+
+    if ($geocoder_definitions) {
+      $form['expose']['input_by_geocoding_widget'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Use geocoding widget to retrieve boundary values'),
+        '#default_value' => $this->options['expose']['input_by_geocoding_widget'],
+      ];
+
+      $geocoder_options = [];
+      foreach ($geocoder_definitions as $id => $definition) {
+        $geocoder_options[$id] = $definition['name'];
+      }
+
+      $form['expose']['geocoder_plugin_settings'] = [
+        '#type' => 'container',
+        '#states' => [
+          'visible' => [
+            'input[name="options[expose][input_by_geocoding_widget]"]' => ['checked' => TRUE],
+          ],
+        ],
+      ];
+
+      $geocoder_container = &$form['expose']['geocoder_plugin_settings'];
+
+      $geocoder_container['plugin_id'] = [
+        '#type' => 'select',
+        '#options' => $geocoder_options,
+        '#title' => $this->t('Geocoder plugin'),
+        '#default_value' => $this->options['expose']['geocoder_plugin_settings']['plugin_id'],
+        '#ajax' => [
+          'callback' => [get_class($this->geolocationCore->getGeocoderManager()), 'addGeocoderSettingsFormAjax'],
+          'wrapper' => 'geocoder-plugin-settings',
+          'effect' => 'fade',
+        ],
+      ];
+
+      if (!empty($this->options['expose']['geocoder_plugin_settings']['plugin_id'])) {
+        $geocoder_plugin = $this->geolocationCore->getGeocoderManager()->getGeocoder(
+          $this->options['expose']['geocoder_plugin_settings']['plugin_id'],
+          $this->options['expose']['geocoder_plugin_settings']['settings']
+        );
+        if ($geocoder_plugin) {
+          $geocoder_settings_form = $geocoder_plugin->getOptionsForm();
+          if ($geocoder_settings_form) {
+            $geocoder_container['settings'] = $geocoder_settings_form;
+          }
+        }
+      }
+
+      if (empty($geocoder_container['settings'])) {
+        $geocoder_container['settings'] = [
+          '#type' => 'html_tag',
+          '#tag' => 'span',
+          '#value' => $this->t("No settings available."),
+        ];
+      }
+
+      $geocoder_container['settings'] = array_replace_recursive($geocoder_container['settings'], [
+        '#flatten' => TRUE,
+        '#prefix' => '<div id="geocoder-plugin-settings">',
+        '#suffix' => '</div>',
+      ]);
+    }
 
     parent::buildExposeForm($form, $form_state);
   }
@@ -119,37 +167,91 @@ class BoundaryFilter extends FilterPluginBase implements ContainerFactoryPluginI
    */
   public function buildExposedForm(&$form, FormStateInterface $form_state) {
     parent::buildExposedForm($form, $form_state);
+    $identifier = $this->options['expose']['identifier'];
 
     if (
       $this->options['expose']['input_by_geocoding_widget']
-      && !empty($form[$this->field])
+      && !empty($form[$identifier])
+      && !empty($this->options['expose']['geocoder_plugin_settings'])
     ) {
-      $form[$this->field]['lat_north_east']['#type'] = 'hidden';
-      $form[$this->field]['lng_north_east']['#type'] = 'hidden';
-      $form[$this->field]['lat_south_west']['#type'] = 'hidden';
-      $form[$this->field]['lng_south_west']['#type'] = 'hidden';
 
-      $form[$this->field]['boundary_geocoding_widget'] = [
-        '#type' => 'textfield',
-        '#title' => $this->options['expose']['label'],
-        '#description' => $this->t('Enter an address to filter results.'),
-        '#attributes' => [
-          'class' => [
-            'form-autocomplete',
-            'geolocation-views-filter-geocoder',
-          ],
-          'data-geolocation-filter-identifier' => $this->options['expose']['identifier'],
-          'data-geolocation-filter-type' => 'boundary',
-        ],
+      $geocoder_configuration = $this->options['expose']['geocoder_plugin_settings']['settings'];
+      $geocoder_configuration['label'] = $this->options['expose']['label'];
+
+      /** @var \Drupal\geolocation\GeocoderInterface $geocoder_plugin */
+      $geocoder_plugin = $this->geolocationCore->getGeocoderManager()->getGeocoder(
+        $this->options['expose']['geocoder_plugin_settings']['plugin_id'],
+        $geocoder_configuration
+      );
+
+      if (empty($geocoder_plugin)) {
+        return;
+      }
+
+      $form[$identifier]['lat_north_east']['#type'] = 'hidden';
+      $form[$identifier]['lng_north_east']['#type'] = 'hidden';
+      $form[$identifier]['lat_south_west']['#type'] = 'hidden';
+      $form[$identifier]['lng_south_west']['#type'] = 'hidden';
+
+      $geocoder_plugin->formAttachGeocoder($form[$this->options['expose']['identifier']], $identifier);
+
+      $form = array_merge_recursive($form, [
         '#attached' => [
           'library' => [
             'geolocation/geolocation.views.filter.geocoder',
           ],
+          'drupalSettings' => [
+            'geolocation' => [
+              'geocoder' => [
+                'viewsFilterGeocoder' => [
+                  $identifier => [
+                    'type' => 'boundary',
+                  ],
+                ],
+              ],
+            ],
+          ],
         ],
-      ];
-
-      $this->geolocationCore->attachGeocoder($form[$this->field]['boundary_geocoding_widget']);
+      ]);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function acceptExposedInput($input) {
+    if (
+      $this->options['expose']['input_by_geocoding_widget']
+      && !empty($this->options['expose']['geocoder_plugin_settings']['plugin_id'])
+    ) {
+      $geocoder_configuration = $this->options['expose']['geocoder_plugin_settings']['settings'];
+      /** @var \Drupal\geolocation\GeocoderInterface $geocoder_plugin */
+      $geocoder_plugin = $this->geolocationCore->getGeocoderManager()->getGeocoder(
+        $this->options['expose']['geocoder_plugin_settings']['plugin_id'],
+        $geocoder_configuration
+      );
+
+      if (!empty($geocoder_plugin)) {
+        $location_data = $geocoder_plugin->formProcessInput($input[$this->options['expose']['identifier']], $this->options['expose']['identifier']);
+
+        // No location found at all.
+        if (!$location_data) {
+          $this->value = [];
+          return FALSE;
+        }
+        else {
+          // Location geocoded server-side. Add to input for later processing.
+          if (!empty($location_data['boundary'])) {
+            $this->value = array_replace($input[$this->options['expose']['identifier']], $location_data['boundary']);
+          }
+          // Location geocoded client-side. Assign to handler value.
+          else {
+            $this->value = $input[$this->options['expose']['identifier']];
+          }
+        }
+      }
+    }
+    return parent::acceptExposedInput($input);
   }
 
   /**
@@ -167,25 +269,21 @@ class BoundaryFilter extends FilterPluginBase implements ContainerFactoryPluginI
       'lat_north_east' => [
         '#type' => 'textfield',
         '#title' => $this->t('North East Boundary - Latitude'),
-        '#default_value' => $this->value['lat_north_east'],
         '#weight' => 10,
       ],
       'lng_north_east' => [
         '#type' => 'textfield',
         '#title' => $this->t('North East Boundary - Longitude'),
-        '#default_value' => $this->value['lng_north_east'],
         '#weight' => 20,
       ],
       'lat_south_west' => [
         '#type' => 'textfield',
         '#title' => $this->t('South West Boundary - Latitude'),
-        '#default_value' => $this->value['lat_south_west'],
         '#weight' => 30,
       ],
       'lng_south_west' => [
         '#type' => 'textfield',
         '#title' => $this->t('South West Boundary - Longitude'),
-        '#default_value' => $this->value['lng_south_west'],
         '#weight' => 40,
       ],
     ];

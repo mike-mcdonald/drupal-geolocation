@@ -55,9 +55,6 @@ geolocation.settings:
     google_map_api_key:
       type: string
       label: 'Google Maps API Key'
-    default_geocoder:
-      type: string
-      label: 'Default geocoder plugin ID'
     google_map_custom_url_parameters:
       type: mapping
       label: 'Additional Google Maps API parameters'

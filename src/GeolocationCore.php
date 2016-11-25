@@ -46,7 +46,6 @@ class GeolocationCore implements ContainerInjectionInterface {
    *
    * @var \Drupal\geolocation\GeocoderManager
    */
-
   protected $geocoderManager;
 
   /**
@@ -78,6 +77,16 @@ class GeolocationCore implements ContainerInjectionInterface {
       $container->get('config.factory'),
       $container->get('plugin.manager.geolocation.geocoder')
     );
+  }
+
+  /**
+   * Return current geocoder manager.
+   *
+   * @return \Drupal\geolocation\GeocoderManager
+   *   Geocoder manager.
+   */
+  public function getGeocoderManager() {
+    return $this->geocoderManager;
   }
 
   /**
@@ -384,33 +393,6 @@ class GeolocationCore implements ContainerInjectionInterface {
     }
 
     return $value;
-  }
-
-  /**
-   * Attach default geocder library & setting.
-   *
-   * @param array $render_array
-   *   Drupal render array to extend.
-   */
-  public function attachGeocoder(array &$render_array) {
-    $geocoder_plugin = $this->geocoderManager->createInstance($this->config->get('default_geocoder'));
-
-    $render_array = array_merge_recursive($render_array, [
-      '#attached' => [
-        'library' => [
-          $geocoder_plugin->getLibraryId(),
-        ],
-        'drupalSettings' => [
-          'geolocation' => [
-            'default_geocoder' => $geocoder_plugin->getObjectName(),
-          ],
-        ],
-      ],
-    ]);
-
-    if (method_exists($geocoder_plugin, 'attachGeocoder')) {
-      $geocoder_plugin->attachGeocoder($render_array);
-    }
   }
 
 }

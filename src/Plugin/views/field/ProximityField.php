@@ -248,12 +248,12 @@ class ProximityField extends NumericField implements ContainerFactoryPluginInter
     if (!empty($entity_id_arguments)) {
       $form['entity_id_argument'] = [
         '#type' => 'select',
-        '#title' => $this->t('Select a contextual filter returning the !entity_type ID to base proximity on.', ['!entity_type' => $entity_type_label]),
+        '#title' => $this->t('Select a contextual filter returning the @entity_type ID to base proximity on.', ['@entity_type' => $entity_type_label]),
         '#description' => $this->t(
-          'The value of the !field_name field of this !entity_type will be used as center for distance values.',
+          'The value of the @field_name field of this @entity_type will be used as center for distance values.',
           [
-            '!entity_type' => $entity_type_label,
-            '!field_name' => $this->field,
+            '@entity_type' => $entity_type_label,
+            '@field_name' => $this->field,
           ]
         ),
         '#options' => $entity_id_arguments,

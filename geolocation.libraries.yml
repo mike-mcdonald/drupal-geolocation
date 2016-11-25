@@ -32,8 +32,7 @@ geolocation.views.filter.geocoder:
   js:
     js/geolocation-views-filter-geocoder.js: {}
   dependencies:
-    - geolocation/geolocation.core
-    - core/jquery.ui.autocomplete
+    - geolocation/geolocation.geocoder
 
 # Google maps display formatter.
 geolocation.formatter.googlemap:

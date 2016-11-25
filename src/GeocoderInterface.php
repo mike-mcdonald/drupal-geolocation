@@ -10,19 +10,59 @@ use Drupal\Component\Plugin\PluginInspectionInterface;
 interface GeocoderInterface extends PluginInspectionInterface {
 
   /**
-   * Return the name of the JS library.
+   * Return additional options form.
    *
-   * @return string
-   *   Library.
+   * @return array
+   *   Options form.
    */
-  public function getLibraryId();
+  public function getOptionsForm();
 
   /**
-   * Return the geocoder object name.
+   * Process the form built above.
    *
-   * @return string
-   *   Function name.
+   * @param array $form_element
+   *   Options form.
+   *
+   * @return array|null
+   *   Settings to store or NULL.
    */
-  public function getObjectName();
+  public function processOptionsForm($form_element);
+
+  /**
+   * Attach geocoding logic to input element.
+   *
+   * @param array $render_array
+   *   Form containing the input element.
+   * @param string $element_name
+   *   Name of the input element.
+   *
+   * @return array|null
+   *   Updated form element or NULL.
+   */
+  public function formAttachGeocoder(array &$render_array, $element_name);
+
+  /**
+   * Process from as altered above.
+   *
+   * @param array $input
+   *   Input values.
+   * @param string $element_name
+   *   Name of the input element.
+   *
+   * @return array|bool
+   *   Location data.
+   */
+  public function formProcessInput(array &$input, $element_name);
+
+  /**
+   * Geocode an address.
+   *
+   * @param string $address
+   *   Address to geocode.
+   *
+   * @return array||null
+   *   Location or NULL.
+   */
+  public function geocode($address);
 
 }

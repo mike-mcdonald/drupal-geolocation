@@ -30,4 +30,27 @@ class Geocoder extends Plugin {
    */
   public $name;
 
+  /**
+   * The description of the geocoder.
+   *
+   * @var \Drupal\Core\Annotation\Translation
+   *
+   * @ingroup plugin_translatable
+   */
+  public $description;
+
+  /**
+   * The name of the geocoder.
+   *
+   * @var bool
+   */
+  public $locationCapable;
+
+  /**
+   * The name of the geocoder.
+   *
+   * @var bool
+   */
+  public $boundaryCapable;
+
 }
