@@ -131,10 +131,10 @@
 
       if (typeof googleMap !== 'undefined' && googleMap !== null) {
         if (map.data('centre-lat') && map.data('centre-lng')) {
-          var newCenter = {
+          var newCenter = new google.maps.LatLng({
             lat: map.data('centre-lat'),
             lng: map.data('centre-lng')
-          };
+          });
 
           if (!googleMap.getCenter().equals(newCenter)) {
             skipMapUpdate = true;
@@ -221,7 +221,7 @@
           googleMap.updateDrupalView = function (dynamic_map_settings) {
 
             // Make sure to load current form DOM element, which will change after every AJAX operation.
-            exposedForm = $('form#views-exposed-form-' + dynamic_map_settings.update_view_id.replace(/_/g, '-') + '-' + dynamic_map_settings.update_view_display_id.replace(/_/g, '-'));
+            var exposedForm = $('form#views-exposed-form-' + dynamic_map_settings.update_view_id.replace(/_/g, '-') + '-' + dynamic_map_settings.update_view_display_id.replace(/_/g, '-'));
 
             var currentBounds = googleMap.getBounds();
             var update_path = '';
