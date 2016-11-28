@@ -220,6 +220,7 @@ class BoundaryFilter extends FilterPluginBase implements ContainerFactoryPluginI
    * {@inheritdoc}
    */
   public function acceptExposedInput($input) {
+    $return_value = parent::acceptExposedInput($input);
     if (
       $this->options['expose']['input_by_geocoding_widget']
       && !empty($this->options['expose']['geocoder_plugin_settings']['plugin_id'])
@@ -251,7 +252,7 @@ class BoundaryFilter extends FilterPluginBase implements ContainerFactoryPluginI
         }
       }
     }
-    return parent::acceptExposedInput($input);
+    return $return_value;
   }
 
   /**
@@ -269,21 +270,25 @@ class BoundaryFilter extends FilterPluginBase implements ContainerFactoryPluginI
       'lat_north_east' => [
         '#type' => 'textfield',
         '#title' => $this->t('North East Boundary - Latitude'),
+        '#default_value' => !empty($this->value['lat_north_east']) ? $this->value['lat_north_east'] : '',
         '#weight' => 10,
       ],
       'lng_north_east' => [
         '#type' => 'textfield',
         '#title' => $this->t('North East Boundary - Longitude'),
+        '#default_value' => !empty($this->value['lng_north_east']) ? $this->value['lng_north_east'] : '',
         '#weight' => 20,
       ],
       'lat_south_west' => [
         '#type' => 'textfield',
         '#title' => $this->t('South West Boundary - Latitude'),
+        '#default_value' => !empty($this->value['lat_south_west']) ? $this->value['lat_south_west'] : '',
         '#weight' => 30,
       ],
       'lng_south_west' => [
         '#type' => 'textfield',
         '#title' => $this->t('South West Boundary - Longitude'),
+        '#default_value' => !empty($this->value['lng_south_west']) ? $this->value['lng_south_west'] : '',
         '#weight' => 40,
       ],
     ];
