@@ -1,55 +1,16 @@
-# Geolocation core library.
-geolocation.core:
-  version: 8.x-1.x
-  dependencies:
-    - core/drupal
-    - core/jquery
-    - core/underscore
-    - core/drupalSettings
-  js:
-    js/geolocation.js: {}
-
 # Google maps geocoder function.
 geolocation.geocoder:
   version: 8.x-1.x
   js:
     js/geolocation-geocoder.js: {}
   dependencies:
-    - geolocation/geolocation.core
     - core/jquery.ui.autocomplete
-
-# Google maps geocoder function.
-geolocation.geocoder.googlegeocodingapi:
-  version: 8.x-1.x
-  js:
-    js/geolocation-google-geocoding-api-geocoder.js: {}
-  dependencies:
-    - geolocation/geolocation.geocoder
 
 # Geolocation views filter geocoder function.
 geolocation.views.filter.geocoder:
   version: 8.x-1.x
   js:
     js/geolocation-views-filter-geocoder.js: {}
-  dependencies:
-    - geolocation/geolocation.geocoder
-
-# Google maps display formatter.
-geolocation.formatter.googlemap:
-  version: 8.x-1.x
-  js:
-    js/geolocation-formatter-googlemap.js: {}
-  dependencies:
-    - geolocation/geolocation.core
-
-# Google geocoder widget library.
-geolocation.widgets.googlegeocoder:
-  version: 1.x
-  css:
-    theme:
-      css/geolocation-widget-googlegeocoder.css: {}
-  js:
-    js/geolocation-widget-googlegeocoder.js: { scope: footer }
   dependencies:
     - geolocation/geolocation.geocoder
 
@@ -61,8 +22,54 @@ geolocation.widgets.html5:
       css/geolocation-widget-html5.css: {}
   js:
     js/geolocation-widget-html5.js: { scope: footer }
+
+#
+#
+# Google Maps API
+#
+# TODO: Seperate into module.
+#
+#
+
+# Geolocation Google maps API integration library.
+geolocation.googlemapsapi:
+  version: 8.x-1.x
   dependencies:
-    - geolocation/geolocation.core
+    - core/drupal
+    - core/jquery
+    - core/underscore
+    - core/drupalSettings
+  js:
+    js/geolocation-google-maps-api.js: {}
+
+# Google maps geocoder function.
+geolocation.geocoder.googlegeocodingapi:
+  version: 8.x-1.x
+  js:
+    js/geolocation-google-geocoding-api-geocoder.js: {}
+  dependencies:
+    - geolocation/geolocation.geocoder
+    - geolocation/geolocation.googlemapsapi
+
+# Google maps display formatter.
+geolocation.formatter.googlemap:
+  version: 8.x-1.x
+  js:
+    js/geolocation-formatter-googlemap.js: {}
+  dependencies:
+    - geolocation/geolocation.googlemapsapi
+
+# Google geocoder widget library.
+geolocation.widgets.googlegeocoder:
+  version: 1.x
+  css:
+    theme:
+      css/geolocation-widget-googlegeocoder.css: {}
+  js:
+    js/geolocation-widget-googlegeocoder.js: { scope: footer }
+  dependencies:
+    - geolocation/geolocation.geocoder
+    - geolocation/geolocation.googlemapsapi
 
 # CommonMap widget library.
 geolocation.commonmap:
@@ -77,4 +84,4 @@ geolocation.commonmap:
     - core/drupal.ajax
     - core/jquery
     - core/jquery.once
-    - geolocation/geolocation.core
+    - geolocation/geolocation.googlemapsapi

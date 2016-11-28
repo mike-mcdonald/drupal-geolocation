@@ -18,7 +18,7 @@ use Drupal\geolocation\GeolocationCore;
  *
  * @FieldWidget(
  *   id = "geolocation_googlegeocoder",
- *   label = @Translation("Geolocation Google Geocoder"),
+ *   label = @Translation("Geolocation Google Maps API - Geocoding and Map"),
  *   field_types = {
  *     "geolocation"
  *   }

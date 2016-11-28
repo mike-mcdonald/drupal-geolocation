@@ -26,6 +26,17 @@ class GooglePlacesAPI extends GeocoderBase {
    * {@inheritdoc}
    */
   public function getOptionsForm() {
+    $settings = [
+      'route' => '',
+      'locality' => '',
+      'administrativeArea' => '',
+      'postalCode' => '',
+      'country' => '',
+    ];
+    if (isset($this->configuration['component_restrictions'])) {
+      $settings = array_replace($settings, $this->configuration['component_restrictions']);
+    }
+
     return [
       'description' => [
         '#type' => 'html_tag',
@@ -37,31 +48,31 @@ class GooglePlacesAPI extends GeocoderBase {
         '#title' => t("Component Restrictions"),
         'route' => [
           '#type' => 'textfield',
-          '#default_value' => isset($this->configuration['component_restrictions']['route']) ? $this->configuration['component_restrictions']['route'] : '',
+          '#default_value' => $settings['route'],
           '#title' => t("Route"),
           '#size' => 15,
         ],
         'locality' => [
           '#type' => 'textfield',
-          '#default_value' => isset($this->configuration['component_restrictions']['locality']) ? $this->configuration['component_restrictions']['locality'] : '',
+          '#default_value' => $settings['locality'],
           '#title' => t("Locality"),
           '#size' => 15,
         ],
         'administrativeArea' => [
           '#type' => 'textfield',
-          '#default_value' => isset($this->configuration['component_restrictions']['administrative_area']) ? $this->configuration['component_restrictions']['administrativeArea'] : '',
+          '#default_value' => $settings['administrativeArea'],
           '#title' => t("Administrative Area"),
           '#size' => 15,
         ],
         'postalCode' => [
           '#type' => 'textfield',
-          '#default_value' => isset($this->configuration['component_restrictions']['postal_code']) ? $this->configuration['component_restrictions']['postalCode'] : '',
+          '#default_value' => $settings['postalCode'],
           '#title' => t("Postal code"),
           '#size' => 5,
         ],
         'country' => [
           '#type' => 'textfield',
-          '#default_value' => isset($this->configuration['component_restrictions']['country']) ? $this->configuration['component_restrictions']['country'] : '',
+          '#default_value' => $settings['country'],
           '#title' => t("Country"),
           '#size' => 5,
         ],

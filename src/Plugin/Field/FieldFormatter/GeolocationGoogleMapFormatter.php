@@ -14,7 +14,7 @@ use Drupal\geolocation\GoogleMapsDisplayTrait;
  * @FieldFormatter(
  *   id = "geolocation_map",
  *   module = "geolocation",
- *   label = @Translation("Geolocation Google Map"),
+ *   label = @Translation("Geolocation Google Maps API - Map"),
  *   field_types = {
  *     "geolocation"
  *   }

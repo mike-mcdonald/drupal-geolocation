@@ -15,7 +15,7 @@ use Drupal\image\Entity\ImageStyle;
  *
  * @ViewsStyle(
  *   id = "maps_common",
- *   title = @Translation("Geolocation - CommonMap"),
+ *   title = @Translation("Geolocation Google Maps API - CommonMap"),
  *   help = @Translation("Display geolocations on a common map."),
  *   theme = "views_view_list",
  *   display_types = {"normal"},
