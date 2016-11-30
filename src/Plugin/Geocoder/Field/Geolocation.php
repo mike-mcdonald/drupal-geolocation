@@ -18,6 +18,7 @@ use Drupal\geocoder_field\Plugin\Geocoder\Field\DefaultField;
  * )
  */
 class Geolocation extends DefaultField {
+
   /**
    * {@inheritdoc}
    */

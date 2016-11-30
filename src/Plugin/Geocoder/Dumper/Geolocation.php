@@ -14,6 +14,7 @@ use Geocoder\Model\Address;
  * )
  */
 class Geolocation extends DumperBase {
+
   /**
    * {@inheritdoc}
    */

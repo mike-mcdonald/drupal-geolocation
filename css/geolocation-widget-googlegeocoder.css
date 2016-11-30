@@ -1,4 +1,3 @@
-
 /**
  * @file
  * CSS for Google Map widget of Geolocation field.
@@ -57,7 +56,7 @@
 }
 
 .geocode-controls-wrapper button {
-  color: #FFF;
+  color: #fff;
   cursor: pointer;
   height: 32px;
   text-align: center;
@@ -121,7 +120,7 @@ button.locate::before {
 button.clear {
   margin: 0 0.5em;
   background: #736648;
-  background: linear-gradient(top,#736648,#685C41);
+  background: linear-gradient(top,#736648,#685c41);
   border-radius: 2px;
   width: 36px;
 }

@@ -113,7 +113,7 @@ class ProximityArgument extends Formula implements ContainerFactoryPluginInterfa
   /**
    * Processes the passed argument into an array of relevant geolocation data.
    *
-   * @return array|bool $values
+   * @return array|bool
    *   The calculated values.
    */
   public function getParsedReferenceLocation() {

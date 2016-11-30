@@ -43,7 +43,7 @@ class GeolocationCommonMapAjaxJavascriptTest extends JavascriptTestBase {
    * @param mixed $path
    *   Path to get.
    *
-   * @return string Return what drupal would.
+   * @return string
    *   Return what drupal would.
    *
    * @throws \Zumba\GastonJS\Exception\JavascriptError

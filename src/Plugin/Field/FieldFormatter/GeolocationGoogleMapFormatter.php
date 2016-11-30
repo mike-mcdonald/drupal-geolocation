@@ -83,7 +83,6 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
       ],
     ];
 
-
     $element['replacement_patterns'] = [
       '#type' => 'details',
       '#title' => 'Replacement patterns',
