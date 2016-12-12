@@ -3,6 +3,7 @@
 namespace Drupal\geolocation;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Defines an interface for geolocation geocoder plugins.
@@ -40,6 +41,17 @@ interface GeocoderInterface extends PluginInspectionInterface {
    *   Updated form element or NULL.
    */
   public function formAttachGeocoder(array &$render_array, $element_name);
+
+  /**
+   * Process from as altered above.
+   *
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   Input values.
+   *
+   * @return bool
+   *   True of false.
+   */
+  public function formValidateInput(FormStateInterface $form_state);
 
   /**
    * Process from as altered above.

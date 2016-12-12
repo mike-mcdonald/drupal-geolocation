@@ -219,6 +219,30 @@ class BoundaryFilter extends FilterPluginBase implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
+  public function validateExposed(&$form, FormStateInterface $form_state) {
+    parent::validateExposed($form, $form_state);
+
+    if (
+      $this->options['expose']['input_by_geocoding_widget']
+      && !empty($this->options['expose']['geocoder_plugin_settings']['plugin_id'])
+    ) {
+      $geocoder_configuration = $this->options['expose']['geocoder_plugin_settings']['settings'];
+      /** @var \Drupal\geolocation\GeocoderInterface $geocoder_plugin */
+      $geocoder_plugin = $this->geolocationCore->getGeocoderManager()
+        ->getGeocoder(
+          $this->options['expose']['geocoder_plugin_settings']['plugin_id'],
+          $geocoder_configuration
+        );
+
+      if (!empty($geocoder_plugin)) {
+        $geocoder_plugin->formvalidateInput($form_state);
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function acceptExposedInput($input) {
     $return_value = parent::acceptExposedInput($input);
     if (
@@ -238,7 +262,8 @@ class BoundaryFilter extends FilterPluginBase implements ContainerFactoryPluginI
         // No location found at all.
         if (!$location_data) {
           $this->value = [];
-          return FALSE;
+          // Accept it anyway, to ensure empty result.
+          return TRUE;
         }
         else {
           // Location geocoded server-side. Add to input for later processing.

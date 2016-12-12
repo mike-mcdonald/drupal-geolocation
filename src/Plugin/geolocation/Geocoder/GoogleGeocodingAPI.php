@@ -6,6 +6,7 @@ use GuzzleHttp\Exception\RequestException;
 use Drupal\Component\Serialization\Json;
 use Drupal\geolocation\GeocoderBase;
 use Drupal\geolocation\GoogleMapsDisplayTrait;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Provides the Google Geocoding API.
@@ -140,6 +141,25 @@ class GoogleGeocodingAPI extends GeocoderBase {
         ]);
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function formValidateInput(FormStateInterface $form_state) {
+    $input = $form_state->getUserInput();
+    if (
+      !empty($input['geolocation_geocoder_google_geocoding_api'])
+      && empty($input['geolocation_geocoder_google_geocoding_api_state'])
+    ) {
+      $location_data = $this->geocode($input['geolocation_geocoder_google_geocoding_api']);
+
+      if (empty($location_data)) {
+        $form_state->setErrorByName('geolocation_geocoder_google_geocoding_api', t('Failed to geocode %input.', ['%input' => $input['geolocation_geocoder_google_geocoding_api']]));
+        return FALSE;
+      }
+    }
+    return TRUE;
   }
 
   /**
