@@ -37,8 +37,8 @@ class GeolocationViewsStyleCommonMapAjaxStaticTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
-    parent::setUp();
+  protected function setUp($import_test_views = TRUE) {
+    parent::setUp($import_test_views);
 
     $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
 

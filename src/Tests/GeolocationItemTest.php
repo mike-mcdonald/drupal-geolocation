@@ -82,7 +82,7 @@ class GeolocationItemTest extends FieldKernelTestBase {
     // Verify changing the field value.
     $new_lat = rand(-90, 90) - rand(0, 999999) / 1000000;
     $new_lng = rand(-180, 180) - rand(0, 999999) / 1000000;
-    $new_data = array('an_array');
+    $new_data = ['an_array'];
     $entity->get('field_test')->lat = $new_lat;
     $entity->get('field_test')->lng = $new_lng;
     $entity->get('field_test')->data = $new_data;

@@ -37,32 +37,32 @@ class GeolocationViewsStyleCommonMapTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
-    parent::setUp();
+  protected function setUp($import_test_views = TRUE) {
+    parent::setUp($import_test_views);
 
     $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
 
     // Add the geolocation field to the article content type.
     FieldStorageConfig::create([
-      'field_name' => 'field_geolocation_test',
+      'field_name' => 'field_geolocation',
       'entity_type' => 'node',
       'type' => 'geolocation',
     ])->save();
     FieldConfig::create([
-      'field_name' => 'field_geolocation_test',
+      'field_name' => 'field_geolocation',
       'label' => 'Geolocation',
       'entity_type' => 'node',
       'bundle' => 'article',
     ])->save();
 
     EntityFormDisplay::load('node.article.default')
-      ->setComponent('field_geolocation_test', [
+      ->setComponent('field_geolocation', [
         'type' => 'geolocation_latlng',
       ])
       ->save();
 
     EntityViewDisplay::load('node.article.default')
-      ->setComponent('field_geolocation_test', [
+      ->setComponent('field_geolocation', [
         'type' => 'geolocation_latlng',
         'weight' => 1,
       ])
@@ -122,7 +122,7 @@ class GeolocationViewsStyleCommonMapTest extends ViewTestBase {
       'title' => 'foo bar baz',
       'body' => 'test test',
       'type' => 'article',
-      'field_geolocation_test' => [
+      'field_geolocation' => [
         'lat' => 52,
         'lng' => 47,
       ],
@@ -132,7 +132,7 @@ class GeolocationViewsStyleCommonMapTest extends ViewTestBase {
       'title' => 'foo test',
       'body' => 'bar test',
       'type' => 'article',
-      'field_geolocation_test' => [
+      'field_geolocation' => [
         'lat' => 53,
         'lng' => 48,
       ],
@@ -142,7 +142,7 @@ class GeolocationViewsStyleCommonMapTest extends ViewTestBase {
       'title' => 'bar',
       'body' => 'test foobar',
       'type' => 'article',
-      'field_geolocation_test' => [
+      'field_geolocation' => [
         'lat' => 54,
         'lng' => 49,
       ],

@@ -94,10 +94,10 @@ display:
           separator: ', '
           field_api_classes: false
           alter: {  }
-        field_geolocation_boundary_test:
-          id: field_geolocation_boundary_test
-          table: node__field_geolocation_boundary_test
-          field: field_geolocation_boundary_test
+        field_geolocation:
+          id: field_geolocation
+          table: node__field_geolocation
+          field: field_geolocation
           relationship: none
           group_type: group
           admin_label: ''
@@ -149,10 +149,10 @@ display:
           entity_type: node
           entity_field: type
           plugin_id: bundle
-        field_geolocation_boundary_test_boundary:
-          id: field_geolocation_boundary_test_boundary
-          table: node__field_geolocation_boundary_test
-          field: field_geolocation_boundary_test_boundary
+        field_geolocation_boundary:
+          id: field_geolocation_boundary
+          table: node__field_geolocation
+          field: field_geolocation_boundary
           operator: '='
           value:
             lat_north_east: '80'

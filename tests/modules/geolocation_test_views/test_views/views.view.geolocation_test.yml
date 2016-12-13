@@ -49,7 +49,7 @@ display:
       style:
         type: maps_common
         options:
-          geolocation_field: field_geolocation_test
+          geolocation_field: field_geolocation
           title_field: title
           centre:
              first_row:
@@ -91,10 +91,10 @@ display:
           plugin_id: field
           entity_type: node
           entity_field: title
-        field_geolocation_test:
-          id: field_geolocation_test
-          table: node__field_geolocation_test
-          field: field_geolocation_test
+        field_geolocation:
+          id: field_geolocation
+          table: node__field_geolocation
+          field: field_geolocation
           relationship: none
           group_type: group
           admin_label: ''

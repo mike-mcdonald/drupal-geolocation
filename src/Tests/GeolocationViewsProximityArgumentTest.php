@@ -39,7 +39,7 @@ class GeolocationViewsProximityArgumentTest extends ViewTestBase {
    *
    * @var string
    */
-  protected $fieldId = 'field_geolocation_proximity_test';
+  protected $fieldId = 'field_geolocation';
 
   /**
    * ID of the geolocation field in this test.
@@ -51,8 +51,8 @@ class GeolocationViewsProximityArgumentTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
-    parent::setUp();
+  protected function setUp($import_test_views = TRUE) {
+    parent::setUp($import_test_views);
 
     $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
 

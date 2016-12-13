@@ -71,14 +71,20 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager */
+    $entity_field_manager = $container->get('entity_field.manager');
+
+    /** @var \Drupal\geolocation\GeolocationCore $geocoder_core */
+    $geocoder_core = $container->get('geolocation.core');
+
     return new static(
       $plugin_id,
       $plugin_definition,
       $configuration['field_definition'],
       $configuration['settings'],
       $configuration['third_party_settings'],
-      $container->get('entity_field.manager'),
-      $container->get('geolocation.core')
+      $entity_field_manager,
+      $geocoder_core
     );
   }
 
@@ -254,19 +260,44 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
     $lat = $items[$delta]->lat;
     $lng = $items[$delta]->lng;
 
-    // Get the default values for existing field.
-    $lat_default_value = isset($lat) ? $lat : $settings['default_latitude'];
-    $lng_default_value = isset($lng) ? $lng : $settings['default_longitude'];
+    $default_field_values = [
+      'lat' => '',
+      'lng' => '',
+    ];
+
+    $default_map_values = [
+      'lat' => $settings['default_latitude'],
+      'lng' => $settings['default_longitude'],
+    ];
+
+    if (!empty($this->fieldDefinition->getDefaultValueLiteral()[0])) {
+      $default_field_values = [
+        'lat' => $this->fieldDefinition->getDefaultValueLiteral()[0]['lat'],
+        'lng' => $this->fieldDefinition->getDefaultValueLiteral()[0]['lng'],
+      ];
+    }
+
+    if (!empty($lat) && !empty($lng)) {
+      $default_field_values = [
+        'lat' => $lat,
+        'lng' => $lng,
+      ];
+
+      $default_map_values = [
+        'lat' => $lat,
+        'lng' => $lng,
+      ];
+    }
 
     // Hidden lat,lng input fields.
     $element['lat'] = [
       '#type' => 'hidden',
-      '#default_value' => $lat_default_value,
+      '#default_value' => $default_field_values['lat'],
       '#attributes' => ['class' => ['geolocation-hidden-lat']],
     ];
     $element['lng'] = [
       '#type' => 'hidden',
-      '#default_value' => $lng_default_value,
+      '#default_value' => $default_field_values['lng'],
       '#attributes' => ['class' => ['geolocation-hidden-lng']],
     ];
 
@@ -292,8 +323,8 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
             'widgetMaps' => [
               $canvas_id => [
                 'id' => $canvas_id,
-                'lat' => (float) $lat_default_value,
-                'lng' => (float) $lng_default_value,
+                'lat' => (float) $default_map_values['lat'],
+                'lng' => (float) $default_map_values['lng'],
                 'settings' => $settings,
               ],
             ],

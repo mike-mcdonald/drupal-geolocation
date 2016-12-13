@@ -3,20 +3,21 @@
 namespace Drupal\Tests\geolocation\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\JavascriptTestBase;
-use Drupal\views\Tests\ViewTestData;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 
 /**
- * Tests the JavaScript functionality.
+ * Tests the Google Geocoder Widget functionality.
  *
  * @group geolocation
  */
-class GeolocationJavascriptTest extends JavascriptTestBase {
+class GeolocationGoogleGeocoderWidgetTest extends JavascriptTestBase {
 
   use GeolocationGoogleTestTrait;
+
+  public $adminUser;
 
   /**
    * {@inheritdoc}
@@ -24,24 +25,19 @@ class GeolocationJavascriptTest extends JavascriptTestBase {
   public static $modules = [
     'node',
     'field',
-    'views',
-    'views_test_config',
     'geolocation',
-    'geolocation_test_views',
   ];
-
-  /**
-   * Views used by this test.
-   *
-   * @var array
-   */
-  public static $testViews = ['geolocation_test'];
 
   /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
+
+    $this->adminUser = $this->drupalCreateUser([
+      'bypass node access',
+      'administer nodes',
+    ]);
 
     $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
 
@@ -76,10 +72,6 @@ class GeolocationJavascriptTest extends JavascriptTestBase {
         'weight' => 1,
       ])
       ->save();
-
-    $this->container->get('views.views_data')->clear();
-
-    ViewTestData::createTestViews(get_class($this), ['geolocation_test_views']);
 
     $entity_test_storage = \Drupal::entityTypeManager()->getStorage('node');
     $entity_test_storage->create([
@@ -131,72 +123,46 @@ class GeolocationJavascriptTest extends JavascriptTestBase {
   }
 
   /**
-   * Tests the CommonMap style.
+   * Tests the GoogleMap widget.
    */
-  public function testCommonMap() {
-    $this->drupalGetFilterGoogleKey('geolocation-test');
+  public function testGeocoderWidgetMapPresent() {
+    $this->drupalLogin($this->adminUser);
 
+    $this->drupalGetFilterGoogleKey('node/3/edit');
     $this->assertSession()->statusCodeEquals(200);
 
-    $this->assertSession()->elementExists('css', '.geolocation-common-map-container');
-    $this->assertSession()->elementExists('css', '.geolocation-common-map-locations');
+    $this->assertSession()->elementExists('css', '.geolocation-map-canvas');
 
     // If Google works, either gm-style or gm-err-container will be present.
-    $this->assertSession()->elementExists('css', '.geolocation-common-map-container [class^="gm-"]');
+    $this->assertSession()->elementExists('css', '.geolocation-map-canvas [class^="gm-"]');
   }
 
   /**
-   * Tests the GoogleMap formatter.
+   * Tests the GoogleMap widget.
    */
-  public function testGoogleMapFormatter() {
-    $this->drupalGetFilterGoogleKey('node/3');
+  public function testGeocoderWidgetEmptyValuePreserved() {
+    EntityFormDisplay::load('node.article.default')
+      ->setComponent('field_geolocation', [
+        'type' => 'geolocation_googlegeocoder',
+        'settings' => [
+          'default_latitude' => 12,
+          'default_longitude' => 24,
+        ],
+      ])
+      ->save();
+
+    $this->drupalLogin($this->adminUser);
+
+    $this->drupalGetFilterGoogleKey('node/add/article');
     $this->assertSession()->statusCodeEquals(200);
 
-    $this->assertSession()->elementExists('css', '.geolocation-google-map');
+    $page = $this->getSession()->getPage();
+    $page->findField('Title')->setValue('I am new');
+    $page->pressButton('Save and publish');
 
-    // If Google works, either gm-style or gm-err-container will be present.
-    $this->assertSession()->elementExists('css', '.geolocation-google-map [class^="gm-"]');
-  }
-
-  /**
-   * Tests the GoogleMap formatter.
-   */
-  public function testGoogleMapFormatterCustomSettings() {
-    $this->drupalGetFilterGoogleKey('node/4');
-    $this->assertSession()->statusCodeEquals(200);
-
-    $this->assertSession()->elementExists('css', '.geolocation-google-map');
-    $this->assertSession()->elementAttributeContains('css', '.geolocation-google-map', 'style', 'height: 376px');
-
-    // If Google works, either gm-style or gm-err-container will be present.
-    $this->assertSession()->elementExists('css', '.geolocation-google-map [class^="gm-"]');
-
-    // TODO: Create node with custom settings and test it.
-    $admin_user = $this->drupalCreateUser([
-      'bypass node access',
-      'administer nodes',
-    ]);
-    $this->drupalLogin($admin_user);
-    // Display creation form.
-    $this->drupalGetFilterGoogleKey('node/4/edit');
-
-    $this->assertSession()->fieldExists("field_geolocation[0][google_map_settings][height]");
-
-    $edit = array(
-      'title[0][value]' => $this->randomMachineName(),
-      'field_geolocation[0][google_map_settings][height]' => '273px',
-    );
-
-    $this->drupalPostForm(NULL, $edit, t('Save'));
-
-    $this->drupalGetFilterGoogleKey('node/4');
-    $this->assertSession()->statusCodeEquals(200);
-
-    $this->assertSession()->elementExists('css', '.geolocation-google-map');
-    $this->assertSession()->elementAttributeContains('css', '.geolocation-google-map', 'style', 'height: 273px;');
-
-    // If Google works, either gm-style or gm-err-container will be present.
-    $this->assertSession()->elementExists('css', '.geolocation-google-map [class^="gm-"]');
+    /** @var \Drupal\node\NodeInterface $new_node */
+    $new_node = \Drupal::entityTypeManager()->getStorage('node')->load(5);
+    $this->assertSession()->assert($new_node->get('field_geolocation')->isEmpty(), "Node geolocation field empty after saving from predefined location widget");
   }
 
 }
