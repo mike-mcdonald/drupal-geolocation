@@ -86,6 +86,7 @@
     })
     .on('input', function () {
       $('.geolocation-geocoder-google-geocoding-api-state[data-source-identifier="' + $(this).data('source-identifier') + '"]').val(0);
+      Drupal.geolocation.geocoder.clearCallback($(this).data('source-identifier'));
     });
   };
 

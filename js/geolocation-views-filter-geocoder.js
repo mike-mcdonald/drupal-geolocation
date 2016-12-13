@@ -76,6 +76,22 @@
           }
         }, elementId);
 
+        Drupal.geolocation.geocoder.addClearCallback(function () {
+          switch (settings.type) {
+            case 'boundary':
+              $(context).find("input[name='" + elementId + "[lat_north_east]']").val('');
+              $(context).find("input[name='" + elementId + "[lng_north_east]']").val('');
+              $(context).find("input[name='" + elementId + "[lat_south_west]']").val('');
+              $(context).find("input[name='" + elementId + "[lng_south_west]']").val('');
+              break;
+
+            case 'proximity':
+              $(context).find("input[name='" + elementId + "-lat']").val('');
+              $(context).find("input[name='" + elementId + "-lng']").val('');
+              break;
+          }
+        }, elementId);
+
         delete drupalSettings.geolocation.geocoder.viewsFilterGeocoder[elementId];
       });
     }
