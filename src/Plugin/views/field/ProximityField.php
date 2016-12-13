@@ -46,11 +46,14 @@ class ProximityField extends NumericField implements ContainerFactoryPluginInter
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    // Make phpcs happy.
+    /** @var \Drupal\geolocation\GeolocationCore $geolocation_core */
+    $geolocation_core = $container->get('geolocation.core');
     return new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('geolocation.core')
+      $geolocation_core
     );
   }
 
@@ -341,6 +344,13 @@ class ProximityField extends NumericField implements ContainerFactoryPluginInter
         $latitude = $this->options['proximity_lat'];
         $longitude = $this->options['proximity_lng'];
         $units = $this->options['proximity_units'];
+    }
+
+    if (
+      !is_numeric($latitude)
+      || !is_numeric($longitude)
+    ) {
+      return;
     }
 
     // Get the earth radius from the units.
