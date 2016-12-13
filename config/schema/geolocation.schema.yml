@@ -257,6 +257,14 @@ field.formatter.settings.geolocation_map:
       type: geolocation.google_map_settings
       label: 'Google map settings'
 
+field.formatter.settings.geolocation_token:
+  type: mapping
+  label: 'Geolocation Token Formatter'
+  mapping:
+    tokenized_text:
+      type: string
+      label: 'Tokenized text'
+
 field.widget.settings.geolocation_googlegeocoder:
   type: mapping
   label: 'Geolocation Google Geocoder Widget settings'

@@ -159,7 +159,7 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
     ];
 
     foreach ($items as $delta => $item) {
-      // @todo: Add token support to the geolocaiton field exposing sub-fields.
+      // @todo: Add token support to the geolocation field exposing sub-fields.
       // Get token context.
       $token_context = [
         'field' => $items,
