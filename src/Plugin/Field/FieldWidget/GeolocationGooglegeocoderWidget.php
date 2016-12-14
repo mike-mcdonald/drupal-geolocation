@@ -169,7 +169,7 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
     if (!empty($address_fields)) {
       $element['populate_address_field'] = [
         '#type' => 'checkbox',
-        '#title' => $this->t('Store retrieved address data in address field?'),
+        '#title' => $this->t('Store retrieved address data in address field'),
         '#default_value' => $settings['populate_address_field'],
       ];
 
@@ -317,7 +317,6 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
               $canvas_id => [
                 'autoClientLocation' => $settings['auto_client_location'] ? TRUE : FALSE,
                 'autoClientLocationMarker' => $settings['auto_client_location_marker'] ? TRUE : FALSE,
-                'locationSet' => (!empty($lat) && !empty($lng)),
               ],
             ],
             'widgetMaps' => [
@@ -336,22 +335,6 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
 
     if ($settings['populate_address_field']) {
       $element['map_canvas']['#attached']['drupalSettings']['geolocation']['widgetSettings'][$canvas_id]['addressFieldTarget'] = $settings['target_address_field'];
-
-      foreach ([
-        'country_code',
-        'administrative_area',
-        'locality',
-        'dependent_locality',
-        'postal_code',
-        'address_line1',
-      ] as $component) {
-        $element[$component] = [
-          '#type' => 'hidden',
-          '#attributes' => [
-            'class' => ['geolocation-hidden-' . $component],
-          ],
-        ];
-      }
     }
 
     if ($settings['allow_override_map_settings']) {

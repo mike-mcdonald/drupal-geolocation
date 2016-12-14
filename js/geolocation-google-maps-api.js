@@ -285,7 +285,7 @@
   /**
    * Set/Update a marker on a map
    *
-   * @param {Object} latLng - A location (latLng) object from google maps API.
+   * @param {GoogleMapLatLng} latLng - A location (latLng) object from google maps API.
    * @param {GeolocationMap} map - The settings object that contains all of the necessary metadata for this map.
    */
   Drupal.geolocation.setMapMarker = function (latLng, map) {

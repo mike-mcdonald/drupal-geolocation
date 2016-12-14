@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Hooks provided by the System module.
+ * Hooks provided by the geolocation module.
  */
 
 /**
