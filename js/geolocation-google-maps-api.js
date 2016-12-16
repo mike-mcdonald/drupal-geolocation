@@ -96,6 +96,8 @@
  * @property {Function} Marker.setMap
  * @property {Function} Marker.setIcon
  *
+ * @property {function(Object):Object} Circle
+ *
  * @property {Function} fitBounds
  *
  * @property {Function} setCenter
@@ -318,6 +320,49 @@
         if (map.settings.google_map_settings.info_auto_display) {
           map.infowindow.open(map.googleMap, map.marker);
         }
+      }
+    }
+  };
+
+  /**
+   * Draw a circle indicating accuracy and slowly fade it out.
+   *
+   * @param {GoogleMapLatLng} location - A location (latLng) object from google maps API.
+   * @param {int} accuracy - Accuracy in meter.
+   * @param {GoogleMap} map - Map to draw on.
+   */
+  Drupal.geolocation.drawAccuracyIndicator = function (location, accuracy, map) {
+
+    // Draw a circle representing the accuracy radius of HTML5 geolocation.
+    var circle = new google.maps.Circle({
+      center: location,
+      radius: accuracy,
+      map: map,
+      fillColor: '#4285F4',
+      fillOpacity: 0.5,
+      strokeColor: '#4285F4',
+      strokeOpacity: 1,
+      clickable: false
+    });
+
+    // Fade circle away.
+    setInterval(fadeCityCircles, 100);
+
+    function fadeCityCircles() {
+      var fillOpacity = circle.get('fillOpacity');
+      fillOpacity -= 0.02;
+
+      var strokeOpacity = circle.get('strokeOpacity');
+      strokeOpacity -= 0.04;
+
+      if (
+        strokeOpacity > 0
+        && fillOpacity > 0
+      ) {
+        circle.setOptions({fillOpacity: fillOpacity, strokeOpacity: strokeOpacity});
+      }
+      else {
+        circle.setMap(null);
       }
     }
   };

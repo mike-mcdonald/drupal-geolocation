@@ -169,6 +169,12 @@
               map.lat = position.coords.latitude;
               map.lng = position.coords.longitude;
 
+              Drupal.geolocation.drawAccuracyIndicator(
+                new google.maps.LatLng(position.coords.latitude, position.coords.longitude),
+                position.coords.accuracy,
+                map.googleMap
+              );
+
               // If requested, also use location as value.
               if (typeof (drupalSettings.geolocation.widgetSettings[widget_id].autoClientLocationMarker) != 'undefined') {
                 if (drupalSettings.geolocation.widgetSettings[widget_id].autoClientLocationMarker) {
@@ -296,6 +302,12 @@
             // Get the geolocation from the browser.
             navigator.geolocation.getCurrentPosition(function (position) {
               var newLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+
+              Drupal.geolocation.drawAccuracyIndicator(
+                newLocation,
+                position.coords.accuracy,
+                map.googleMap
+              );
 
               map.googleMap.setCenter(newLocation);
 

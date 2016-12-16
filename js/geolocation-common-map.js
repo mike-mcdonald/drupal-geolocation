@@ -287,11 +287,13 @@
             navigator.geolocation.getCurrentPosition(function (position) {
               map.data('centre-lat', position.coords.latitude);
               map.data('centre-lng', position.coords.longitude);
-              googleMap.setCenter({
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-              });
+
+              var newLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+
+              googleMap.setCenter(newLocation);
               googleMap.setZoom(parseInt(mapSettings.settings.google_map_settings.zoom));
+
+              Drupal.geolocation.drawAccuracyIndicator(newLocation, position.coords.accuracy, googleMap);
 
               if (
                 typeof mapSettings.client_location.update_map !== 'undefined'
