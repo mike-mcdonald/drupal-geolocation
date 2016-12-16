@@ -23,6 +23,8 @@
  * @property {String} client_location.update_map
  * @property {Boolean} showRawLocations
  * @property {Boolean} markerScrollToResult
+ * @property {String} markerClusterer.enable
+ * @property {String} markerClusterer.imagePath
  */
 
 /**
@@ -357,6 +359,32 @@
           }
         });
       });
+
+      /**
+       * MarkerClusterer handling.
+       */
+      if (
+        typeof mapSettings.markerClusterer !== 'undefined'
+        && mapSettings.markerClusterer.enable
+      ) {
+
+        /* global MarkerClusterer */
+
+        var imagePath = '';
+        if (mapSettings.markerClusterer.imagePath) {
+          imagePath = mapSettings.markerClusterer.imagePath;
+        }
+        else {
+          imagePath = 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m';
+        }
+
+        new MarkerClusterer(
+          googleMap,
+          currentMarkers, {
+            imagePath: imagePath
+          }
+        );
+      }
 
       if (map.data('fitbounds') === 1) {
         // Fit map center and zoom to all currently loaded markers.

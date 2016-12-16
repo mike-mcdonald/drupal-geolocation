@@ -142,6 +142,16 @@ class CommonMap extends StylePluginBase {
     }
 
     /*
+     * Marker clusterer.
+     */
+    if (!empty($this->options['marker_clusterer'])) {
+      $build['#attached']['library'][] = 'geolocation/geolocation.markerclusterer';
+      $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['markerClusterer'] = [];
+      $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['markerClusterer']['enable'] = TRUE;
+      $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['markerClusterer']['imagePath'] = $this->options['marker_clusterer_image_path'];
+    }
+
+    /*
      * Dynamic map handling.
      */
     if (!empty($this->options['dynamic_map']['enabled'])) {
@@ -383,6 +393,8 @@ class CommonMap extends StylePluginBase {
     $options['icon_field'] = ['default' => ''];
     $options['marker_scroll_to_result'] = ['default' => 0];
     $options['id_field'] = ['default' => ''];
+    $options['marker_clusterer'] = ['default' => 0];
+    $options['marker_clusterer_image_path'] = ['default' => ''];
     $options['dynamic_map'] = [
       'contains' => [
         'enabled' => ['default' => 0],
@@ -488,7 +500,7 @@ class CommonMap extends StylePluginBase {
     ];
 
     $form['marker_scroll_to_result'] = [
-      '#title' => $this->t('On clicking marker scroll to result instead of opening marker bubble.'),
+      '#title' => $this->t('On clicking marker scroll to result instead of opening marker bubble'),
       '#type' => 'checkbox',
       '#default_value' => $this->options['marker_scroll_to_result'],
     ];
@@ -502,6 +514,24 @@ class CommonMap extends StylePluginBase {
       '#states' => [
         'visible' => [
           ':input[name="style_options[marker_scroll_to_result]"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+
+    $form['marker_clusterer'] = [
+      '#title' => $this->t('Cluster markers'),
+      '#type' => 'checkbox',
+      '#description' => $this->t('See example at :url', [':url' => 'https://developers.google.com/maps/documentation/javascript/marker-clustering']),
+      '#default_value' => $this->options['marker_clusterer'],
+    ];
+    $form['marker_clusterer_image_path'] = [
+      '#title' => $this->t('Cluster image path'),
+      '#type' => 'textfield',
+      '#default_value' => $this->options['marker_clusterer_image_path'],
+      '#description' => $this->t("Override default image path :url", [':url' => 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m']),
+      '#states' => [
+        'visible' => [
+          ':input[name="style_options[marker_clusterer]"]' => ['checked' => TRUE],
         ],
       ],
     ];

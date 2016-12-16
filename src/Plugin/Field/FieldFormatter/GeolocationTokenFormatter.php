@@ -115,7 +115,7 @@ class GeolocationTokenFormatter extends FormatterBase {
    *   A keyed array of settings and flags to control the token replacement
    *   process. See \Drupal\Core\Utility\Token::replace().
    */
-  public function geolocationItemTokens(&$replacements, $data, $options) {
+  public function geolocationItemTokens(array &$replacements, array $data, array $options) {
     if (isset($data['geolocation_current_item'])) {
       $replacements['[geolocation_current_item:lat]'] = $data['geolocation_current_item']->lat;
       $replacements['[geolocation_current_item:lng]'] = $data['geolocation_current_item']->lng;

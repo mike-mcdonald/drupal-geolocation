@@ -85,3 +85,13 @@ geolocation.commonmap:
     - core/jquery
     - core/jquery.once
     - geolocation/geolocation.googlemapsapi
+
+geolocation.markerclusterer:
+  remote: https://github.com/googlemaps/js-marker-clusterer
+  version: 1.x
+  license:
+    name: Apache License, Version 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0
+    gpl-compatible: true
+  js:
+    https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js: { type: external }

@@ -76,7 +76,7 @@ class ProximityArgument extends Formula implements ContainerFactoryPluginInterfa
    */
   public function getFormula() {
     // Parse argument for reference location.
-    $values  = $this->getParsedReferenceLocation();
+    $values = $this->getParsedReferenceLocation();
     // Make sure we have enough information to start with.
     if ($values && $values['lat'] && $values['lng'] && $values['distance']) {
       // Get the earth radius in from the units.

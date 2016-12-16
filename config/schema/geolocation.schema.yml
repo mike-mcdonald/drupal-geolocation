@@ -122,6 +122,12 @@ views.style.maps_common:
         update_target:
           type: string
           label: 'Display to update'
+    marker_clusterer:
+      type: integer
+      label: 'Cluster markers'
+    marker_clusterer_image_path:
+      type: string
+      label: 'Path to cluster base images'
     centre:
       type: sequence
       label: 'Centre Option'

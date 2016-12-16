@@ -91,7 +91,7 @@
  * @property InfoWindow
  *
  * @function
- * @property {function():Object} Marker
+ * @property {function(GoogleMapLatLng, GoogleMap, string, string):Object} Marker
  * @property {Function} Marker.setPosition
  * @property {Function} Marker.setMap
  * @property {Function} Marker.setIcon
