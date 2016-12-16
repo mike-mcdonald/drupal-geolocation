@@ -97,6 +97,7 @@
  * @property {Function} Marker.setIcon
  *
  * @property {function(Object):Object} Circle
+ * @property {function():GoogleMapBounds} Circle.getBounds()
  *
  * @property {Function} fitBounds
  *
@@ -344,6 +345,9 @@
       strokeOpacity: 1,
       clickable: false
     });
+
+    // Set the zoom level to the accuracy circle's size.
+    map.fitBounds(circle.getBounds());
 
     // Fade circle away.
     setInterval(fadeCityCircles, 100);
