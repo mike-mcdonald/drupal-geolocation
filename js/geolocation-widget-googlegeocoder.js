@@ -578,11 +578,9 @@
     // Set the country.
     addressField.find('.country.form-select').val(countryCode).trigger('change');
 
-    // TODO: ask address module for correct formatting
-
     if (streetNumber) {
       if (countryCode === 'DE') {
-        addressLine1 = route + streetNumber;
+        addressLine1 = route + ' ' + streetNumber;
       }
       else {
         addressLine1 = streetNumber + ' ' + route;
@@ -600,6 +598,10 @@
     }
     else if (!locality && neighborhood) {
       addressLine2 = neighborhood;
+    }
+
+    if (postalTown) {
+      locality = postalTown;
     }
 
     $(document).ajaxComplete(function (event, xhr, settings) {
