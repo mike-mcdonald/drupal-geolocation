@@ -69,7 +69,15 @@
 
         // Set the map marker.
         if (map.container.data('set-marker')) {
-          Drupal.geolocation.setMapMarker(map.googleMap.getCenter(), map);
+          var markerTitle = '';
+          var markerInfoText = '';
+          if (map.settings.title && map.settings.title.length > 0) {
+            markerTitle = map.settings.title;
+          }
+          if (map.settings.info_text && map.settings.info_text.length > 0) {
+            markerInfoText = map.settings.info_text;
+          }
+          Drupal.geolocation.setMapMarker(map.googleMap.getCenter(), map, markerTitle, markerInfoText);
         }
 
         // Set the already processed flag.

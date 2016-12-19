@@ -77,6 +77,8 @@
  * @property {Object} ControlPosition
  * @property {String} ControlPosition.LEFT_TOP
  * @property {String} ControlPosition.TOP_LEFT
+ * @property {String} ControlPosition.RIGHT_BOTTOM
+ * @property {String} ControlPosition.RIGHT_CENTER
  *
  * @property {Object} MapTypeId
  * @property {String} MapTypeId.ROADMAP
@@ -95,6 +97,7 @@
  * @property {Function} Marker.setPosition
  * @property {Function} Marker.setMap
  * @property {Function} Marker.setIcon
+ * @property {Function} Marker.setTitle
  *
  * @property {function(Object):Object} Circle
  * @property {function():GoogleMapBounds} Circle.getBounds()
@@ -163,10 +166,6 @@
         streetViewControl: false,
         overviewMapControl: false,
         zoomControl: true,
-        zoomControlOptions: {
-          style: google.maps.ZoomControlStyle.LARGE,
-          position: google.maps.ControlPosition.LEFT_TOP
-        },
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         zoom: 2,
         style: [],
@@ -259,8 +258,18 @@
       zoom: parseInt(map.settings.google_map_settings.zoom),
       center: center,
       mapTypeId: google.maps.MapTypeId[map.settings.google_map_settings.type],
+      mapTypeControlOptions: {
+        position: google.maps.ControlPosition.RIGHT_BOTTOM
+      },
       zoomControl: map.settings.google_map_settings.zoomControl,
+      zoomControlOptions: {
+        style: google.maps.ZoomControlStyle.LARGE,
+        position: google.maps.ControlPosition.RIGHT_CENTER
+      },
       streetViewControl: map.settings.google_map_settings.streetViewControl,
+      streetViewControlOptions: {
+        position: google.maps.ControlPosition.RIGHT_CENTER
+      },
       mapTypeControl: map.settings.google_map_settings.mapTypeControl,
       scrollwheel: map.settings.google_map_settings.scrollwheel,
       disableDoubleClickZoom: map.settings.google_map_settings.disableDoubleClickZoom,
@@ -290,34 +299,44 @@
    *
    * @param {GoogleMapLatLng} latLng - A location (latLng) object from google maps API.
    * @param {GeolocationMap} map - The settings object that contains all of the necessary metadata for this map.
+   * @param {string} title - Title for marker.
+   * @param {string} infoText - Content of info window.
    */
-  Drupal.geolocation.setMapMarker = function (latLng, map) {
+  Drupal.geolocation.setMapMarker = function (latLng, map, title, infoText) {
     // make sure the marker exists.
     if (map.marker instanceof google.maps.Marker) {
       map.marker.setPosition(latLng);
       map.marker.setMap(map.googleMap);
+      if (title.length > 0) {
+        map.marker.setTitle(title);
+      }
+
+      if (map.infowindow && infoText.length > 0) {
+        map.infowindow.setContent(infoText);
+      }
     }
     else {
-
-      // Set the info popup text.
-      map.infowindow = new google.maps.InfoWindow({
-        content: map.settings.info_text,
-        disableAutoPan: map.settings.disableAutoPan
-      });
 
       // Add the marker to the map.
       map.marker = new google.maps.Marker({
         position: latLng,
         map: map.googleMap,
-        title: map.settings.title,
-        label: map.settings.label
+        title: title
       });
 
       // Add the info window event if the info text has been set.
-      if (map.settings.info_text && map.settings.info_text.length > 0) {
+      if (infoText.length > 0) {
+
+        // Set the info popup text.
+        map.infowindow = new google.maps.InfoWindow({
+          content: infoText,
+          disableAutoPan: map.settings.disableAutoPan
+        });
+
         map.marker.addListener('click', function () {
           map.infowindow.open(map.googleMap, map.marker);
         });
+
         if (map.settings.google_map_settings.info_auto_display) {
           map.infowindow.open(map.googleMap, map.marker);
         }

@@ -113,12 +113,14 @@
         // Execute when a location is defined by the widget.
         Drupal.geolocation.geocoderWidget.addLocationCallback(function (location) {
           Drupal.geolocation.geocoderWidget.setHiddenInputFields(location, map);
+          map.controls.children('button.clear').removeClass('disabled');
           Drupal.geolocation.geocoderWidget.setMapMarker(location, map);
         }, widget_id);
 
         // Execute when a location is unset by the widget.
         Drupal.geolocation.geocoderWidget.addClearCallback(function () {
           Drupal.geolocation.geocoderWidget.clearHiddenInputFields(map);
+          map.controls.children('button.clear').addClass('disabled');
           // Clear the map point.
           map.marker.setMap();
         }, widget_id);
@@ -169,8 +171,10 @@
               map.lat = position.coords.latitude;
               map.lng = position.coords.longitude;
 
+              var location = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+
               Drupal.geolocation.drawAccuracyIndicator(
-                new google.maps.LatLng(position.coords.latitude, position.coords.longitude),
+                location,
                 position.coords.accuracy,
                 map.googleMap
               );
@@ -178,7 +182,15 @@
               // If requested, also use location as value.
               if (typeof (drupalSettings.geolocation.widgetSettings[widget_id].autoClientLocationMarker) != 'undefined') {
                 if (drupalSettings.geolocation.widgetSettings[widget_id].autoClientLocationMarker) {
-                  setInitialLocation = true;
+
+                  // Map most likely already initialized.
+                  if (typeof map.googleMap !== 'undefined') {
+                    Drupal.geolocation.geocoderWidget.locationCallback(location, widget_id);
+                    Drupal.geolocation.geocoderWidget.setHiddenAddressFieldByReverseLocation(location, map);
+                  }
+                  else {
+                    setInitialLocation = true;
+                  }
                 }
               }
             });
@@ -196,6 +208,7 @@
         // We know that fields are already correctly set, so just place the marker.
         else if (setInitialMarker) {
           Drupal.geolocation.geocoderWidget.setMapMarker(initialLocation, map);
+          $('#geocoder-controls-wrapper-' + map.id + 'button.clear', context).removeClass('disabled');
         }
 
         /**
@@ -205,18 +218,11 @@
          */
 
         // Add the geocoder to the map.
-        map.controls = $('<form class="geocode-controls-wrapper" />')
-            .append($('<input id="geocoder-input-' + map.id + '" type="text" class="input" placeholder="' + Drupal.t('Enter a location') + '" />'))
-            // Create submit button
-            .append($('<button class="submit" />'))
-            // Create clear button
-            .append($('<button class="clear" />'))
-            // Create indicator
-            .append($('<div class="geolocation-map-indicator" />'));
+        map.controls = $('#geocoder-controls-wrapper-' + map.id, context);
 
         map.googleMap.controls[google.maps.ControlPosition.TOP_LEFT].push(map.controls.get(0));
 
-        map.controls.children('input.input').first().autocomplete({
+        map.controls.children('input.location').first().autocomplete({
           autoFocus: true,
           source: function (request, response) {
             var autocompleteResults = [];
@@ -261,7 +267,29 @@
         map.controls.submit(function (e) {
           e.preventDefault();
           Drupal.geolocation.geocoderWidget.geocoder.geocode(
-            {address: $(this).children('input.input').val()},
+            {address: map.controls.children('input.location').first().val()},
+
+            /**
+             * Google Geocoding API geocode.
+             *
+             * @param {GoogleAddress[]} results - Returned results
+             * @param {String} status - Whether geocoding was successful
+             */
+            function (results, status) {
+              if (status === google.maps.GeocoderStatus.OK) {
+                map.googleMap.fitBounds(results[0].geometry.viewport);
+
+                Drupal.geolocation.geocoderWidget.locationCallback(results[0].geometry.location, widget_id);
+                Drupal.geolocation.geocoderWidget.setHiddenAddressField(results[0], map);
+              }
+            }
+          );
+        });
+
+        google.maps.event.addDomListener(map.controls.children('button.search')[0], 'click', function (e) {
+          e.preventDefault();
+          Drupal.geolocation.geocoderWidget.geocoder.geocode(
+            {address: map.controls.children('input.location').first().val()},
 
             /**
              * Google Geocoding API geocode.
@@ -283,17 +311,15 @@
         google.maps.event.addDomListener(map.controls.children('button.clear')[0], 'click', function (e) {
           // Stop all that bubbling and form submitting.
           e.preventDefault();
-          // Remove the coordinates.
-          map.controls.children('.geolocation-map-indicator').text('').removeClass('has-location');
           // Clear the input text.
-          map.controls.children('input.input').val('');
+          map.controls.children('input.location').val('');
 
           Drupal.geolocation.geocoderWidget.clearCallback(widget_id);
         });
 
         // If the browser supports W3C Geolocation API.
         if (navigator.geolocation) {
-          map.controls.children('button.clear').first().before($('<button class="locate" />'));
+          map.controls.children('button.locate').show();
 
           google.maps.event.addDomListener(map.controls.children('button.locate')[0], 'click', function (e) {
             // Stop all that bubbling and form submitting.
@@ -472,11 +498,12 @@
    * @param {GeocoderWidgetMap} map - The settings object that contains all of the necessary metadata for this map.
    */
   Drupal.geolocation.geocoderWidget.setMapMarker = function (latLng, map) {
-    Drupal.geolocation.setMapMarker(latLng, map);
-    // Add a visual indicator.
-    $(map.controls).children('.geolocation-map-indicator')
-        .text(Drupal.t('Latitude') + ': ' + latLng.lat() + ' ' + Drupal.t('Longitude') + ': ' + latLng.lng())
-        .addClass('has-location');
+    Drupal.geolocation.setMapMarker(
+      latLng,
+      map,
+      latLng.lat() + ', ' + latLng.lng(),
+      Drupal.t('Latitude') + ': ' + latLng.lat() + ' ' + Drupal.t('Longitude') + ': ' + latLng.lng()
+    );
   };
 
   /**

@@ -143,7 +143,7 @@ trait GoogleMapsDisplayTrait {
    * @return array
    *   An array only containing keys defined in this trait.
    */
-  public function getGoogleMapsSettings($settings = []) {
+  public function getGoogleMapsSettings(array $settings) {
     $default_settings = self::getGoogleMapDefaultSettings();
     $settings = array_merge($default_settings, $settings);
 
@@ -175,7 +175,7 @@ trait GoogleMapsDisplayTrait {
    * @return array
    *   An array to use as field formatter summary.
    */
-  public function getGoogleMapsSettingsSummary($settings) {
+  public function getGoogleMapsSettingsSummary(array $settings) {
     $types = $this->getMapTypes();
     $summary = [];
     $summary[] = $this->t('Map Type: @type', ['@type' => $types[$settings['google_map_settings']['type']]]);
@@ -194,7 +194,7 @@ trait GoogleMapsDisplayTrait {
    * @return array
    *   A form array to be integrated in whatever.
    */
-  public function getGoogleMapsSettingsForm($settings = []) {
+  public function getGoogleMapsSettingsForm(array $settings) {
     $settings['google_map_settings'] += self::getGoogleMapDefaultSettings()['google_map_settings'];
     $form = [
       'google_map_settings' => [
@@ -320,7 +320,7 @@ trait GoogleMapsDisplayTrait {
    * @param string|null $prefix
    *   Form state prefix if needed.
    */
-  public function validateGoogleMapsSettingsForm($form, FormStateInterface $form_state, $prefix = NULL) {
+  public function validateGoogleMapsSettingsForm(array $form, FormStateInterface $form_state, $prefix = NULL) {
     if ($prefix) {
       $values = $form_state->getValues();
       if (!empty($values[$prefix])) {

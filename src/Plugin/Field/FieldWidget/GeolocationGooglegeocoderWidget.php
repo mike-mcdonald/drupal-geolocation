@@ -301,6 +301,63 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
       '#attributes' => ['class' => ['geolocation-hidden-lng']],
     ];
 
+    $element['controls'] = [
+      '#type' => 'container',
+      '#attributes' => [
+        'id' => 'geocoder-controls-wrapper-' . $canvas_id,
+        'class' => [
+          'geocode-controls-wrapper',
+        ],
+      ],
+    ];
+
+    $element['controls']['location'] = [
+      '#type' => 'textfield',
+      '#placeholder' => t('Enter a location'),
+      '#attributes' => [
+        'class' => [
+          'location',
+          'form-autocomplete',
+        ],
+      ],
+      '#theme_wrappers' => [],
+    ];
+
+    $element['controls']['search'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'button',
+      '#attributes' => [
+        'class' => [
+          'search',
+        ],
+        'title' => t('Search'),
+      ],
+    ];
+
+    $element['controls']['locate'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'button',
+      '#attributes' => [
+        'class' => [
+          'locate',
+        ],
+        'style' => 'display: none;',
+        'title' => t('Locate'),
+      ],
+    ];
+
+    $element['controls']['clear'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'button',
+      '#attributes' => [
+        'class' => [
+          'clear',
+          'disabled'
+        ],
+        'title' => t('Clear'),
+      ],
+    ];
+
     // Add the map container.
     $element['map_canvas'] = [
       '#type' => 'html_tag',
