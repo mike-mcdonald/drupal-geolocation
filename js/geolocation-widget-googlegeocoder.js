@@ -578,6 +578,8 @@
     // Set the country.
     addressField.find('.country.form-select').val(countryCode).trigger('change');
 
+    // See https://github.com/commerceguys/addressing/issues/73 for reason.
+
     if (streetNumber) {
       if (countryCode === 'DE') {
         addressLine1 = route + ' ' + streetNumber;
