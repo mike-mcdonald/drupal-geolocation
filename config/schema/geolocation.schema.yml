@@ -250,6 +250,9 @@ field.formatter.settings.geolocation_map:
     set_marker:
       type: string
       label: 'Set marker at map center'
+    common_map:
+      type: string
+      label: 'Display results on a common map'
     title:
       type: string
       label: 'Title'

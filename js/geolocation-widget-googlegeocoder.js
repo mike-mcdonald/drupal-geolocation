@@ -20,7 +20,6 @@
  * @property {GoogleMapSettings} settings.google_map_settings
  * @property {GoogleMap} googleMap
  * @property {Object} controls
- * @property {Object} marker
  */
 
 /**
@@ -65,15 +64,15 @@
    *   Attaches geocoder functionality to relevant elements.
    */
   Drupal.behaviors.geolocationGeocoderWidget = {
-    attach: function (context, settings) {
-      // Ensure iterables.
-      settings.geolocation = settings.geolocation || {widgetMaps: [], widgetSettings: []};
+    attach: function (context, drupalSettings) {
+      // Ensure itterables.
+      drupalSettings.geolocation = drupalSettings.geolocation || {widgetMaps: [], widgetSettings: []};
       // Make sure the lazy loader is available.
       if (typeof Drupal.geolocation.loadGoogle === 'function') {
         // First load the library from google.
         Drupal.geolocation.loadGoogle(function () {
           // This won't fire until window load.
-          initialize(settings.geolocation.widgetMaps, context);
+          initialize(drupalSettings.geolocation.widgetMaps, context);
         });
       }
     }
@@ -114,7 +113,13 @@
         Drupal.geolocation.geocoderWidget.addLocationCallback(function (location) {
           Drupal.geolocation.geocoderWidget.setHiddenInputFields(location, map);
           map.controls.children('button.clear').removeClass('disabled');
-          Drupal.geolocation.geocoderWidget.setMapMarker(location, map);
+          Drupal.geolocation.removeMapMarker(map);
+          Drupal.geolocation.setMapMarker(map, {
+            position: location,
+            map: map.googleMap,
+            title: location.lat() + ', ' + location.lng(),
+            infoWindowContent: Drupal.t('Latitude') + ': ' + location.lat() + ' ' + Drupal.t('Longitude') + ': ' + location.lng()
+          });
         }, widget_id);
 
         // Execute when a location is unset by the widget.
@@ -122,7 +127,7 @@
           Drupal.geolocation.geocoderWidget.clearHiddenInputFields(map);
           map.controls.children('button.clear').addClass('disabled');
           // Clear the map point.
-          map.marker.setMap();
+          Drupal.geolocation.removeMapMarker(map);
         }, widget_id);
 
         /**
@@ -207,7 +212,12 @@
         }
         // We know that fields are already correctly set, so just place the marker.
         else if (setInitialMarker) {
-          Drupal.geolocation.geocoderWidget.setMapMarker(initialLocation, map);
+          Drupal.geolocation.setMapMarker(map, {
+            position: initialLocation,
+            map: map.googleMap,
+            title: initialLocation.lat() + ', ' + initialLocation.lng(),
+            infoWindowContent: Drupal.t('Latitude') + ': ' + initialLocation.lat() + ' ' + Drupal.t('Longitude') + ': ' + initialLocation.lng()
+          });
           $('#geocoder-controls-wrapper-' + map.id + 'button.clear', context).removeClass('disabled');
         }
 
@@ -489,21 +499,6 @@
     // Update the lat and lng input fields.
     $('.canvas-' + map.id + ' .geolocation-hidden-lat').attr('value', '');
     $('.canvas-' + map.id + ' .geolocation-hidden-lng').attr('value', '');
-  };
-
-  /**
-   * Extend geolocation core setMapMarker to also add text to indicator.
-   *
-   * @param {GoogleMapLatLng} latLng - A location (latLng) object from google maps API.
-   * @param {GeocoderWidgetMap} map - The settings object that contains all of the necessary metadata for this map.
-   */
-  Drupal.geolocation.geocoderWidget.setMapMarker = function (latLng, map) {
-    Drupal.geolocation.setMapMarker(
-      latLng,
-      map,
-      latLng.lat() + ', ' + latLng.lng(),
-      Drupal.t('Latitude') + ': ' + latLng.lat() + ' ' + Drupal.t('Longitude') + ': ' + latLng.lng()
-    );
   };
 
   /**

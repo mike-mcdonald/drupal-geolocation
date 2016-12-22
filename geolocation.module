@@ -36,6 +36,15 @@ function geolocation_help($route_name, RouteMatchInterface $route_match) {
  */
 function geolocation_theme() {
   return [
+    'geolocation_map_formatter' => [
+      'variables' => [
+        'locations' => NULL,
+        'latitude' => NULL,
+        'longitude' => NULL,
+        'uniqueid' => NULL,
+      ],
+      'template' => 'geolocation-map-formatter',
+    ],
     'geolocation_latlng_formatter' => [
       'variables' => [
         'lat' => NULL,

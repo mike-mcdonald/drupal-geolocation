@@ -145,7 +145,7 @@ trait GoogleMapsDisplayTrait {
    */
   public function getGoogleMapsSettings(array $settings) {
     $default_settings = self::getGoogleMapDefaultSettings();
-    $settings = array_merge($default_settings, $settings);
+    $settings = array_replace_recursive($default_settings, $settings);
 
     foreach ($settings['google_map_settings'] as $key => $setting) {
       if (!isset($default_settings['google_map_settings'][$key])) {

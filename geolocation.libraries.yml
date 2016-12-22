@@ -54,6 +54,9 @@ geolocation.geocoder.googlegeocodingapi:
 # Google maps display formatter.
 geolocation.formatter.googlemap:
   version: 8.x-1.x
+  css:
+    theme:
+      css/geolocation-formatter-map.css: {}
   js:
     js/geolocation-formatter-googlemap.js: {}
   dependencies:

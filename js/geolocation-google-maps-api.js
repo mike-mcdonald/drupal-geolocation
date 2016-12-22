@@ -42,11 +42,6 @@
  */
 
 /**
- * @typedef {Object} GoogleMapEvent
- * @property {Function} addDomListener
- */
-
-/**
  * @typedef {Object} AddressComponent
  * @property {String} long_name - Long component name
  * @property {String} short_name - Short component name
@@ -67,6 +62,40 @@
  * @property {String} location_type - Location type
  * @property {GoogleMapBounds} viewport - Viewport
  * @property {GoogleMapBounds} bounds - Bounds (optionally)
+ */
+
+/**
+ * @typedef {Object} GoogleMarkerSettings
+ *
+ * Settings from https://developers.google.com/maps/documentation/javascript/3.exp/reference#MarkerOptions:
+ * @property {GoogleMapLatLng} position
+ * @property {GoogleMap} map
+ * @property {string} title
+ * @property {string} [icon]
+ *
+ * Settings from Geolocation module:
+ * @property {string} [infoWindowContent]
+ * @property {boolean} [infoWindowSolitary]
+ */
+
+/**
+ * @typedef {Object} GoogleMarker
+ * @property {Function} setPosition
+ * @property {Function} setMap
+ * @property {Function} setIcon
+ * @property {Function} setTitle
+ * @property {Function} addListener
+ */
+
+/**
+ * @typedef {Object} GoogleInfoWindow
+ * @property {Function} open
+ * @property {Function} close
+ */
+
+/**
+ * @typedef {Object} GoogleCircle
+ * @property {function():GoogleMapBounds} Circle.getBounds()
  */
 
 /**
@@ -93,14 +122,15 @@
  * @property InfoWindow
  *
  * @function
- * @property {function(GoogleMapLatLng, GoogleMap, string, string):Object} Marker
- * @property {Function} Marker.setPosition
- * @property {Function} Marker.setMap
- * @property {Function} Marker.setIcon
- * @property {Function} Marker.setTitle
+ * @property {function({GoogleMarkerSettings}):GoogleMarker} Marker
  *
- * @property {function(Object):Object} Circle
- * @property {function():GoogleMapBounds} Circle.getBounds()
+ * @function
+ * @property {function({}):GoogleInfoWindow} InfoWindow
+ *
+ * @function
+ * @property {function(string|number, string|number):GoogleMapLatLng} LatLng
+ *
+ * @property {function(Object):GoogleCircle} Circle
  *
  * @property {Function} fitBounds
  *
@@ -111,23 +141,25 @@
  *
  * @property {function():GoogleMapBounds} getBounds
  * @property {function():GoogleMapLatLng} getCenter
+ *
+ * @property {Function} addListener
  */
 
 /**
  * @typedef {Object} google
  * @property {GoogleMap} maps
- * @property {GoogleMapEvent[]} events
  */
 
 /**
  * @typedef {Object} GeolocationMap
- * @property {GoogleMapSettings} settings
+ * @property {Object} settings
+ * @property {GoogleMapSettings} settings.google_map_settings
  * @property {GoogleMap} googleMap
  * @property {Number} lat
  * @property {Number} lng
- * @property {Object} container
- * @property {Object} marker
- * @property {Object} infowindow
+ * @property {jQuery} container
+ * @property {GoogleMarker[]} mapMarkers
+ * @property {GoogleInfoWindow} infoWindow
  */
 
 (function ($, _, Drupal, drupalSettings) {
@@ -223,7 +255,7 @@
           });
       }
       else {
-        console.error('Geolocation - Google map url not set.');
+        console.error('Geolocation - Google map url not set.'); // eslint-disable-line no-console
       }
     }
     else {
@@ -297,51 +329,70 @@
   /**
    * Set/Update a marker on a map
    *
-   * @param {GoogleMapLatLng} latLng - A location (latLng) object from google maps API.
    * @param {GeolocationMap} map - The settings object that contains all of the necessary metadata for this map.
-   * @param {string} title - Title for marker.
-   * @param {string} infoText - Content of info window.
+   * @param {GoogleMarkerSettings} markerSettings - Marker settings.
+   * @return {GoogleMarker} - Created marker.
    */
-  Drupal.geolocation.setMapMarker = function (latLng, map, title, infoText) {
-    // make sure the marker exists.
-    if (map.marker instanceof google.maps.Marker) {
-      map.marker.setPosition(latLng);
-      map.marker.setMap(map.googleMap);
-      if (title.length > 0) {
-        map.marker.setTitle(title);
-      }
+  Drupal.geolocation.setMapMarker = function (map, markerSettings) {
+    map.mapMarkers = map.mapMarkers || [];
 
-      if (map.infowindow && infoText.length > 0) {
-        map.infowindow.setContent(infoText);
-      }
-    }
-    else {
+    // Add the marker to the map.
+    /** @type {GoogleMarker} */
+    var currentMarker = new google.maps.Marker(markerSettings);
 
-      // Add the marker to the map.
-      map.marker = new google.maps.Marker({
-        position: latLng,
-        map: map.googleMap,
-        title: title
+    // Add the info window event if the info text has been set.
+    if (markerSettings.infoWindowContent.length > 0) {
+
+      // Set the info popup text.
+      var currentInfoWindow = new google.maps.InfoWindow({
+        content: markerSettings.infoWindowContent,
+        maxWidth: 200,
+        disableAutoPan: map.settings.google_map_settings.disableAutoPan
       });
 
-      // Add the info window event if the info text has been set.
-      if (infoText.length > 0) {
-
-        // Set the info popup text.
-        map.infowindow = new google.maps.InfoWindow({
-          content: infoText,
-          disableAutoPan: map.settings.disableAutoPan
-        });
-
-        map.marker.addListener('click', function () {
-          map.infowindow.open(map.googleMap, map.marker);
-        });
-
-        if (map.settings.google_map_settings.info_auto_display) {
-          map.infowindow.open(map.googleMap, map.marker);
+      currentMarker.addListener('click', function () {
+        if (markerSettings.infoWindowSolitary) {
+          if (typeof map.infoWindow !== 'undefined') {
+            map.infoWindow.close();
+          }
+          map.infoWindow = currentInfoWindow;
         }
+        currentInfoWindow.open(map.googleMap, currentMarker);
+      });
+
+      if (map.settings.google_map_settings.info_auto_display) {
+        if (markerSettings.infoWindowSolitary) {
+          if (typeof map.infoWindow !== 'undefined') {
+            map.infoWindow.close();
+          }
+          map.infoWindow = currentInfoWindow;
+        }
+        currentInfoWindow.open(map.googleMap, currentMarker);
       }
     }
+
+    map.mapMarkers.push(currentMarker);
+
+    return currentMarker;
+  };
+
+  /**
+   * Remove marker(s) from map.
+   *
+   * @param {GeolocationMap} map - The settings object that contains all of the necessary metadata for this map.
+   */
+  Drupal.geolocation.removeMapMarker = function (map) {
+    $.each(
+      map.mapMarkers,
+
+      /**
+       * @param {integer} index - Current index.
+       * @param {GoogleMarker} item - Current marker.
+       */
+      function (index, item) {
+        item.setMap();
+      }
+    );
   };
 
   /**
