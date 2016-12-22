@@ -45,7 +45,7 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
   /**
    * Constructs a WidgetBase object.
    *
-   * @param array $plugin_id
+   * @param string $plugin_id
    *   The plugin_id for the widget.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
@@ -71,20 +71,14 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager */
-    $entity_field_manager = $container->get('entity_field.manager');
-
-    /** @var \Drupal\geolocation\GeolocationCore $geocoder_core */
-    $geocoder_core = $container->get('geolocation.core');
-
     return new static(
       $plugin_id,
       $plugin_definition,
       $configuration['field_definition'],
       $configuration['settings'],
       $configuration['third_party_settings'],
-      $entity_field_manager,
-      $geocoder_core
+      $container->get('entity_field.manager'),
+      $container->get('geolocation.core')
     );
   }
 
@@ -107,6 +101,7 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
     $settings = [
       'populate_address_field' => FALSE,
       'target_address_field' => NULL,
+      'explicite_actions_address_field' => FALSE,
       'default_longitude' => NULL,
       'default_latitude' => NULL,
       'auto_client_location' => FALSE,
@@ -169,7 +164,7 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
     if (!empty($address_fields)) {
       $element['populate_address_field'] = [
         '#type' => 'checkbox',
-        '#title' => $this->t('Store retrieved address data in address field'),
+        '#title' => $this->t('Automatically push retrieved address data to address field widget'),
         '#default_value' => $settings['populate_address_field'],
       ];
 
@@ -179,6 +174,17 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
         '#description' => $this->t('Only fields of type "address" with a cardinality of 1 are available.'),
         '#options' => $address_fields,
         '#default_value' => $settings['target_address_field'],
+        '#states' => [
+          'visible' => [
+            ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][populate_address_field]"]' => ['checked' => TRUE],
+          ],
+        ],
+      ];
+
+      $element['explicite_actions_address_field'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Use explicite push/locate buttons to interact with address field widget'),
+        '#default_value' => $settings['explicite_actions_address_field'],
         '#states' => [
           'visible' => [
             ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][populate_address_field]"]' => ['checked' => TRUE],
@@ -352,11 +358,52 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
       '#attributes' => [
         'class' => [
           'clear',
-          'disabled'
+          'disabled',
         ],
         'title' => t('Clear'),
       ],
     ];
+
+    if (
+      $settings['populate_address_field']
+      && $settings['explicite_actions_address_field']
+      && $settings['target_address_field']
+    ) {
+      $address_label = $this->t('Address');
+
+      $field_definitions = $this->entityFieldManager->getFieldDefinitions($this->fieldDefinition->getTargetEntityTypeId(), $this->fieldDefinition->getTargetBundle());
+      foreach ($field_definitions as $field_definition) {
+        if ($field_definition->getName() == $settings['target_address_field']) {
+          $address_label = $field_definition->getLabel();
+        }
+      }
+
+      $element['controls']['address_locate'] = [
+        '#type' => 'html_tag',
+        '#tag' => 'button',
+        '#attributes' => [
+          'class' => [
+            'address-button',
+            'address-button-locate',
+          ],
+          'title' => $this->t('Locate current %address on map', ['%address' => $address_label]),
+        ],
+        '#value' => $this->t('Locate %address', ['%address' => $address_label]),
+      ];
+
+      $element['controls']['address_push'] = [
+        '#type' => 'html_tag',
+        '#tag' => 'button',
+        '#attributes' => [
+          'class' => [
+            'address-button',
+            'address-button-push',
+          ],
+          'title' => $this->t('Push current location data to %address', ['%address' => $address_label]),
+        ],
+        '#value' => $this->t('Push to %address', ['%address' => $address_label]),
+      ];
+    }
 
     // Add the map container.
     $element['map_canvas'] = [
@@ -378,7 +425,6 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
             ],
             'widgetMaps' => [
               $canvas_id => [
-                'id' => $canvas_id,
                 'lat' => (float) $default_map_values['lat'],
                 'lng' => (float) $default_map_values['lng'],
                 'settings' => $settings,
@@ -392,6 +438,7 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
 
     if ($settings['populate_address_field']) {
       $element['map_canvas']['#attached']['drupalSettings']['geolocation']['widgetSettings'][$canvas_id]['addressFieldTarget'] = $settings['target_address_field'];
+      $element['map_canvas']['#attached']['drupalSettings']['geolocation']['widgetSettings'][$canvas_id]['addressFieldExpliciteActions'] = $settings['explicite_actions_address_field'];
     }
 
     if ($settings['allow_override_map_settings']) {

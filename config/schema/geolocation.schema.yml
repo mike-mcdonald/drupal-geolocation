@@ -296,6 +296,9 @@ field.widget.settings.geolocation_googlegeocoder:
     target_address_field:
       type: string
       label: 'Target address field name'
+    explicite_actions_address_field:
+      type: string
+      label: 'Explicite buttons'
     allow_override_map_settings:
       type: integer
       label: 'Allow override map settings.'

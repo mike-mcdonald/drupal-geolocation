@@ -141,17 +141,21 @@
  *
  * @property {function():GoogleMapBounds} getBounds
  * @property {function():GoogleMapLatLng} getCenter
- *
- * @property {Function} addListener
  */
 
 /**
  * @typedef {Object} google
  * @property {GoogleMap} maps
+ * @property {Object} event
+ * @property {Function} addListener
+ * @property {Function} addDomListener
+ * @property {Function} addListenerOnce
+ * @property {Function} addDomListenerOnce
  */
 
 /**
  * @typedef {Object} GeolocationMap
+ * @property {string} id
  * @property {Object} settings
  * @property {GoogleMapSettings} settings.google_map_settings
  * @property {GoogleMap} googleMap
