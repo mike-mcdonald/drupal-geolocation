@@ -12,11 +12,12 @@ use Drupal\Core\Form\FormStateInterface;
  * @FieldFormatter(
  *   id = "geolocation_raw",
  *   module = "geolocation",
- *   label = @Translation("Geolocation Raw"),
+ *   label = @Translation("DEPRECATED - Use token instead - Geolocation Raw"),
  *   field_types = {
  *     "geolocation"
  *   }
  * )
+ * @deprecated
  */
 class GeolocationRawFormatter extends FormatterBase {
 
