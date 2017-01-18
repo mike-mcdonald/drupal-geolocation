@@ -94,7 +94,7 @@
             });
 
             // Hide entire form if it's empty now, except form-submit.
-            if (exposedForm.find('input:visible:not(.form-submit)').length === 0) {
+            if (exposedForm.find('input:visible:not(.form-submit), select:visible').length === 0) {
               exposedForm.hide();
             }
           }
@@ -123,20 +123,14 @@
          */
         var geolocationMap = {};
 
-        geolocationMap.settings = {};
-        geolocationMap.settings.google_map_settings = commonMapSettings.settings.google_map_settings;
-
-        geolocationMap.container = mapWrapper.children('.geolocation-common-map-container');
-        geolocationMap.container.show();
-
         /*
          * Check for map already created (i.e. after AJAX)
          */
         if (typeof Drupal.geolocation.maps !== 'undefined') {
-          $.each(Drupal.geolocation.maps, function (index, item) {
-            if (typeof item.container !== 'undefined') {
-              if (item.container.is(geolocationMap.container)) {
-                geolocationMap.googleMap = item.googleMap;
+          $.each(Drupal.geolocation.maps, function (index, map) {
+            if (typeof map.container !== 'undefined') {
+              if (map.container.is(mapWrapper.children('.geolocation-common-map-container'))) {
+                geolocationMap = map;
               }
             }
           });
@@ -146,7 +140,7 @@
         skipMapUpdate = true;
 
         /*
-         * Instantiate new map.
+         * Update existing map, depending on present data-attribute settings.
          */
         if (typeof geolocationMap.googleMap !== 'undefined') {
           skipMapUpdate = false;
@@ -180,36 +174,47 @@
         }
 
         /*
-         * Update existing map, depending on present data-attribute settings
+         * Instantiate new map.
          */
-        else if (mapWrapper.data('centre-lat') && mapWrapper.data('centre-lng')) {
-          geolocationMap.lat = mapWrapper.data('centre-lat');
-          geolocationMap.lng = mapWrapper.data('centre-lng');
-
-          geolocationMap.googleMap = Drupal.geolocation.addMap(geolocationMap);
-        }
-        else if (
-          mapWrapper.data('centre-lat-north-east')
-          && mapWrapper.data('centre-lng-north-east')
-          && mapWrapper.data('centre-lat-south-west')
-          && mapWrapper.data('centre-lng-south-west')
-        ) {
-          var centerBounds = {
-            north: mapWrapper.data('centre-lat-north-east'),
-            east: mapWrapper.data('centre-lng-north-east'),
-            south: mapWrapper.data('centre-lat-south-west'),
-            west: mapWrapper.data('centre-lng-south-west')
-          };
-
-          geolocationMap.lat = geolocationMap.lng = 0;
-          geolocationMap.googleMap = Drupal.geolocation.addMap(geolocationMap);
-
-          geolocationMap.googleMap.fitBounds(centerBounds);
-        }
         else {
-          geolocationMap.lat = geolocationMap.lng = 0;
+          geolocationMap.settings = {};
+          geolocationMap.settings.google_map_settings = commonMapSettings.settings.google_map_settings;
 
-          geolocationMap.googleMap = Drupal.geolocation.addMap(geolocationMap);
+          geolocationMap.container = mapWrapper.children('.geolocation-common-map-container');
+          geolocationMap.container.show();
+
+          if (
+            mapWrapper.data('centre-lat')
+            && mapWrapper.data('centre-lng')
+          ) {
+            geolocationMap.lat = mapWrapper.data('centre-lat');
+            geolocationMap.lng = mapWrapper.data('centre-lng');
+
+            geolocationMap.googleMap = Drupal.geolocation.addMap(geolocationMap);
+          }
+          else if (
+            mapWrapper.data('centre-lat-north-east')
+            && mapWrapper.data('centre-lng-north-east')
+            && mapWrapper.data('centre-lat-south-west')
+            && mapWrapper.data('centre-lng-south-west')
+          ) {
+            var centerBounds = {
+                north: mapWrapper.data('centre-lat-north-east'),
+                east: mapWrapper.data('centre-lng-north-east'),
+                south: mapWrapper.data('centre-lat-south-west'),
+                west: mapWrapper.data('centre-lng-south-west')
+            };
+
+            geolocationMap.lat = geolocationMap.lng = 0;
+            geolocationMap.googleMap = Drupal.geolocation.addMap(geolocationMap);
+
+            geolocationMap.googleMap.fitBounds(centerBounds);
+          }
+          else {
+            geolocationMap.lat = geolocationMap.lng = 0;
+
+            geolocationMap.googleMap = Drupal.geolocation.addMap(geolocationMap);
+          }
         }
 
         /**
@@ -241,7 +246,6 @@
            */
           if (typeof geolocationMap.updateDrupalView === 'undefined') {
             geolocationMap.updateDrupalView = function (dynamic_map_settings) {
-
               // Make sure to load current form DOM element, which will change after every AJAX operation.
               var exposedForm = $('form#views-exposed-form-' + dynamic_map_settings.update_view_id.replace(/_/g, '-') + '-' + dynamic_map_settings.update_view_display_id.replace(/_/g, '-'));
 
@@ -287,7 +291,7 @@
             geolocationMap.googleMap.addListener('idle', function () {
               clearTimeout(geolocationMapIdleTimer);
               geolocationMapIdleTimer = setTimeout(function () {
-                geolocationMap.googleMap.updateDrupalView(commonMapSettings.dynamic_map);
+                geolocationMap.updateDrupalView(commonMapSettings.dynamic_map);
               }, commonMapSettings.dynamic_map.views_refresh_delay);
             });
           }
@@ -333,13 +337,13 @@
          */
         // A google maps API tool to re-center the map on its content.
         var bounds = new google.maps.LatLngBounds();
-
         Drupal.geolocation.removeMapMarker(geolocationMap);
 
         /*
          * Add the locations to the map.
          */
         mapWrapper.find('.geolocation-common-map-locations .geolocation').each(function (key, location) {
+          /** @type {jQuery} */
           location = $(location);
           var position = new google.maps.LatLng(parseFloat(location.data('lat')), parseFloat(location.data('lng')));
 
