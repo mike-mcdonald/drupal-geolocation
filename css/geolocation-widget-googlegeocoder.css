@@ -35,6 +35,7 @@
   border: 1px solid transparent;
   box-sizing: content-box;
   font-size: 14px;
+  margin: 0;
 }
 
 .geocode-controls-wrapper input.location {
