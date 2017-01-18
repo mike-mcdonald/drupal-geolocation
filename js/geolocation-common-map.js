@@ -199,10 +199,10 @@
             && mapWrapper.data('centre-lng-south-west')
           ) {
             var centerBounds = {
-                north: mapWrapper.data('centre-lat-north-east'),
-                east: mapWrapper.data('centre-lng-north-east'),
-                south: mapWrapper.data('centre-lat-south-west'),
-                west: mapWrapper.data('centre-lng-south-west')
+              north: mapWrapper.data('centre-lat-north-east'),
+              east: mapWrapper.data('centre-lng-north-east'),
+              south: mapWrapper.data('centre-lat-south-west'),
+              west: mapWrapper.data('centre-lng-south-west')
             };
 
             geolocationMap.lat = geolocationMap.lng = 0;
@@ -265,7 +265,7 @@
                   exposedForm.find('input[name="' + dynamic_map_settings.parameter_identifier + '[lat_south_west]"]').val(currentBounds.getSouthWest().lat());
                   exposedForm.find('input[name="' + dynamic_map_settings.parameter_identifier + '[lng_south_west]"]').val(currentBounds.getSouthWest().lng());
 
-                  $('input[type=submit], input[type=image]', exposedForm).not('[data-drupal-selector=edit-reset]').trigger('click');
+                  $('input[type=submit], input[type=image], button[type=submit]', exposedForm).not('[data-drupal-selector=edit-reset]').trigger('click');
                 }
                 // No AJAX, no form, just enforce a page reload with GET parameters set.
                 else {
@@ -343,6 +343,7 @@
          * Add the locations to the map.
          */
         mapWrapper.find('.geolocation-common-map-locations .geolocation').each(function (key, location) {
+
           /** @type {jQuery} */
           location = $(location);
           var position = new google.maps.LatLng(parseFloat(location.data('lat')), parseFloat(location.data('lng')));
