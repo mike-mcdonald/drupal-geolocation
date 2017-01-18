@@ -157,8 +157,8 @@
 
           // Override map center with field values.
           if (
-            fieldValues.lat.length
-            && fieldValues.lng.length
+            typeof fieldValues.lat != 'undefined'
+            && typeof fieldValues.lng != 'undefined'
           ) {
             map.lat = fieldValues.lat;
             map.lng = fieldValues.lng;

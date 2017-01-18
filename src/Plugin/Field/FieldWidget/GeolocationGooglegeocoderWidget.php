@@ -12,6 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\geolocation\GeolocationCore;
+use Drupal\Component\Utility\Html;
 
 /**
  * Plugin implementation of the 'geolocation_googlegeocoder' widget.
@@ -241,27 +242,6 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $settings = $this->getGoogleMapsSettings($this->getSettings()) + $this->getSettings();
 
-    // Get this field name and parent.
-    $field_name = $this->fieldDefinition->getName();
-    $parents = $form['#parents'];
-    // Get the field state.
-    $field_state = static::getWidgetState($parents, $field_name, $form_state);
-
-    // Create a unique canvas id for each map of each geolocation field
-    // instance.
-    $field_id = preg_replace('/[^a-zA-Z0-9\-]/', '-', $this->fieldDefinition->getName());
-    $canvas_id = !empty($field_state['canvas_ids'][$delta])
-      ? $field_state['canvas_ids'][$delta]
-      : uniqid("map-canvas-{$field_id}-");
-
-    // Add the canvas id for this field.
-    $field_state['canvas_ids'] = isset($field_state['canvas_ids'])
-      ? $field_state['canvas_ids'] + [$delta => $canvas_id]
-      : [$delta => $canvas_id];
-
-    // Save the field state for this field.
-    static::setWidgetState($parents, $field_name, $form_state, $field_state);
-
     // Get the geolocation value for this element.
     $lat = $items[$delta]->lat;
     $lng = $items[$delta]->lng;
@@ -294,6 +274,8 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
         'lng' => $lng,
       ];
     }
+
+    $canvas_id = Html::getUniqueId($this->fieldDefinition->getName());
 
     // Hidden lat,lng input fields.
     $element['lat'] = [
