@@ -202,6 +202,30 @@ views.filter.geolocation_filter_boundary:
         lng_south_west:
            type: string
            label: 'North East Longitude'
+    expose:
+      type: mapping
+      label: 'Expose settings'
+      mapping:
+        input_by_geocoding_widget:
+          type: integer
+          label: 'Enable geocoding widget'
+        geocoder_plugin_settings:
+          type: mapping
+          label: 'Geocoding widget settings'
+          mapping:
+            plugin_id:
+              type: string
+              label: 'Geolocation geocoding widget'
+            settings:
+              type: mapping
+              label: 'Settings'
+              mapping:
+                components:
+                  type: sequence
+                  label: 'Components'
+                  sequence:
+                    type: string
+                    label: 'Address component'
 
 views.filter.geolocation_filter_proximity:
   type: views_filter
@@ -305,3 +329,26 @@ field.widget.settings.geolocation_googlegeocoder:
     google_map_settings:
       type: geolocation.google_map_settings
       label: 'Google map settings'
+
+field.value.geolocation:
+  type: mapping
+  label: 'Default value'
+  mapping:
+    lat:
+      type: text
+      label: 'Latitude'
+    lng:
+      type: text
+      label: 'Longitude'
+    lat_sin:
+      type: text
+      label: 'Support value'
+    lat_cos:
+      type: text
+      label: 'Support value'
+    lng_rad:
+      type: text
+      label: 'Support value'
+    data:
+      type: text
+      label: 'Catchall'
