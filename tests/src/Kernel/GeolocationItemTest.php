@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\tests\geolocation\Kernel;
+namespace Drupal\Tests\geolocation\Kernel;
 
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
