@@ -323,7 +323,10 @@ class ProximityField extends NumericField implements ContainerFactoryPluginInter
         }
         /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
         $entity = \Drupal::entityTypeManager()->getStorage($this->getEntityType())->load($entity_id);
-        if (!$entity->hasField($this->realField)) {
+        if (
+          !$entity
+          || !$entity->hasField($this->realField)
+        ) {
           return;
         }
         $field = $entity->get($this->realField);

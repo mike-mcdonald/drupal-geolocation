@@ -102,9 +102,9 @@ class ProximityArgument extends Formula implements ContainerFactoryPluginInterfa
     // Now that our table is secure, get our formula.
     $placeholder = $this->placeholder();
     $formula = $this->getFormula() . ' ' . $this->operator . ' ' . $placeholder;
-    $placeholders = array(
+    $placeholders = [
       $placeholder => $this->proximity,
-    );
+    ];
 
     // The addWhere function is only available for SQL queries.
     if ($this->query instanceof Sql) {

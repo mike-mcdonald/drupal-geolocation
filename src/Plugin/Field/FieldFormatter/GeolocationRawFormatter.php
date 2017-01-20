@@ -25,29 +25,29 @@ class GeolocationRawFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public static function defaultSettings() {
-    return array(
+    return [
       'value' => 'lat',
-    ) + parent::defaultSettings();
+    ] + parent::defaultSettings();
   }
 
   /**
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
-    $element['value'] = array(
+    $element['value'] = [
       '#title' => $this->t('Raw value'),
       '#type' => 'radios',
-      '#options' => array(
+      '#options' => [
         'lat' => $this->t('Latitude'),
         'lng' => $this->t('Longitude'),
         'lat_sin' => $this->t('Precalculated latitude sine'),
         'lat_cos' => $this->t('Precalculated latitude cosine'),
         'lng_rad' => $this->t('Precalculated radian longitude'),
-      ),
+      ],
       '#default_value' => $this->getSetting('value'),
       '#description' => $this->t('Renders a single raw value.'),
       '#required' => TRUE,
-    );
+    ];
     return $element;
   }
 
@@ -55,8 +55,8 @@ class GeolocationRawFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public function settingsSummary() {
-    $summary = array();
-    $summary[] = $this->t('Raw value: @item', array('@item' => $this->getSetting('value')));
+    $summary = [];
+    $summary[] = $this->t('Raw value: @item', ['@item' => $this->getSetting('value')]);
     return $summary;
   }
 
@@ -64,12 +64,12 @@ class GeolocationRawFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    $element = array();
+    $element = [];
 
     foreach ($items as $delta => $item) {
-      $element[$delta] = array(
+      $element[$delta] = [
         '#markup' => $item->{$this->settings['value']},
-      );
+      ];
     }
 
     return $element;
