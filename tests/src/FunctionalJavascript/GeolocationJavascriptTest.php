@@ -182,10 +182,10 @@ class GeolocationJavascriptTest extends JavascriptTestBase {
 
     $this->assertSession()->fieldExists("field_geolocation[0][google_map_settings][height]");
 
-    $edit = array(
+    $edit = [
       'title[0][value]' => $this->randomMachineName(),
       'field_geolocation[0][google_map_settings][height]' => '273px',
-    );
+    ];
 
     $this->drupalPostForm(NULL, $edit, t('Save'));
 

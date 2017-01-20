@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\geolocation\Tests;
+namespace Drupal\tests\geolocation\Kernel;
 
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
@@ -20,7 +20,7 @@ class GeolocationItemTest extends FieldKernelTestBase {
    *
    * @var array
    */
-  public static $modules = array('geolocation');
+  public static $modules = ['geolocation'];
 
   /**
    * {@inheritdoc}
