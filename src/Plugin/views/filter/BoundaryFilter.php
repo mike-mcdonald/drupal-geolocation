@@ -82,7 +82,6 @@ class BoundaryFilter extends FilterPluginBase implements ContainerFactoryPluginI
     $options = parent::defineOptions();
 
     $options['expose']['contains']['input_by_geocoding_widget'] = ['default' => FALSE];
-    $options['expose']['contains']['input_by_geocoding_widget'] = ['default' => FALSE];
     $options['expose']['contains']['geocoder_plugin_settings'] = [
       'default' => [
         'plugin_id' => '',
