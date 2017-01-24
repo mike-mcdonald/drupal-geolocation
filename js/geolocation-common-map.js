@@ -40,7 +40,7 @@
 
   /* global google */
 
-  var skipMapUpdate = false; // Setting to true will skip the next triggered map related viewsRefresh.
+  var skipMapIdleEventHandler = false; // Setting to true will skip the next triggered map related viewsRefresh.
 
   /**
    * @namespace
@@ -136,14 +136,10 @@
           });
         }
 
-        // Set to true to skip initial map set.
-        skipMapUpdate = true;
-
         /*
          * Update existing map, depending on present data-attribute settings.
          */
         if (typeof geolocationMap.googleMap !== 'undefined') {
-          skipMapUpdate = false;
           if (mapWrapper.data('centre-lat') && mapWrapper.data('centre-lng')) {
             var newCenter = new google.maps.LatLng(
               mapWrapper.data('centre-lat'),
@@ -151,6 +147,7 @@
             );
 
             if (!geolocationMap.googleMap.getCenter().equals(newCenter)) {
+              skipMapIdleEventHandler = true;
               geolocationMap.googleMap.setCenter(newCenter);
             }
           }
@@ -168,6 +165,7 @@
             };
 
             if (!geolocationMap.googleMap.getBounds().equals(newBounds)) {
+              skipMapIdleEventHandler = true;
               geolocationMap.googleMap.fitBounds(newBounds);
             }
           }
@@ -190,6 +188,7 @@
             geolocationMap.lat = mapWrapper.data('centre-lat');
             geolocationMap.lng = mapWrapper.data('centre-lng');
 
+            skipMapIdleEventHandler = true;
             geolocationMap.googleMap = Drupal.geolocation.addMap(geolocationMap);
           }
           else if (
@@ -206,13 +205,16 @@
             };
 
             geolocationMap.lat = geolocationMap.lng = 0;
+            skipMapIdleEventHandler = true;
             geolocationMap.googleMap = Drupal.geolocation.addMap(geolocationMap);
 
+            skipMapIdleEventHandler = true;
             geolocationMap.googleMap.fitBounds(centerBounds);
           }
           else {
             geolocationMap.lat = geolocationMap.lng = 0;
 
+            skipMapIdleEventHandler = true;
             geolocationMap.googleMap = Drupal.geolocation.addMap(geolocationMap);
           }
         }
@@ -251,10 +253,6 @@
 
               var currentBounds = geolocationMap.googleMap.getBounds();
               var update_path = '';
-              if (skipMapUpdate === true) {
-                skipMapUpdate = false;
-                return;
-              }
 
               if (
                 typeof dynamic_map_settings.boundary_filter !== 'undefined'
@@ -289,6 +287,10 @@
           if (mapWrapper.data('geolocationAjaxProcessed') !== 1) {
             var geolocationMapIdleTimer;
             geolocationMap.googleMap.addListener('idle', function () {
+              if (skipMapIdleEventHandler === true) {
+                skipMapIdleEventHandler = false;
+                return;
+              }
               clearTimeout(geolocationMapIdleTimer);
               geolocationMapIdleTimer = setTimeout(function () {
                 geolocationMap.updateDrupalView(commonMapSettings.dynamic_map);
@@ -315,7 +317,11 @@
 
                 var newLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
 
+                skipMapIdleEventHandler = true;
                 geolocationMap.googleMap.setCenter(newLocation);
+                if (skipMapIdleEventHandler !== true) {
+                  skipMapIdleEventHandler = true;
+                }
                 geolocationMap.googleMap.setZoom(parseInt(geolocationMap.settings.zoom));
 
                 Drupal.geolocation.drawAccuracyIndicator(newLocation, position.coords.accuracy, geolocationMap.googleMap);
@@ -325,6 +331,7 @@
                   && commonMapSettings.client_location.update_map === true
                   && typeof commonMapSettings.dynamic_map !== 'undefined'
                 ) {
+                  skipMapIdleEventHandler = true;
                   geolocationMap.updateDrupalView(commonMapSettings.dynamic_map);
                 }
               });
@@ -416,6 +423,7 @@
 
         if (mapWrapper.data('fitbounds') === 1) {
           // Fit map center and zoom to all currently loaded markers.
+          skipMapIdleEventHandler = true;
           geolocationMap.googleMap.fitBounds(bounds);
         }
       }
