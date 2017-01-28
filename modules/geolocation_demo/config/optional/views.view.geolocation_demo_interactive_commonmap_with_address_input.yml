@@ -16,8 +16,8 @@ dependencies:
     - node
     - text
     - user
-id: geolocation_demo_commonmap_boundary_filter_with_ajax
-label: 'Geolocation Demo - Interactive CommonMap'
+id: geolocation_demo_interactive_commonmap_with_address_input
+label: 'Geolocation Demo - Interactive CommonMap with address input'
 module: views
 description: ''
 tag: 'Geolocation Demo'
@@ -395,7 +395,7 @@ display:
               authenticated: authenticated
               anonymous: '0'
               administrator: '0'
-            input_by_geocoding_widget: 0
+            input_by_geocoding_widget: 1
             geocoder_plugin_settings:
               plugin_id: google_geocoding_api
               settings:
@@ -448,7 +448,7 @@ display:
           expose:
             label: ''
           granularity: second
-      title: 'Geolocation Demo - Interactive CommonMap'
+      title: 'Geolocation Demo - Dynamic CommonMap with Boundary filter'
       header:
         area:
           id: area
@@ -460,7 +460,7 @@ display:
           empty: false
           tokenize: false
           content:
-            value: 'Interact with the map by dragging or zooming and see the result markers on the map as well the list of results below update accordingly.'
+            value: "Interact with the map by dragging or zooming and see the result markers on the map as well the list of results below update accordingly.\nAlternatively, you can type in an address and see the map move to the location and update itself."
             format: basic_html
           plugin_id: text
       footer: {  }
@@ -498,7 +498,7 @@ display:
         type: maps_common
         options:
           show_raw_locations: 0
-          even_empty: 0
+          even_empty: 1
           geolocation_field: field_geolocation_demo_single
           title_field: title
           icon_field: none
@@ -509,7 +509,7 @@ display:
           dynamic_map:
             enabled: 1
             update_handler: boundary_filter_field_geolocation_demo_single_boundary
-            hide_form: 1
+            hide_form: 0
             views_refresh_delay: '1200'
             update_target: common_map_ajax_page
           centre:
@@ -517,17 +517,17 @@ display:
               enable: true
               weight: -10
             fit_bounds:
-              enable: false
               weight: -9
+              enable: false
             first_row:
               weight: -8
               enable: false
             fixed_value:
+              enable: true
               weight: -7
               settings:
                 latitude: '52'
                 longitude: '13'
-              enable: true
             client_location:
               weight: -6
               enable: false
@@ -581,13 +581,13 @@ display:
     position: 1
     display_options:
       display_extenders: {  }
-      path: geolocation-demo/common-map-ajax-with-boundary-filter
+      path: geolocation-demo/common-map-ajax-with-address-input
       defaults:
         filters: true
         filter_groups: true
       menu:
         type: normal
-        title: 'Interactive CommonMap'
+        title: 'Interactive CommonMap with address input'
         description: ''
         expanded: false
         parent: ''

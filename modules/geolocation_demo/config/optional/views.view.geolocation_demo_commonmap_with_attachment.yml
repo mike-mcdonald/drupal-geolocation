@@ -19,7 +19,7 @@ dependencies:
     - text
     - user
 id: geolocation_demo_commonmap_with_attachment
-label: 'Geolocation Demo - CommonMap with Attachment'
+label: 'Geolocation Demo - CommonMap with updating attachment'
 module: views
 description: ''
 tag: 'Geolocation Demo'
@@ -560,7 +560,7 @@ display:
         filter_groups: true
       menu:
         type: normal
-        title: 'CommonMap with Attachment & AJAX'
+        title: 'CommonMap with updating Attachment'
         description: ''
         expanded: false
         parent: ''

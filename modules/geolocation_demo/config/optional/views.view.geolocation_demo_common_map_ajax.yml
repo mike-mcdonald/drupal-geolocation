@@ -19,7 +19,7 @@ dependencies:
     module:
       - geolocation_demo
 id: geolocation_demo_common_map_ajax
-label: 'Geolocation Demo - CommonMap Ajax'
+label: 'Geolocation Demo - CommonMap with exposed filter and Ajax enabled'
 module: views
 description: ''
 tag: 'Geolocation Demo'
@@ -483,7 +483,7 @@ display:
           expose:
             label: ''
           granularity: second
-      title: 'Geolocation Demo - CommonMap Ajax'
+      title: 'Geolocation Demo - CommonMap with exposed filter and Ajax enabled'
       header: {  }
       footer: {  }
       empty: {  }
@@ -522,7 +522,7 @@ display:
         filter_groups: true
       menu:
         type: normal
-        title: 'CommonMap with AJAX enabled'
+        title: 'CommonMap with exposed filter and AJAX'
         description: ''
         expanded: false
         parent: ''

@@ -67,25 +67,25 @@ display:
           marker_clusterer_image_path: ''
           centre:
             first_row:
-              enable: true
+              enable: false
               weight: -9
             fixed_value:
               weight: -8
               settings:
-                latitude: '0'
-                longitude: '0'
-              enable: false
-            fit_bounds:
+                latitude: '-33.45'
+                longitude: '-70.66'
               enable: true
+            fit_bounds:
+              enable: false
               weight: 0
             client_location:
-              enable: true
+              enable: false
               weight: 0
               settings:
                 update_map: '0'
           google_map_settings:
             type: ROADMAP
-            zoom: '10'
+            zoom: '3'
             mapTypeControl: 1
             streetViewControl: 1
             zoomControl: 1
