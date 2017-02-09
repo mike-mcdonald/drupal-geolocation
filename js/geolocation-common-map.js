@@ -390,8 +390,6 @@
               }
             }
           });
-
-          geolocationMap.mapMarkers.push(marker);
         });
 
         /**
