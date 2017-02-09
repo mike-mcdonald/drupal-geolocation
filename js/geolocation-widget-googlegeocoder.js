@@ -152,13 +152,21 @@
             lng: $('.canvas-' + mapId + ' .geolocation-hidden-lng').attr('value')
           };
 
+          if (
+            typeof fieldValues.lat == 'undefined'
+            && typeof fieldValues.lng == 'undefined'
+          ) {
+            fieldValues.lat = '';
+            fieldValues.lng = '';
+          }
+
           var setInitialMarker = false;
           var setInitialLocation = false;
 
           // Override map center with field values.
           if (
-            typeof fieldValues.lat != 'undefined'
-            && typeof fieldValues.lng != 'undefined'
+            !isNaN(parseFloat(fieldValues.lat))
+            && !isNaN(parseFloat(fieldValues.lng))
           ) {
             map.lat = fieldValues.lat;
             map.lng = fieldValues.lng;
