@@ -165,6 +165,8 @@ class GeolocationSettings extends ConfigFormBase {
     $config->set('google_map_custom_url_parameters', $parameters);
 
     $config->save();
+   // Confirmation on form submission.
+   drupal_set_message($this->t('The configuration options have been saved.'));
   }
 
 }
