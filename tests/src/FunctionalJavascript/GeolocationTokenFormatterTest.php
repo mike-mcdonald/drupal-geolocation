@@ -76,7 +76,6 @@ class GeolocationTokenFormatterTest extends JavascriptTestBase {
    */
   public function testGeocoderTokenizedTestReplacement() {
     $this->drupalGet('node/1');
-    $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->responseContains('<span class="geolocation-latlng">52, 47</span>');
 
     EntityViewDisplay::load('node.article.default')
@@ -90,7 +89,6 @@ class GeolocationTokenFormatterTest extends JavascriptTestBase {
       ->save();
 
     $this->drupalGet('node/1');
-    $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->responseContains('<div class="testing">52/47</div>');
   }
 

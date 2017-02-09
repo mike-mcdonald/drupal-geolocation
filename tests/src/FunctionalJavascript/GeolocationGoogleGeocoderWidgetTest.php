@@ -129,7 +129,6 @@ class GeolocationGoogleGeocoderWidgetTest extends JavascriptTestBase {
     $this->drupalLogin($this->adminUser);
 
     $this->drupalGetFilterGoogleKey('node/3/edit');
-    $this->assertSession()->statusCodeEquals(200);
 
     $this->assertSession()->elementExists('css', '.geolocation-map-canvas');
 
@@ -154,7 +153,6 @@ class GeolocationGoogleGeocoderWidgetTest extends JavascriptTestBase {
     $this->drupalLogin($this->adminUser);
 
     $this->drupalGetFilterGoogleKey('node/add/article');
-    $this->assertSession()->statusCodeEquals(200);
 
     $page = $this->getSession()->getPage();
     $page->findField('Title')->setValue('I am new');

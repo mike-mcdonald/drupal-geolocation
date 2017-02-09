@@ -81,8 +81,8 @@ class GeolocationJavascriptTest extends JavascriptTestBase {
 
     ViewTestData::createTestViews(get_class($this), ['geolocation_test_views']);
 
-    $entity_test_storage = \Drupal::entityTypeManager()->getStorage('node');
-    $entity_test_storage->create([
+    $node_storage = \Drupal::entityTypeManager()->getStorage('node');
+    $node_storage->create([
       'id' => 1,
       'title' => 'foo bar baz',
       'body' => 'test test',
@@ -92,7 +92,7 @@ class GeolocationJavascriptTest extends JavascriptTestBase {
         'lng' => 47,
       ],
     ])->save();
-    $entity_test_storage->create([
+    $node_storage->create([
       'id' => 2,
       'title' => 'foo test',
       'body' => 'bar test',
@@ -102,7 +102,7 @@ class GeolocationJavascriptTest extends JavascriptTestBase {
         'lng' => 48,
       ],
     ])->save();
-    $entity_test_storage->create([
+    $node_storage->create([
       'id' => 3,
       'title' => 'bar',
       'body' => 'test foobar',
@@ -112,7 +112,7 @@ class GeolocationJavascriptTest extends JavascriptTestBase {
         'lng' => 49,
       ],
     ])->save();
-    $entity_test_storage->create([
+    $node_storage->create([
       'id' => 4,
       'title' => 'Custom map settings',
       'body' => 'This content tests if the custom map settings are respected',
@@ -136,8 +136,6 @@ class GeolocationJavascriptTest extends JavascriptTestBase {
   public function testCommonMap() {
     $this->drupalGetFilterGoogleKey('geolocation-test');
 
-    $this->assertSession()->statusCodeEquals(200);
-
     $this->assertSession()->elementExists('css', '.geolocation-common-map-container');
     $this->assertSession()->elementExists('css', '.geolocation-common-map-locations');
 
@@ -150,7 +148,6 @@ class GeolocationJavascriptTest extends JavascriptTestBase {
    */
   public function testGoogleMapFormatter() {
     $this->drupalGetFilterGoogleKey('node/3');
-    $this->assertSession()->statusCodeEquals(200);
 
     $this->assertSession()->elementExists('css', '.geolocation-google-map');
 
@@ -163,7 +160,6 @@ class GeolocationJavascriptTest extends JavascriptTestBase {
    */
   public function testGoogleMapFormatterCustomSettings() {
     $this->drupalGetFilterGoogleKey('node/4');
-    $this->assertSession()->statusCodeEquals(200);
 
     $this->assertSession()->elementExists('css', '.geolocation-google-map');
     $this->assertSession()->elementAttributeContains('css', '.geolocation-google-map', 'style', 'height: 376px');
@@ -190,7 +186,6 @@ class GeolocationJavascriptTest extends JavascriptTestBase {
     $this->drupalPostForm(NULL, $edit, t('Save'));
 
     $this->drupalGetFilterGoogleKey('node/4');
-    $this->assertSession()->statusCodeEquals(200);
 
     $this->assertSession()->elementExists('css', '.geolocation-google-map');
     $this->assertSession()->elementAttributeContains('css', '.geolocation-google-map', 'style', 'height: 273px;');
