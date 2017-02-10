@@ -390,6 +390,7 @@
 
                 var addressData = {};
 
+                addressData.organization = addressDetails.find('.organization').val();
                 addressData.addressLine1 = addressDetails.find('.address-line1').val();
                 addressData.addressLine2 = addressDetails.find('.address-line2').val();
                 addressData.locality = addressDetails.find('.locality').val();
