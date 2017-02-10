@@ -134,15 +134,20 @@ class BoundaryFilter extends FilterPluginBase implements ContainerFactoryPluginI
       ];
 
       if (!empty($this->options['expose']['geocoder_plugin_settings']['plugin_id'])) {
-        $geocoder_plugin = $this->geolocationCore->getGeocoderManager()->getGeocoder(
-          $this->options['expose']['geocoder_plugin_settings']['plugin_id'],
-          $this->options['expose']['geocoder_plugin_settings']['settings']
-        );
-        if ($geocoder_plugin) {
-          $geocoder_settings_form = $geocoder_plugin->getOptionsForm();
-          if ($geocoder_settings_form) {
-            $geocoder_container['settings'] = $geocoder_settings_form;
-          }
+        $geocoder_plugin = $this->geolocationCore->getGeocoderManager()
+          ->getGeocoder(
+            $this->options['expose']['geocoder_plugin_settings']['plugin_id'],
+            $this->options['expose']['geocoder_plugin_settings']['settings']
+          );
+      }
+      elseif (current(array_keys($geocoder_options))) {
+        $geocoder_plugin = $this->geolocationCore->getGeocoderManager()->getGeocoder(current(array_keys($geocoder_options)));
+      }
+
+      if (!empty($geocoder_plugin)) {
+        $geocoder_settings_form = $geocoder_plugin->getOptionsForm();
+        if ($geocoder_settings_form) {
+          $geocoder_container['settings'] = $geocoder_settings_form;
         }
       }
 
