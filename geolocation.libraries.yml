@@ -6,6 +6,14 @@ geolocation.geocoder:
   dependencies:
     - core/jquery.ui.autocomplete
 
+# Geolocation views field geocoder function.
+geolocation.views.field.geocoder:
+  version: 8.x-1.x
+  js:
+    js/geolocation-views-field-geocoder.js: {}
+  dependencies:
+    - geolocation/geolocation.geocoder
+
 # Geolocation views filter geocoder function.
 geolocation.views.filter.geocoder:
   version: 8.x-1.x

@@ -181,6 +181,26 @@ views.field.geolocation_field_proximity:
     entity_id_argument:
       type: string
       label: 'Proximity Entity ID argument'
+    proximity_geocoder:
+      type: integer
+      label: 'Enable geocoding widget'
+    proximity_geocoder_plugin_settings:
+      type: mapping
+      label: 'Geocoding widget settings'
+      mapping:
+        plugin_id:
+          type: string
+          label: 'Geolocation geocoding widget'
+        settings:
+          type: mapping
+          label: 'Settings'
+          mapping:
+            components:
+              type: sequence
+              label: 'Components'
+              sequence:
+                type: string
+                label: 'Address component'
 
 views.filter.geolocation_filter_boundary:
   type: views_filter
