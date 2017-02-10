@@ -477,6 +477,7 @@ class ProximityField extends NumericField implements ContainerFactoryPluginInter
       unset($form['actions']);
       return;
     }
+    $form['#cache']['max-age'] = 0;
 
     $form['#method'] = 'GET';
 
