@@ -35,6 +35,9 @@ geolocation.google_map_settings:
     info_auto_display:
       type: integer
       label: 'Display info'
+    marker_icon_path:
+      type: string
+      label: 'Path to marker icon'
     disableAutoPan:
       type: integer
       label: 'Disable automatic panning for info window'

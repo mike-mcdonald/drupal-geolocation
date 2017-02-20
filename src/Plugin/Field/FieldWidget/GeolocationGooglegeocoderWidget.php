@@ -199,7 +199,7 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
       '#title' => $this->t('Allow override the map settings when create/edit an content.'),
       '#default_value' => $settings['allow_override_map_settings'],
     ];
-    $element += $this->getGoogleMapsSettingsForm($settings);
+    $element += $this->getGoogleMapsSettingsForm($settings, 'fields][' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][');
 
     return $element;
   }
@@ -432,7 +432,7 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
       else {
         $map_settings = $settings;
       }
-      $element += $this->getGoogleMapsSettingsForm($map_settings);
+      $element += $this->getGoogleMapsSettingsForm($map_settings, $this->fieldDefinition->getName() . '][' . $delta . '][');
     }
 
     // Wrap the whole form in a container.

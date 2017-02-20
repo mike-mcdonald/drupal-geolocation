@@ -11,6 +11,7 @@
 /**
  * @name GoogleMapSettings
  * @property {String} info_auto_display
+ * @property {String} marker_icon_path
  * @property {String} height
  * @property {String} width
  * @property {String} zoom
@@ -339,6 +340,12 @@
    */
   Drupal.geolocation.setMapMarker = function (map, markerSettings) {
     map.mapMarkers = map.mapMarkers || [];
+
+    if (typeof map.settings.google_map_settings.marker_icon_path === 'string') {
+      if (typeof markerSettings.icon === 'undefined') {
+        markerSettings.icon = map.settings.google_map_settings.marker_icon_path;
+      }
+    }
 
     // Add the marker to the map.
     /** @type {GoogleMarker} */

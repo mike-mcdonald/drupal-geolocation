@@ -118,7 +118,7 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
 
     $element['replacement_patterns']['token_geolocation'] = $this->getTokenHelp();
 
-    $element += $this->getGoogleMapsSettingsForm($settings);
+    $element += $this->getGoogleMapsSettingsForm($settings, 'fields][' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][');
 
     $element['use_overridden_map_settings'] = [
       '#type' => 'checkbox',

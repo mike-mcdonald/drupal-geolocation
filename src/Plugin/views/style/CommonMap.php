@@ -234,6 +234,9 @@ class CommonMap extends StylePluginBase {
               $icon_url = file_create_url($item->entity->getFileUri());
             }
           }
+          else {
+            $icon_url = NULL;
+          }
         }
       }
 
@@ -719,7 +722,7 @@ class CommonMap extends StylePluginBase {
     /*
      * Additional map settings.
      */
-    $form += $this->getGoogleMapsSettingsForm($this->options);
+    $form += $this->getGoogleMapsSettingsForm($this->options, 'style_options][');
   }
 
   /**

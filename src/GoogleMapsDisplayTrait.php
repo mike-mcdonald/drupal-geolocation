@@ -126,6 +126,7 @@ trait GoogleMapsDisplayTrait {
         'height' => '400px',
         'width' => '100%',
         'info_auto_display' => TRUE,
+        'marker_icon_path' => TRUE,
         'disableAutoPan' => TRUE,
         'style' => '',
         'preferScrollingToZooming' => FALSE,
@@ -146,6 +147,8 @@ trait GoogleMapsDisplayTrait {
   public function getGoogleMapsSettings(array $settings) {
     $default_settings = self::getGoogleMapDefaultSettings();
     $settings = array_replace_recursive($default_settings, $settings);
+
+    $settings['google_map_settings']['marker_icon_path'] = \Drupal::token()->replace($settings['google_map_settings']['marker_icon_path']);
 
     foreach ($settings['google_map_settings'] as $key => $setting) {
       if (!isset($default_settings['google_map_settings'][$key])) {
@@ -194,7 +197,7 @@ trait GoogleMapsDisplayTrait {
    * @return array
    *   A form array to be integrated in whatever.
    */
-  public function getGoogleMapsSettingsForm(array $settings) {
+  public function getGoogleMapsSettingsForm(array $settings, $form_prefix = '') {
     $settings['google_map_settings'] += self::getGoogleMapDefaultSettings()['google_map_settings'];
     $form = [
       'google_map_settings' => [
@@ -204,11 +207,41 @@ trait GoogleMapsDisplayTrait {
       ],
     ];
 
+    /*
+     * General settings.
+     */
+    $form['google_map_settings']['general_settings'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('General'),
+    ];
+    $form['google_map_settings']['height'] = [
+      '#group' => $form_prefix . 'google_map_settings][general_settings',
+      '#type' => 'textfield',
+      '#title' => $this->t('Height'),
+      '#description' => $this->t('Enter the dimensions and the measurement units. E.g. 200px or 100%.'),
+      '#size' => 4,
+      '#default_value' => $settings['google_map_settings']['height'],
+    ];
+    $form['google_map_settings']['width'] = [
+      '#group' => $form_prefix . 'google_map_settings][general_settings',
+      '#type' => 'textfield',
+      '#title' => $this->t('Width'),
+      '#description' => $this->t('Enter the dimensions and the measurement units. E.g. 200px or 100%.'),
+      '#size' => 4,
+      '#default_value' => $settings['google_map_settings']['width'],
+    ];
     $form['google_map_settings']['type'] = [
       '#type' => 'select',
       '#title' => $this->t('Default map type'),
       '#options' => $this->getMapTypes(),
       '#default_value' => $settings['google_map_settings']['type'],
+      '#group' => $form_prefix . 'google_map_settings][general_settings',
+      '#process' => [
+        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+      ],
+      '#pre_render' => [
+        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+      ],
     ];
     $form['google_map_settings']['zoom'] = [
       '#type' => 'select',
@@ -216,32 +249,62 @@ trait GoogleMapsDisplayTrait {
       '#options' => range(0, 18),
       '#description' => $this->t('The initial resolution at which to display the map, where zoom 0 corresponds to a map of the Earth fully zoomed out, and higher zoom levels zoom in at a higher resolution.'),
       '#default_value' => $settings['google_map_settings']['zoom'],
+      '#group' => $form_prefix . 'google_map_settings][general_settings',
+      '#process' => [
+        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+      ],
+      '#pre_render' => [
+        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+      ],
+    ];
+
+    /*
+     * Control settings.
+     */
+
+    $form['google_map_settings']['control_settings'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Controls'),
     ];
     $form['google_map_settings']['mapTypeControl'] = [
+      '#group' => $form_prefix . 'google_map_settings][control_settings',
       '#type' => 'checkbox',
       '#title' => $this->t('Map type control'),
       '#description' => $this->t('Allow the user to change the map type.'),
       '#default_value' => $settings['google_map_settings']['mapTypeControl'],
     ];
     $form['google_map_settings']['streetViewControl'] = [
+      '#group' => $form_prefix . 'google_map_settings][control_settings',
       '#type' => 'checkbox',
       '#title' => $this->t('Street view control'),
       '#description' => $this->t('Allow the user to switch to google street view.'),
       '#default_value' => $settings['google_map_settings']['streetViewControl'],
     ];
     $form['google_map_settings']['zoomControl'] = [
+      '#group' => $form_prefix . 'google_map_settings][control_settings',
       '#type' => 'checkbox',
       '#title' => $this->t('Zoom control'),
       '#description' => $this->t('Show zoom controls.'),
       '#default_value' => $settings['google_map_settings']['zoomControl'],
     ];
+
+    /*
+     * Behavior settings.
+     */
+    $form['google_map_settings']['behavior_settings'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Behavior'),
+    ];
+
     $form['google_map_settings']['scrollwheel'] = [
+      '#group' => $form_prefix . 'google_map_settings][behavior_settings',
       '#type' => 'checkbox',
       '#title' => $this->t('Scrollwheel'),
       '#description' => $this->t('Allow the user to zoom the map using the scrollwheel.'),
       '#default_value' => $settings['google_map_settings']['scrollwheel'],
     ];
     $form['google_map_settings']['gestureHandling'] = [
+      '#group' => $form_prefix . 'google_map_settings][behavior_settings',
       '#type' => 'select',
       '#title' => $this->t('Gesture Handling'),
       '#default_value' => $settings['google_map_settings']['gestureHandling'],
@@ -255,25 +318,35 @@ trait GoogleMapsDisplayTrait {
         'greedy' => $this->t('greedy'),
         'none' => $this->t('none'),
       ],
+      '#process' => [
+        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+      ],
+      '#pre_render' => [
+        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+      ],
     ];
     $form['google_map_settings']['draggable'] = [
+      '#group' => $form_prefix . 'google_map_settings][behavior_settings',
       '#type' => 'checkbox',
       '#title' => $this->t('Draggable'),
       '#description' => $this->t('Allow the user to change the field of view. <i>Deprecated as of v3.27 / Nov. 2016 in favor of gesture handling described above.</i>.'),
       '#default_value' => $settings['google_map_settings']['draggable'],
     ];
     $form['google_map_settings']['preferScrollingToZooming'] = [
+      '#group' => $form_prefix . 'google_map_settings][behavior_settings',
       '#type' => 'checkbox',
       '#title' => $this->t('Require the user to click the map once to zoom, to ease scrolling behavior.'),
       '#description' => $this->t('Note: this is only relevant, when the Scrollwheel option is enabled.'),
       '#default_value' => $settings['google_map_settings']['preferScrollingToZooming'],
     ];
     $form['google_map_settings']['disableDoubleClickZoom'] = [
+      '#group' => $form_prefix . 'google_map_settings][behavior_settings',
       '#type' => 'checkbox',
       '#title' => $this->t('Disable double click zoom'),
       '#description' => $this->t('Disables the double click zoom functionality.'),
       '#default_value' => $settings['google_map_settings']['disableDoubleClickZoom'],
     ];
+
     $form['google_map_settings']['style'] = [
       '#title' => $this->t('JSON styles'),
       '#type' => 'textarea',
@@ -282,26 +355,30 @@ trait GoogleMapsDisplayTrait {
         ':styling' => 'https://developers.google.com/maps/documentation/javascript/styling',
       ]),
     ];
-    $form['google_map_settings']['height'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Height'),
-      '#description' => $this->t('Enter the dimensions and the measurement units. E.g. 200px or 100%.'),
-      '#size' => 4,
-      '#default_value' => $settings['google_map_settings']['height'],
+
+    /*
+     * Marker settings.
+     */
+    $form['google_map_settings']['marker_settings'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Marker'),
     ];
-    $form['google_map_settings']['width'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Width'),
-      '#description' => $this->t('Enter the dimensions and the measurement units. E.g. 200px or 100%.'),
-      '#size' => 4,
-      '#default_value' => $settings['google_map_settings']['width'],
-    ];
+
     $form['google_map_settings']['info_auto_display'] = [
+      '#group' => $form_prefix . 'google_map_settings][marker_settings',
       '#type' => 'checkbox',
       '#title' => $this->t('Automatically show info text'),
       '#default_value' => $settings['google_map_settings']['info_auto_display'],
     ];
+    $form['google_map_settings']['marker_icon_path'] = [
+      '#group' => $form_prefix . 'google_map_settings][marker_settings',
+      '#type' => 'textfield',
+      '#title' => $this->t('Marker icon path'),
+      '#description' => $this->t('Set relative or absolute path to custom marker icon. Tokens supported. Empty for default.'),
+      '#default_value' => $settings['google_map_settings']['marker_icon_path'],
+    ];
     $form['google_map_settings']['disableAutoPan'] = [
+      '#group' => $form_prefix . 'google_map_settings][marker_settings',
       '#type' => 'checkbox',
       '#title' => $this->t('Disable automatic panning of map when info bubble is opened.'),
       '#default_value' => $settings['google_map_settings']['disableAutoPan'],
