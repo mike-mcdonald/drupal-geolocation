@@ -142,6 +142,16 @@ class CommonMap extends StylePluginBase {
     }
 
     /*
+     * Context popup content.
+     */
+    if (!empty($this->options['context_popup_content'])) {
+      $context_popup_content = \Drupal::token()->replace($this->options['context_popup_content']);
+      $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['contextPopupContent'] = [];
+      $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['contextPopupContent']['enable'] = TRUE;
+      $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['contextPopupContent']['content'] = $context_popup_content;
+    }
+
+    /*
      * Marker clusterer.
      */
     if (!empty($this->options['marker_clusterer'])) {
@@ -408,6 +418,7 @@ class CommonMap extends StylePluginBase {
       ],
     ];
     $options['centre'] = ['default' => ''];
+    $options['context_popup_content'] = ['default' => ''];
 
     foreach (self::getGoogleMapDefaultSettings() as $key => $setting) {
       $options[$key] = ['default' => $setting];
@@ -619,6 +630,13 @@ class CommonMap extends StylePluginBase {
         }
       }
     }
+
+    $form['context_popup_content'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Context popup content'),
+      '#description' => $this->t('A right click on the map will open a context popup with this content. Tokens supported. Additionally "@lat, @lng" will be replaced dynamically.'),
+      '#default_value' => $this->options['context_popup_content'],
+    ];
 
     /*
      * Centre handling.

@@ -125,6 +125,9 @@ views.style.maps_common:
         update_target:
           type: string
           label: 'Display to update'
+    context_popup_content:
+      type: string
+      label: 'Context Popup content'
     marker_clusterer:
       type: integer
       label: 'Cluster markers'

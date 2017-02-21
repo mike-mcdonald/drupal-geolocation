@@ -82,10 +82,7 @@ class GeolocationTokenFormatter extends FormatterBase {
 
     $elements = [];
     foreach ($items as $delta => $item) {
-      $token_context['geolocation_current_item'] = (object) [
-        'lat' => $item->lat,
-        'lng' => $item->lng,
-      ];
+      $token_context['geolocation_current_item'] = $item;
       $tokenized_text = \Drupal::token()->replace($this->getSetting('tokenized_text'), $token_context, ['callback' => [$this, 'geolocationItemTokens']]);
       $elements[$delta] = [
         '#markup' => $tokenized_text,

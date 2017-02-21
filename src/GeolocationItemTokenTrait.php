@@ -2,8 +2,6 @@
 
 namespace Drupal\geolocation;
 
-use Drupal\geolocation\Plugin\Field\FieldType\GeolocationItem;
-
 /**
  * Class GeolocationItemTokenTrait - Provide Token for geolocation items.
  *
@@ -68,14 +66,16 @@ trait GeolocationItemTokenTrait {
       'description' => [
         '#plain_text' => $this->t('Add description'),
       ],
-    ];$element['token_items'][] = [
+    ];
+    $element['token_items'][] = [
       'token' => [
         '#plain_text' => '[geolocation_current_item:lat_cos]',
       ],
       'description' => [
         '#plain_text' => $this->t('Add description'),
       ],
-    ];$element['token_items'][] = [
+    ];
+    $element['token_items'][] = [
       'token' => [
         '#plain_text' => '[geolocation_current_item:lng_rad]',
       ],
@@ -102,7 +102,7 @@ trait GeolocationItemTokenTrait {
    * @param array $replacements
    *   An associative array variable containing mappings from token names to
    *   values (for use with strtr()).
-   * @param GeolocationItem[] $data
+   * @param array $data
    *   Current item replacements.
    * @param array $options
    *   A keyed array of settings and flags to control the token replacement
@@ -111,21 +111,21 @@ trait GeolocationItemTokenTrait {
   public function geolocationItemTokens(array &$replacements, array $data, array $options) {
     if (isset($data['geolocation_current_item'])) {
 
-      /** @var GeolocationItem $item */
+      /** @var \Drupal\geolocation\Plugin\Field\FieldType\GeolocationItem $item */
       $item = $data['geolocation_current_item'];
-      $replacements['[geolocation_current_item:lat]'] = $item->lat;
-      $replacements['[geolocation_current_item:lat_sex]'] = GeolocationCore::decimalToSexagesimal($item->lat);
-      $replacements['[geolocation_current_item:lng]'] = $item->lng;
-      $replacements['[geolocation_current_item:lng_sex]'] = GeolocationCore::decimalToSexagesimal($item->lng);
-      $replacements['[geolocation_current_item:lat_sin]'] = $item->lat_sin;
-      $replacements['[geolocation_current_item:lat_cos]'] = $item->lat_cos;
-      $replacements['[geolocation_current_item:lng_rad]'] = $item->lng_rad;
+      $replacements['[geolocation_current_item:lat]'] = $item->get('lat')->getValue();
+      $replacements['[geolocation_current_item:lat_sex]'] = GeolocationCore::decimalToSexagesimal($item->get('lat')->getValue());
+      $replacements['[geolocation_current_item:lng]'] = $item->get('lng')->getValue();
+      $replacements['[geolocation_current_item:lng_sex]'] = GeolocationCore::decimalToSexagesimal($item->get('lng')->getValue());
+      $replacements['[geolocation_current_item:lat_sin]'] = $item->get('lat_sin')->getValue();
+      $replacements['[geolocation_current_item:lat_cos]'] = $item->get('lat_cos')->getValue();
+      $replacements['[geolocation_current_item:lng_rad]'] = $item->get('lng_rad')->getValue();
 
       // TODO: Deprecated. Remove at some point.
-      $replacements[':lat'] = $item->lat;
-      $replacements['%lat'] = $item->lat;
-      $replacements[':lng'] = $item->lng;
-      $replacements['%lng'] = $item->lng;
+      $replacements[':lat'] = $item->get('lat')->getValue();
+      $replacements['%lat'] = $item->get('lat')->getValue();
+      $replacements[':lng'] = $item->get('lng')->getValue();
+      $replacements['%lng'] = $item->get('lng')->getValue();
     }
   }
 

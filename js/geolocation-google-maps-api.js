@@ -43,6 +43,12 @@
  */
 
 /**
+ * @typedef {Object} GoogleMapPoint
+ * @property {function():float} x
+ * @property {function():float} y
+ */
+
+/**
  * @typedef {Object} AddressComponent
  * @property {String} long_name - Long component name
  * @property {String} short_name - Short component name
@@ -63,6 +69,11 @@
  * @property {String} location_type - Location type
  * @property {GoogleMapBounds} viewport - Viewport
  * @property {GoogleMapBounds} bounds - Bounds (optionally)
+ */
+
+/**
+ * @typedef {Object} GoogleMapProjection
+ * @property {function(GoogleMapLatLng):GoogleMapPoint} fromLatLngToPoint
  */
 
 /**
@@ -113,7 +124,6 @@
  * @property {Object} MapTypeId
  * @property {String} MapTypeId.ROADMAP
  *
- * @property {Function} LatLng
  * @property {Function} LatLngBounds
  *
  * @function
@@ -129,9 +139,14 @@
  * @property {function({}):GoogleInfoWindow} InfoWindow
  *
  * @function
- * @property {function(string|number, string|number):GoogleMapLatLng} LatLng
+ * @property {function(string|number|float, string|number|float):GoogleMapLatLng} LatLng
+ *
+ * @function
+ * @property {function(string|number|float, string|number|float):GoogleMapPoint} Point
  *
  * @property {function(Object):GoogleCircle} Circle
+ *
+ * @property {function():GoogleMapProjection} getProjection
  *
  * @property {Function} fitBounds
  *
