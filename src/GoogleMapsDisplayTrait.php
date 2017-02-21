@@ -193,6 +193,8 @@ trait GoogleMapsDisplayTrait {
    *
    * @param array $settings
    *   The current map settings.
+   * @param string $form_prefix
+   *   Form specific optional prefix.
    *
    * @return array
    *   A form array to be integrated in whatever.

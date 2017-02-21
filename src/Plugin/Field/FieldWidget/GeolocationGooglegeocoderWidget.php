@@ -430,7 +430,9 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
         ];
       }
       else {
-        $map_settings = $settings;
+        $map_settings = [
+          'google_map_settings' => [],
+        ];
       }
       $element += $this->getGoogleMapsSettingsForm($map_settings, $this->fieldDefinition->getName() . '][' . $delta . '][');
     }
@@ -453,7 +455,7 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     $values = parent::massageFormValues($values, $form, $form_state);
 
-    if ($this->settings['allow_override_map_settings']) {
+    if (!empty($this->settings['allow_override_map_settings'])) {
       foreach ($values as $delta => $item_values) {
         if (!empty($item_values['google_map_settings'])) {
           $values[$delta]['data']['google_map_settings'] = $item_values['google_map_settings'];
