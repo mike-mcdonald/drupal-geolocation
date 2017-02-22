@@ -58,7 +58,6 @@ class CommonMap extends StylePluginBase {
 
       switch ($filter['plugin_id']) {
         case 'geolocation_filter_boundary':
-          $map_update_target_options['boundary_filters'][$filter_name] = $filter_handler;
           if ($filter_handler->isExposed()) {
             $options['boundary_filters_exposed'][$filter_name] = $filter_handler;
           }
