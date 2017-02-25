@@ -144,7 +144,7 @@ class GeolocationJavascriptTest extends JavascriptTestBase {
   }
 
   /**
-   * Tests the GoogleMap formatter.
+   * Tests the Google Maps formatter.
    */
   public function testGoogleMapFormatter() {
     $this->drupalGetFilterGoogleKey('node/3');
@@ -156,7 +156,7 @@ class GeolocationJavascriptTest extends JavascriptTestBase {
   }
 
   /**
-   * Tests the GoogleMap formatter.
+   * Tests the Google Maps formatter.
    */
   public function testGoogleMapFormatterCustomSettings() {
     $this->drupalGetFilterGoogleKey('node/4');

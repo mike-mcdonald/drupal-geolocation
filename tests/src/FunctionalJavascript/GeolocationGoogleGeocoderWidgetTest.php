@@ -123,7 +123,7 @@ class GeolocationGoogleGeocoderWidgetTest extends JavascriptTestBase {
   }
 
   /**
-   * Tests the GoogleMap widget.
+   * Tests the Google Maps widget.
    */
   public function testGeocoderWidgetMapPresent() {
     $this->drupalLogin($this->adminUser);
@@ -137,7 +137,7 @@ class GeolocationGoogleGeocoderWidgetTest extends JavascriptTestBase {
   }
 
   /**
-   * Tests the GoogleMap widget.
+   * Tests the Google Maps widget.
    */
   public function testGeocoderWidgetEmptyValuePreserved() {
     EntityFormDisplay::load('node.article.default')
