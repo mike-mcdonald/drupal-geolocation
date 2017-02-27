@@ -50,14 +50,14 @@ trait GoogleMapsDisplayTrait {
   /**
    * Google map max zoom level.
    *
-   * @var integer
+   * @var int
    */
   public static $MAXZOOMLEVEL = 18;
 
   /**
    * Google map min zoom level.
    *
-   * @var integer
+   * @var int
    */
   public static $MINZOOMLEVEL = 0;
 

@@ -18,7 +18,7 @@ class AjaxResponseSubscriber implements EventSubscriberInterface {
    * @param array $commands
    *   An array of commands to alter.
    */
-  protected function alterCommands(&$commands) {
+  protected function alterCommands(array &$commands) {
     foreach ($commands as $delta => &$command) {
       // Substitute the 'replace' method without our custom jQuery method which
       // will allow views content to be injected one after the other.

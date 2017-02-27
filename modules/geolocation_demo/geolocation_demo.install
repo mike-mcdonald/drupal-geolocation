@@ -1,7 +1,11 @@
 <?php
 
+/**
+ * @file
+ * Handle install.
+ */
+
 use Drupal\Component\Utility\Random;
-use Drupal\block\Entity\Block;
 
 /**
  * @file

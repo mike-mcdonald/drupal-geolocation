@@ -217,9 +217,13 @@
         scaleControl: false,
         streetViewControl: false,
         overviewMapControl: false,
+        rotateControl: false,
+        fullscreenControl: false,
         zoomControl: true,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         zoom: 2,
+        maxZoom: 0,
+        minZoom: 18,
         style: [],
         gestureHandling: 'auto'
       }
@@ -328,10 +332,10 @@
       draggable: map.settings.google_map_settings.draggable,
       styles: map.settings.google_map_settings.style,
       gestureHandling: map.settings.google_map_settings.gestureHandling,
-      maxZoom : map.settings.google_map_settings.maxZoom,
-      minZoom : map.settings.google_map_settings.minZoom,
-      rotateControl : map.settings.google_map_settings.rotateControl,
-      fullscreenControl : map.settings.google_map_settings.fullscreenControl
+      maxZoom: map.settings.google_map_settings.maxZoom,
+      minZoom: map.settings.google_map_settings.minZoom,
+      rotateControl: map.settings.google_map_settings.rotateControl,
+      fullscreenControl: map.settings.google_map_settings.fullscreenControl
     });
 
     if (!Drupal.geolocation.hasOwnProperty('maps')) {

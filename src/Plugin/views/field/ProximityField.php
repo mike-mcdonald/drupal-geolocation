@@ -472,7 +472,7 @@ class ProximityField extends NumericField implements ContainerFactoryPluginInter
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  public function viewsForm(&$form, FormStateInterface $form_state) {
+  public function viewsForm(array &$form, FormStateInterface $form_state) {
     if ($this->options['proximity_source'] != 'user_input') {
       unset($form['actions']);
       return;
