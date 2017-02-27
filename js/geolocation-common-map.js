@@ -374,7 +374,12 @@
             markerConfig.icon = location.data('icon');
           }
 
-          var marker = Drupal.geolocation.setMapMarker(geolocationMap, markerConfig);
+          var skipInfoWindow = false;
+          if (commonMapSettings.markerScrollToResult === true) {
+            skipInfoWindow = true;
+          }
+
+          var marker = Drupal.geolocation.setMapMarker(geolocationMap, markerConfig, skipInfoWindow);
 
           marker.addListener('click', function () {
             if (commonMapSettings.markerScrollToResult === true) {

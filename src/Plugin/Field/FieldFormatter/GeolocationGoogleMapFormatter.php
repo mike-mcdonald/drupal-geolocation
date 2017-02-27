@@ -210,9 +210,6 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
         $title = $item->lat . ', ' . $item->lng;
       }
       $content = \Drupal::token()->replace($settings['info_text'], $token_context, ['callback' => [$this, 'geolocationItemTokens']]);
-      if (empty($content)) {
-        $content = $this->t('Latitude: %latitude, Longitude: %longitude', ['%latitude' => $item->lat, '%longitude' => $item->lng]);
-      }
 
       $location = [
         '#theme' => 'geolocation_common_map_location',

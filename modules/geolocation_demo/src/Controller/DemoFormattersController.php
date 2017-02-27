@@ -77,6 +77,7 @@ class DemoFormattersController extends ControllerBase {
         ],
         'third_party_settings' => [],
       ],
+      'view_mode' => 'default',
     ];
 
     $form = [];

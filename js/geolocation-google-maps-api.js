@@ -351,10 +351,12 @@
    *
    * @param {GeolocationMap} map - The settings object that contains all of the necessary metadata for this map.
    * @param {GoogleMarkerSettings} markerSettings - Marker settings.
+   * @param {Boolean} [skipInfoWindow=false] - Skip attaching InfoWindow.
    * @return {GoogleMarker} - Created marker.
    */
-  Drupal.geolocation.setMapMarker = function (map, markerSettings) {
+  Drupal.geolocation.setMapMarker = function (map, markerSettings, skipInfoWindow) {
     map.mapMarkers = map.mapMarkers || [];
+    skipInfoWindow = skipInfoWindow || false;
 
     if (typeof map.settings.google_map_settings.marker_icon_path === 'string') {
       if (typeof markerSettings.icon === 'undefined') {
@@ -366,8 +368,7 @@
     /** @type {GoogleMarker} */
     var currentMarker = new google.maps.Marker(markerSettings);
 
-    // Add the info window event if the info text has been set.
-    if (markerSettings.infoWindowContent.length > 0) {
+    if (skipInfoWindow !== true) {
 
       // Set the info popup text.
       var currentInfoWindow = new google.maps.InfoWindow({

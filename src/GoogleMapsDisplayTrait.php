@@ -126,7 +126,7 @@ trait GoogleMapsDisplayTrait {
         'height' => '400px',
         'width' => '100%',
         'info_auto_display' => TRUE,
-        'marker_icon_path' => TRUE,
+        'marker_icon_path' => '',
         'disableAutoPan' => TRUE,
         'style' => '',
         'preferScrollingToZooming' => FALSE,

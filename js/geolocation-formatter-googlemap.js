@@ -99,14 +99,17 @@
               var markerConfig = {
                 position: position,
                 map: map.googleMap,
-                title: location.children('h2').text(),
+                title: location.children('.location-title').text(),
                 infoWindowContent: location.html(),
                 infoWindowSolitary: true
               };
 
-              var marker = Drupal.geolocation.setMapMarker(map, markerConfig);
+              var skipInfoWindow = false;
+              if (location.children('.location-content').text().trim().length < 1) {
+                skipInfoWindow = true;
+              }
 
-              map.mapMarkers.push(marker);
+              Drupal.geolocation.setMapMarker(map, markerConfig, skipInfoWindow);
             });
 
             map.googleMap.fitBounds(bounds);
