@@ -471,6 +471,7 @@
         if (
           typeof commonMapSettings.markerClusterer !== 'undefined'
           && commonMapSettings.markerClusterer.enable
+          && typeof MarkerClusterer !== 'undefined'
         ) {
 
           /* global MarkerClusterer */
@@ -483,11 +484,17 @@
             imagePath = 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m';
           }
 
+          var markerClustererStyles = '';
+          if (typeof commonMapSettings.markerClusterer.styles !== 'undefined') {
+            markerClustererStyles = commonMapSettings.markerClusterer.styles;
+          }
+
           new MarkerClusterer(
             geolocationMap.googleMap,
             geolocationMap.mapMarkers,
             {
-              imagePath: imagePath
+              imagePath: imagePath,
+              styles: markerClustererStyles
             }
           );
         }

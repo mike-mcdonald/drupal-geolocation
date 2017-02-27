@@ -48,6 +48,20 @@ trait GoogleMapsDisplayTrait {
   public static $GOOGLEMAPSAPIURL = 'https://maps.googleapis.com/maps/api/js';
 
   /**
+   * Google map max zoom level.
+   *
+   * @var integer
+   */
+  public static $MAXZOOMLEVEL = 18;
+
+  /**
+   * Google map min zoom level.
+   *
+   * @var integer
+   */
+  public static $MINZOOMLEVEL = 0;
+
+  /**
    * Return all module and custom defined parameters.
    *
    * @return array
@@ -117,9 +131,13 @@ trait GoogleMapsDisplayTrait {
       'google_map_settings' => [
         'type' => static::$ROADMAP,
         'zoom' => 10,
+        'minZoom' => static::$MINZOOMLEVEL,
+        'maxZoom' => static::$MAXZOOMLEVEL,
+        'rotateControl' => FALSE,
         'mapTypeControl' => TRUE,
         'streetViewControl' => TRUE,
         'zoomControl' => TRUE,
+        'fullscreenControl' => FALSE,
         'scrollwheel' => TRUE,
         'disableDoubleClickZoom' => FALSE,
         'draggable' => TRUE,
@@ -248,10 +266,38 @@ trait GoogleMapsDisplayTrait {
     $form['google_map_settings']['zoom'] = [
       '#type' => 'select',
       '#title' => $this->t('Zoom level'),
-      '#options' => range(0, 18),
+      '#options' => range(static::$MINZOOMLEVEL, static::$MAXZOOMLEVEL),
       '#description' => $this->t('The initial resolution at which to display the map, where zoom 0 corresponds to a map of the Earth fully zoomed out, and higher zoom levels zoom in at a higher resolution.'),
       '#default_value' => $settings['google_map_settings']['zoom'],
       '#group' => $form_prefix . 'google_map_settings][general_settings',
+      '#process' => [
+        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+      ],
+      '#pre_render' => [
+        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+      ],
+    ];
+    $form['google_map_settings']['maxZoom'] = [
+      '#group' => $form_prefix . 'google_map_settings][general_settings',
+      '#type' => 'select',
+      '#title' => $this->t('Max Zoom level'),
+      '#options' => range(static::$MINZOOMLEVEL, static::$MAXZOOMLEVEL),
+      '#description' => $this->t('The maximum zoom level which will be displayed on the map. If omitted, or set to null, the maximum zoom from the current map type is used instead.'),
+      '#default_value' => $settings['google_map_settings']['maxZoom'],
+      '#process' => [
+        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+      ],
+      '#pre_render' => [
+        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+      ],
+    ];
+    $form['google_map_settings']['minZoom'] = [
+      '#group' => $form_prefix . 'google_map_settings][general_settings',
+      '#type' => 'select',
+      '#title' => $this->t('Min Zoom level'),
+      '#options' => range(static::$MINZOOMLEVEL, static::$MAXZOOMLEVEL),
+      '#description' => $this->t('The minimum zoom level which will be displayed on the map. If omitted, or set to null, the minimum zoom from the current map type is used instead.'),
+      '#default_value' => $settings['google_map_settings']['minZoom'],
       '#process' => [
         ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
       ],
@@ -288,6 +334,20 @@ trait GoogleMapsDisplayTrait {
       '#title' => $this->t('Zoom control'),
       '#description' => $this->t('Show zoom controls.'),
       '#default_value' => $settings['google_map_settings']['zoomControl'],
+    ];
+    $form['google_map_settings']['rotateControl'] = [
+      '#group' => $form_prefix . 'google_map_settings][control_settings',
+      '#type' => 'checkbox',
+      '#title' => $this->t('Rotate control'),
+      '#description' => $this->t('Show rotate control.'),
+      '#default_value' => $settings['google_map_settings']['rotateControl'],
+    ];
+    $form['google_map_settings']['fullscreenControl'] = [
+      '#group' => $form_prefix . 'google_map_settings][control_settings',
+      '#type' => 'checkbox',
+      '#title' => $this->t('Fullscreen control'),
+      '#description' => $this->t('Show fullscreen control.'),
+      '#default_value' => $settings['google_map_settings']['fullscreenControl'],
     ];
 
     /*

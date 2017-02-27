@@ -327,7 +327,11 @@
       disableDoubleClickZoom: map.settings.google_map_settings.disableDoubleClickZoom,
       draggable: map.settings.google_map_settings.draggable,
       styles: map.settings.google_map_settings.style,
-      gestureHandling: map.settings.google_map_settings.gestureHandling
+      gestureHandling: map.settings.google_map_settings.gestureHandling,
+      maxZoom : map.settings.google_map_settings.maxZoom,
+      minZoom : map.settings.google_map_settings.minZoom,
+      rotateControl : map.settings.google_map_settings.rotateControl,
+      fullscreenControl : map.settings.google_map_settings.fullscreenControl
     });
 
     if (!Drupal.geolocation.hasOwnProperty('maps')) {
