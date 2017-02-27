@@ -25,6 +25,7 @@
  * @property {Boolean} markerScrollToResult
  * @property {String} markerClusterer.enable
  * @property {String} markerClusterer.imagePath
+ * @property {Object} markerClusterer.styles
  * @property {String} contextPopupContent.enable
  * @property {String} contextPopupContent.content
  */

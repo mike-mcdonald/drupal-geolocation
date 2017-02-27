@@ -15,6 +15,8 @@
  * @property {String} height
  * @property {String} width
  * @property {String} zoom
+ * @property {String} maxZoom
+ * @property {String} minZoom
  * @property {String} type
  * @property {Boolean} scrollwheel
  * @property {Boolean} preferScrollingToZooming
@@ -25,6 +27,8 @@
  * @property {Boolean} streetViewControl
  * @property {Boolean} overviewMapControl
  * @property {Boolean} zoomControl
+ * @property {Boolean} rotateControl
+ * @property {Boolean} fullscreenControl
  * @property {Object} zoomControlOptions
  * @property {String} mapTypeId
  * @property {String} info_text
@@ -312,11 +316,15 @@
      */
     map.googleMap = new google.maps.Map(map.container.get(0), {
       zoom: parseInt(map.settings.google_map_settings.zoom),
+      maxZoom: parseInt(map.settings.google_map_settings.maxZoom),
+      minZoom: parseInt(map.settings.google_map_settings.minZoom),
       center: center,
       mapTypeId: google.maps.MapTypeId[map.settings.google_map_settings.type],
       mapTypeControlOptions: {
         position: google.maps.ControlPosition.RIGHT_BOTTOM
       },
+      rotateControl: map.settings.google_map_settings.rotateControl,
+      fullscreenControl: map.settings.google_map_settings.fullscreenControl,
       zoomControl: map.settings.google_map_settings.zoomControl,
       zoomControlOptions: {
         style: google.maps.ZoomControlStyle.LARGE,
@@ -331,11 +339,7 @@
       disableDoubleClickZoom: map.settings.google_map_settings.disableDoubleClickZoom,
       draggable: map.settings.google_map_settings.draggable,
       styles: map.settings.google_map_settings.style,
-      gestureHandling: map.settings.google_map_settings.gestureHandling,
-      maxZoom: map.settings.google_map_settings.maxZoom,
-      minZoom: map.settings.google_map_settings.minZoom,
-      rotateControl: map.settings.google_map_settings.rotateControl,
-      fullscreenControl: map.settings.google_map_settings.fullscreenControl
+      gestureHandling: map.settings.google_map_settings.gestureHandling
     });
 
     if (!Drupal.geolocation.hasOwnProperty('maps')) {
@@ -396,13 +400,9 @@
       });
 
       if (map.settings.google_map_settings.info_auto_display) {
-        if (markerSettings.infoWindowSolitary) {
-          if (typeof map.infoWindow !== 'undefined') {
-            map.infoWindow.close();
-          }
-          map.infoWindow = currentInfoWindow;
-        }
-        currentInfoWindow.open(map.googleMap, currentMarker);
+        google.maps.event.addListenerOnce(map.googleMap, 'tilesloaded', function () {
+          google.maps.event.trigger(currentMarker, 'click');
+        });
       }
     }
 

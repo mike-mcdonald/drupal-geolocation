@@ -26,7 +26,7 @@ abstract class GeocoderBase extends PluginBase implements GeocoderInterface {
   /**
    * {@inheritdoc}
    */
-  public function processOptionsForm($form_element) {
+  public function processOptionsForm(array $form_element) {
     return NULL;
   }
 
