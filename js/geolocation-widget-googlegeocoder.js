@@ -68,9 +68,9 @@
   };
 
   /**
-   * Runs after the google maps api is available
+   * Runs after the Google Maps API is available
    *
-   * @param {GeolocationMap[]} maps - The google map object.
+   * @param {GeolocationMap[]} maps - The Google Maps object.
    * @param {object} context - The html context.
    */
   function initialize(maps, context) {
@@ -570,7 +570,7 @@
   /**
    * Set the latitude and longitude values to the input fields
    *
-   * @param {GoogleMapLatLng} latLng - A location (latLng) object from google maps API.
+   * @param {GoogleMapLatLng} latLng - A location (latLng) object from Google Maps API.
    * @param {GeolocationMap} map - The settings object that contains all of the necessary metadata for this map.
    */
   Drupal.geolocation.geocoderWidget.setHiddenInputFields = function (latLng, map) {

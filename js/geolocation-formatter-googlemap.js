@@ -13,12 +13,12 @@
   Drupal.geolocation = Drupal.geolocation || {};
 
   /**
-   * Attach google map formatter functionality.
+   * Attach Google Maps formatter functionality.
    *
    * @type {Drupal~behavior}
    *
    * @prop {Drupal~behaviorAttach} attach
-   *   Attaches google map formatter functionality to relevant elements.
+   *   Attaches Google Maps formatter functionality to relevant elements.
    */
   Drupal.behaviors.geolocationGoogleMaps = {
     attach: function (context, drupalSettings) {
@@ -32,7 +32,7 @@
   };
 
   /**
-   * Runs after the google maps api is available
+   * Runs after the Google Maps API is available
    *
    * @param {GeolocationMap[]} mapSettings - The geolocation map objects.
    * @param {object} context - The html context.
@@ -79,7 +79,7 @@
             /**
              * Result handling.
              */
-              // A google maps API tool to re-center the map on its content.
+              // A Google Maps API tool to re-center the map on its content.
             var bounds = new google.maps.LatLngBounds();
 
             Drupal.geolocation.removeMapMarker(map);

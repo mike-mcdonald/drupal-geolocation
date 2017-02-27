@@ -1,4 +1,4 @@
-# Google maps geocoder function.
+# Google Maps geocoder function.
 geolocation.geocoder:
   version: 8.x-1.x
   js:
@@ -39,7 +39,7 @@ geolocation.widgets.html5:
 #
 #
 
-# Geolocation Google maps API integration library.
+# Geolocation Google Maps API integration library.
 geolocation.googlemapsapi:
   version: 8.x-1.x
   dependencies:
@@ -50,7 +50,7 @@ geolocation.googlemapsapi:
   js:
     js/geolocation-google-maps-api.js: {}
 
-# Google maps geocoder function.
+# Google Maps geocoder function.
 geolocation.geocoder.googlegeocodingapi:
   version: 8.x-1.x
   js:
@@ -60,7 +60,7 @@ geolocation.geocoder.googlegeocodingapi:
     - geolocation/geolocation.geocoder
     - geolocation/geolocation.googlemapsapi
 
-# Google maps display formatter.
+# Google Maps display formatter.
 geolocation.formatter.googlemap:
   version: 8.x-1.x
   css:

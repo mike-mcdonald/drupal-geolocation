@@ -344,7 +344,7 @@
         /**
          * Result handling.
          */
-        // A google maps API tool to re-center the map on its content.
+        // A Google Maps API tool to re-center the map on its content.
         var bounds = new google.maps.LatLngBounds();
         Drupal.geolocation.removeMapMarker(geolocationMap);
 
@@ -413,7 +413,7 @@
           contextContainer.appendTo(geolocationMap.container);
 
           /**
-           * Gets the default settings for the google map.
+           * Gets the default settings for the Google Map.
            *
            * @param {GoogleMapLatLng} latLng - Coordinates.
            * @return {GoogleMapPoint} - Pixel offset against top left corner of map container.

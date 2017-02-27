@@ -204,7 +204,7 @@
   Drupal.geolocation.maps_api_loading = false;
 
   /**
-   * Gets the default settings for the google map.
+   * Gets the default settings for the Google Map.
    *
    * @return {{GoogleMapSettings}}.
    */
@@ -251,7 +251,7 @@
   };
 
   /**
-   * Load google maps and set a callback to run when it's ready.
+   * Load Google Maps and set a callback to run when it's ready.
    *
    * @param {geolocationCallback} callback - The callback
    */
@@ -259,14 +259,14 @@
     // Add the callback.
     Drupal.geolocation.addCallback(callback);
 
-    // Check for google maps.
+    // Check for Google Maps.
     if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
       if (Drupal.geolocation.maps_api_loading === true) {
         return;
       }
 
       Drupal.geolocation.maps_api_loading = true;
-      // Google maps isn't loaded so lazy load google maps.
+      // Google Maps isn't loaded so lazy load Google Maps.
 
       if (typeof drupalSettings.geolocation.google_map_url !== 'undefined') {
         $.getScript(drupalSettings.geolocation.google_map_url)
@@ -279,17 +279,17 @@
       }
     }
     else {
-      // Google maps loaded. Run callback.
+      // Google Maps loaded. Run callback.
       Drupal.geolocation.googleCallback();
     }
   };
 
   /**
-   * Load google maps and set a callback to run when it's ready.
+   * Load Google Maps and set a callback to run when it's ready.
    *
    * @param {GeolocationMap} map - Container of settings and ID.
    *
-   * @return {object} - The google map object.
+   * @return {object} - The Google Map object.
    */
   Drupal.geolocation.addMap = function (map) {
     // Set the container size.
@@ -425,7 +425,7 @@
   /**
    * Draw a circle indicating accuracy and slowly fade it out.
    *
-   * @param {GoogleMapLatLng} location - A location (latLng) object from google maps API.
+   * @param {GoogleMapLatLng} location - A location (latLng) object from Google Maps API.
    * @param {int} accuracy - Accuracy in meter.
    * @param {GoogleMap} map - Map to draw on.
    */

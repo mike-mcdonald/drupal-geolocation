@@ -75,7 +75,7 @@ trait GoogleMapsDisplayTrait {
    * Return the fully build URL to load Google Maps API.
    *
    * @return string
-   *   Google Maps API url
+   *   Google Maps API URL
    */
   public function getGoogleMapsApiUrl() {
     $parameters = [];
@@ -204,8 +204,8 @@ trait GoogleMapsDisplayTrait {
     $form = [
       'google_map_settings' => [
         '#type' => 'details',
-        '#title' => t('GoogleMap settings'),
-        '#description' => t('Addtional map settings provided by GoogleMaps'),
+        '#title' => t('Google Maps settings'),
+        '#description' => t('Additional map settings provided by Google Maps'),
       ],
     ];
 
