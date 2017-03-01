@@ -305,41 +305,39 @@
         /**
          * Client location handling.
          */
-        if (typeof mapWrapper.data('clientlocation') !== 'undefined') {
-          // Only act when location still unknown.
-          if (typeof mapWrapper.data('centre-lat') === 'undefined' || typeof mapWrapper.data('centre-lng') === 'undefined') {
-            if (
-              mapWrapper.data('geolocationAjaxProcessed') !== 1
-              && navigator.geolocation
-              && typeof commonMapSettings.client_location !== 'undefined'
-              && commonMapSettings.client_location.enable === true
-            ) {
-              navigator.geolocation.getCurrentPosition(function (position) {
-                mapWrapper.data('centre-lat', position.coords.latitude);
-                mapWrapper.data('centre-lng', position.coords.longitude);
+        if (typeof mapWrapper.data('clientlocation') !== 'undefined' && !mapWrapper.hasClass('clientlocation-processed')) {
+          mapWrapper.addClass('clientlocation-processed');
+          if (
+            mapWrapper.data('geolocationAjaxProcessed') !== 1
+            && navigator.geolocation
+            && typeof commonMapSettings.client_location !== 'undefined'
+            && commonMapSettings.client_location.enable === true
+          ) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+              mapWrapper.data('centre-lat', position.coords.latitude);
+              mapWrapper.data('centre-lng', position.coords.longitude);
 
-                var newLocation = new google.maps.LatLng(parseFloat(position.coords.latitude), parseFloat(position.coords.longitude));
+              var newLocation = new google.maps.LatLng(parseFloat(position.coords.latitude), parseFloat(position.coords.longitude));
 
+              skipMapIdleEventHandler = true;
+              geolocationMap.googleMap.setCenter(newLocation);
+              if (skipMapIdleEventHandler !== true) {
                 skipMapIdleEventHandler = true;
-                geolocationMap.googleMap.setCenter(newLocation);
-                if (skipMapIdleEventHandler !== true) {
-                  skipMapIdleEventHandler = true;
-                }
+              }
 
-                geolocationMap.googleMap.setZoom(geolocationMap.settings.google_map_settings.zoom);
+              geolocationMap.googleMap.setZoom(geolocationMap.settings.google_map_settings.zoom);
 
-                Drupal.geolocation.drawAccuracyIndicator(newLocation, parseInt(position.coords.accuracy), geolocationMap.googleMap);
+              Drupal.geolocation.drawAccuracyIndicator(newLocation, parseInt(position.coords.accuracy), geolocationMap.googleMap);
 
-                if (
-                  typeof commonMapSettings.client_location.update_map !== 'undefined'
-                  && commonMapSettings.client_location.update_map === true
-                  && typeof commonMapSettings.dynamic_map !== 'undefined'
-                ) {
-                  skipMapIdleEventHandler = true;
-                  geolocationMap.updateDrupalView(commonMapSettings.dynamic_map);
-                }
-              });
-            }
+              if (
+                typeof commonMapSettings.client_location.update_map !== 'undefined'
+                && commonMapSettings.client_location.update_map === true
+                && typeof commonMapSettings.dynamic_map !== 'undefined'
+              ) {
+                skipMapIdleEventHandler = true;
+                geolocationMap.updateDrupalView(commonMapSettings.dynamic_map);
+              }
+            });
           }
         }
 
