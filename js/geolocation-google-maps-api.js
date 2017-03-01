@@ -14,9 +14,9 @@
  * @property {String} marker_icon_path
  * @property {String} height
  * @property {String} width
- * @property {String} zoom
- * @property {String} maxZoom
- * @property {String} minZoom
+ * @property {Number} zoom
+ * @property {Number} maxZoom
+ * @property {Number} minZoom
  * @property {String} type
  * @property {Boolean} scrollwheel
  * @property {Boolean} preferScrollingToZooming
@@ -207,31 +207,23 @@
   // This flag will prevent repeat $.getScript() calls.
   Drupal.geolocation.maps_api_loading = false;
 
-  /**
-   * Gets the default settings for the Google Map.
-   *
-   * @return {{GoogleMapSettings}}.
-   */
-  Drupal.geolocation.defaultSettings = function () {
-    return {
-      google_map_settings: {
-        scrollwheel: false,
-        panControl: false,
-        mapTypeControl: true,
-        scaleControl: false,
-        streetViewControl: false,
-        overviewMapControl: false,
-        rotateControl: false,
-        fullscreenControl: false,
-        zoomControl: true,
-        mapTypeId: google.maps.MapTypeId.ROADMAP,
-        zoom: 2,
-        maxZoom: 0,
-        minZoom: 18,
-        style: [],
-        gestureHandling: 'auto'
-      }
-    };
+  /** {GoogleMapSettings} **/
+  Drupal.geolocation.defaultMapSettings = {
+    scrollwheel: false,
+    panControl: false,
+    mapTypeControl: true,
+    scaleControl: false,
+    streetViewControl: false,
+    overviewMapControl: false,
+    rotateControl: false,
+    fullscreenControl: false,
+    zoomControl: true,
+    mapTypeId: 'roadmap',
+    zoom: 2,
+    maxZoom: 0,
+    minZoom: 18,
+    style: [],
+    gestureHandling: 'auto'
   };
 
   /**
@@ -309,15 +301,22 @@
     // Get the center point.
     var center = new google.maps.LatLng(map.lat, map.lng);
 
-    /**
+    // Add any missing settings.
+    map.settings.google_map_settings = $.extend(Drupal.geolocation.defaultMapSettings, map.settings.google_map_settings);
+
+    map.settings.google_map_settings.zoom = parseInt(map.settings.google_map_settings.zoom) || Drupal.geolocation.defaultMapSettings.zoom;
+    map.settings.google_map_settings.maxZoom = parseInt(map.settings.google_map_settings.maxZoom) || Drupal.geolocation.defaultMapSettings.maxZoom;
+    map.settings.google_map_settings.minZoom = parseInt(map.settings.google_map_settings.minZoom) || Drupal.geolocation.defaultMapSettings.minZoom;
+
+     /**
      * Create the map object and assign it to the map.
      *
      * @type {GoogleMap} map.googleMap
      */
     map.googleMap = new google.maps.Map(map.container.get(0), {
-      zoom: parseInt(map.settings.google_map_settings.zoom),
-      maxZoom: parseInt(map.settings.google_map_settings.maxZoom),
-      minZoom: parseInt(map.settings.google_map_settings.minZoom),
+      zoom: map.settings.google_map_settings.zoom,
+      maxZoom: map.settings.google_map_settings.maxZoom,
+      minZoom: map.settings.google_map_settings.minZoom,
       center: center,
       mapTypeId: google.maps.MapTypeId[map.settings.google_map_settings.type],
       mapTypeControlOptions: {
@@ -417,6 +416,8 @@
    * @param {GeolocationMap} map - The settings object that contains all of the necessary metadata for this map.
    */
   Drupal.geolocation.removeMapMarker = function (map) {
+    map.mapMarkers = map.mapMarkers || [];
+
     $.each(
       map.mapMarkers,
 

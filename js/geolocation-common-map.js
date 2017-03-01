@@ -318,16 +318,17 @@
                 mapWrapper.data('centre-lat', position.coords.latitude);
                 mapWrapper.data('centre-lng', position.coords.longitude);
 
-                var newLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                var newLocation = new google.maps.LatLng(parseFloat(position.coords.latitude), parseFloat(position.coords.longitude));
 
                 skipMapIdleEventHandler = true;
                 geolocationMap.googleMap.setCenter(newLocation);
                 if (skipMapIdleEventHandler !== true) {
                   skipMapIdleEventHandler = true;
                 }
-                geolocationMap.googleMap.setZoom(parseInt(geolocationMap.settings.zoom));
 
-                Drupal.geolocation.drawAccuracyIndicator(newLocation, position.coords.accuracy, geolocationMap.googleMap);
+                geolocationMap.googleMap.setZoom(geolocationMap.settings.google_map_settings.zoom);
+
+                Drupal.geolocation.drawAccuracyIndicator(newLocation, parseInt(position.coords.accuracy), geolocationMap.googleMap);
 
                 if (
                   typeof commonMapSettings.client_location.update_map !== 'undefined'

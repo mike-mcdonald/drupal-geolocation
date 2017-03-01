@@ -115,10 +115,9 @@
             map.googleMap.fitBounds(bounds);
 
             if (map.settings.google_map_settings.zoom) {
-              var zoomSetting = parseInt(map.settings.google_map_settings.zoom);
               google.maps.event.addListenerOnce(map.googleMap, 'zoom_changed', function () {
-                if (zoomSetting < map.googleMap.getZoom()) {
-                  map.googleMap.setZoom(zoomSetting);
+                if (map.settings.google_map_settings.zoom < map.googleMap.getZoom()) {
+                  map.googleMap.setZoom(map.settings.google_map_settings.zoom);
                 }
               });
             }

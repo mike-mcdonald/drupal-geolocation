@@ -131,15 +131,6 @@
 
           /**
            *
-           * Settings setup.
-           *
-           */
-
-          // Add any missing settings.
-          map.settings = $.extend(Drupal.geolocation.defaultSettings(), map.settings);
-
-          /**
-           *
            * Initialize map.
            *
            */
