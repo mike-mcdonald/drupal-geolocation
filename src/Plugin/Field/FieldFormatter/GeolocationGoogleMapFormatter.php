@@ -156,6 +156,10 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
+    if ($items->count() == 0) {
+      return [];
+    }
+
     $settings = $this->getSettings();
     $map_settings = $this->getGoogleMapsSettings($this->getSettings());
 
