@@ -115,6 +115,9 @@ views.style.maps_common:
     marker_scroll_to_result:
       type: integer
       label: 'Scroll instead of open bubble'
+    marker_row_number:
+      type: integer
+      label: 'Use row number as marker label'
     id_field:
       type: string
       label: 'ID field'

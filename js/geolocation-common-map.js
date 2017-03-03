@@ -374,6 +374,10 @@
             markerConfig.icon = location.data('icon');
           }
 
+          if (typeof location.data('markerLabel') !== 'undefined') {
+            markerConfig.label = location.data('markerLabel').toString();
+          }
+
           var skipInfoWindow = false;
           if (commonMapSettings.markerScrollToResult === true) {
             skipInfoWindow = true;

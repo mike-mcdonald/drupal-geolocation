@@ -88,6 +88,7 @@
  * @property {GoogleMap} map
  * @property {string} title
  * @property {string} [icon]
+ * @property {string} [label]
  *
  * Settings from Geolocation module:
  * @property {string} [infoWindowContent]

@@ -75,6 +75,7 @@ function geolocation_theme() {
         'position' => NULL,
         'icon' => NULL,
         'location_id' => NULL,
+        'marker_label' => NULL,
       ],
     ],
   ];

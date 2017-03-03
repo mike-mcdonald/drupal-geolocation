@@ -200,7 +200,7 @@ class CommonMap extends StylePluginBase {
     /*
      * Add locations to output.
      */
-    foreach ($this->view->result as $row) {
+    foreach ($this->view->result as $row_number => $row) {
       if (!empty($title_field)) {
         $title_field_handler = $this->view->field[$title_field];
         $title_build = [
@@ -271,6 +271,9 @@ class CommonMap extends StylePluginBase {
         }
         if (!empty($location_id)) {
           $location['#location_id'] = $location_id;
+        }
+        if ($this->options['marker_row_number']) {
+          $location['#marker_label'] = (int) $row_number + 1;
         }
 
         $build['#locations'][] = $location;
@@ -407,6 +410,7 @@ class CommonMap extends StylePluginBase {
     $options['title_field'] = ['default' => ''];
     $options['icon_field'] = ['default' => ''];
     $options['marker_scroll_to_result'] = ['default' => 0];
+    $options['marker_row_number'] = ['default' => FALSE];
     $options['id_field'] = ['default' => ''];
     $options['marker_clusterer'] = ['default' => 0];
     $options['marker_clusterer_image_path'] = ['default' => ''];
@@ -744,6 +748,13 @@ class CommonMap extends StylePluginBase {
         ],
       ];
     }
+
+    $form['marker_row_number'] = [
+      '#group' => 'style_options][advanced_settings',
+      '#title' => $this->t('Show views result row number in marker'),
+      '#type' => 'checkbox',
+      '#default_value' => $this->options['marker_row_number'],
+    ];
 
     $form['context_popup_content'] = [
       '#group' => 'style_options][advanced_settings',
