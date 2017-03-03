@@ -116,7 +116,7 @@ class GoogleGeocodingAPI extends GeocoderBase {
     $config = \Drupal::config('geolocation.settings');
 
     if (!empty($config->get('google_map_custom_url_parameters')['region'])) {
-      $form['#attached']['drupalSettings']['geolocation']['geocoder']['googleGeocodingAPI']['region'] = $config->get('google_map_custom_url_parameters')['region'];
+      $render_array['#attached']['drupalSettings']['geolocation']['geocoder']['googleGeocodingAPI']['region'] = $config->get('google_map_custom_url_parameters')['region'];
     }
 
     if (!empty($this->configuration['components'])) {
