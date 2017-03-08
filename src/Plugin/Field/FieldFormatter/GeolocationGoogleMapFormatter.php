@@ -209,11 +209,17 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
     foreach ($items as $delta => $item) {
       $token_context['geolocation_current_item'] = $item;
 
-      $title = \Drupal::token()->replace($settings['title'], $token_context, ['callback' => [$this, 'geolocationItemTokens'], 'clear' => TRUE]);
+      $title = \Drupal::token()->replace($settings['title'], $token_context, [
+        'callback' => [$this, 'geolocationItemTokens'],
+        'clear' => TRUE,
+      ]);
       if (empty($title)) {
         $title = $item->lat . ', ' . $item->lng;
       }
-      $content = \Drupal::token()->replace($settings['info_text'], $token_context, ['callback' => [$this, 'geolocationItemTokens'], 'clear' => TRUE]);
+      $content = \Drupal::token()->replace($settings['info_text'], $token_context, [
+        'callback' => [$this, 'geolocationItemTokens'],
+        'clear' => TRUE,
+      ]);
 
       $location = [
         '#theme' => 'geolocation_common_map_location',
