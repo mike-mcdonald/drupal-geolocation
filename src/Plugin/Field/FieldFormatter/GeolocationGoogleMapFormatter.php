@@ -2,7 +2,6 @@
 
 namespace Drupal\geolocation\Plugin\Field\FieldFormatter;
 
-use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -26,13 +25,6 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
 
   use GoogleMapsDisplayTrait;
   use GeolocationItemTokenTrait;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings) {
-    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
-  }
 
   /**
    * {@inheritdoc}
