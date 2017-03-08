@@ -214,7 +214,14 @@ class CommonMap extends StylePluginBase {
       if ($this->view->field[$geo_field] instanceof GeolocationField) {
         /** @var \Drupal\geolocation\Plugin\views\field\GeolocationField $geolocation_field */
         $geolocation_field = $this->view->field[$geo_field];
-        $geo_items = $geolocation_field->getItems($row);
+        $entity = $geolocation_field->getEntity($row);
+        if (isset($entity->{$geolocation_field->definition['field_name']})) {
+          /** @var \Drupal\Core\Field\FieldItemListInterface $field_item_list */
+          $geo_items = $entity->{$geolocation_field->definition['field_name']};
+        }
+        else {
+          $geo_items = [];
+        }
       }
       else {
         return $build;
@@ -253,10 +260,9 @@ class CommonMap extends StylePluginBase {
       }
 
       foreach ($geo_items as $delta => $item) {
-        $geolocation = $item['raw'];
         $position = [
-          'lat' => $geolocation->lat,
-          'lng' => $geolocation->lng,
+          'lat' => $item->lat,
+          'lng' => $item->lng,
         ];
 
         $location = [
