@@ -120,12 +120,6 @@ trait GeolocationItemTokenTrait {
       $replacements['[geolocation_current_item:lat_sin]'] = $item->get('lat_sin')->getValue();
       $replacements['[geolocation_current_item:lat_cos]'] = $item->get('lat_cos')->getValue();
       $replacements['[geolocation_current_item:lng_rad]'] = $item->get('lng_rad')->getValue();
-
-      // TODO: Deprecated. Remove at some point.
-      $replacements[':lat'] = $item->get('lat')->getValue();
-      $replacements['%lat'] = $item->get('lat')->getValue();
-      $replacements[':lng'] = $item->get('lng')->getValue();
-      $replacements['%lng'] = $item->get('lng')->getValue();
     }
   }
 
