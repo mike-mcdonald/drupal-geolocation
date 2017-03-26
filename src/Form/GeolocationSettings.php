@@ -149,8 +149,7 @@ class GeolocationSettings extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    /** @var \Drupal\Core\Config\Config $config */
-    $config = \Drupal::service('config.factory')->getEditable('geolocation.settings');
+    $config = $this->configFactory()->getEditable('geolocation.settings');
     $config->set('google_map_api_key', $form_state->getValue('google_map_api_key'));
 
     $parameters = $form_state->getValue('parameters');
