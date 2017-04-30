@@ -719,6 +719,7 @@ class CommonMap extends StylePluginBase {
         '#empty_value' => 'none',
         '#process' => [
           ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+          ['\Drupal\Core\Render\Element\Select', 'processSelect'],
         ],
         '#pre_render' => [
           ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
@@ -748,6 +749,7 @@ class CommonMap extends StylePluginBase {
         ],
         '#process' => [
           ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+          ['\Drupal\Core\Render\Element\Select', 'processSelect'],
         ],
         '#pre_render' => [
           ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],

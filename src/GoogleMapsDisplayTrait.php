@@ -258,6 +258,7 @@ trait GoogleMapsDisplayTrait {
       '#group' => $form_prefix . 'google_map_settings][general_settings',
       '#process' => [
         ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\Select', 'processSelect'],
       ],
       '#pre_render' => [
         ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
@@ -272,6 +273,7 @@ trait GoogleMapsDisplayTrait {
       '#group' => $form_prefix . 'google_map_settings][general_settings',
       '#process' => [
         ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\Select', 'processSelect'],
       ],
       '#pre_render' => [
         ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
@@ -286,6 +288,7 @@ trait GoogleMapsDisplayTrait {
       '#default_value' => $settings['google_map_settings']['maxZoom'],
       '#process' => [
         ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\Select', 'processSelect'],
       ],
       '#pre_render' => [
         ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
@@ -300,6 +303,7 @@ trait GoogleMapsDisplayTrait {
       '#default_value' => $settings['google_map_settings']['minZoom'],
       '#process' => [
         ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\Select', 'processSelect'],
       ],
       '#pre_render' => [
         ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
@@ -382,6 +386,7 @@ trait GoogleMapsDisplayTrait {
       ],
       '#process' => [
         ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\Select', 'processSelect'],
       ],
       '#pre_render' => [
         ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
