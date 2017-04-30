@@ -29,39 +29,54 @@ function geolocation_demo_install() {
 
     $icon_path = drupal_get_path('module', 'geolocation_demo') . '/icons/';
 
-    $data = file_get_contents($icon_path . 'druplicon-deadpool.png');
-    $file = file_save_data($data, 'public://druplicon-deadpool.png', FILE_EXISTS_REPLACE);
+    /** @var \Drupal\taxonomy\TermInterface $term_a */
     $term_a = $taxonomy_storage->create([
       'vid' => 'geolocation_demo_taxonomy',
       'name' => 'Class A',
-      'field_geolocation_demo_term_icon' => [
-        'target_id' => $file->id(),
-      ],
     ]);
+
+    $data = file_get_contents($icon_path . 'druplicon-deadpool.png');
+    $file = file_save_data($data, 'public://druplicon-deadpool.png', FILE_EXISTS_REPLACE);
+    if ($file) {
+      $term_a->set('field_geolocation_demo_term_icon', [
+        'target_id' => $file->id(),
+      ]);
+    }
+
     $term_a->save();
     $term_ids[] = $term_a->id();
 
-    $data = file_get_contents($icon_path . 'druplicon-wolverine.png');
-    $file = file_save_data($data, 'public://druplicon-wolverine.png', FILE_EXISTS_REPLACE);
+    /** @var \Drupal\taxonomy\TermInterface $term_b */
     $term_b = $taxonomy_storage->create([
       'vid' => 'geolocation_demo_taxonomy',
       'name' => 'Class B',
-      'field_geolocation_demo_term_icon' => [
-        'target_id' => $file->id(),
-      ],
     ]);
+
+    $data = file_get_contents($icon_path . 'druplicon-wolverine.png');
+    $file = file_save_data($data, 'public://druplicon-wolverine.png', FILE_EXISTS_REPLACE);
+    if ($file) {
+      $term_b->set('field_geolocation_demo_term_icon', [
+        'target_id' => $file->id(),
+      ]);
+    }
+
     $term_b->save();
     $term_ids[] = $term_b->id();
 
-    $data = file_get_contents($icon_path . 'druplicon-wonder-woman.png');
-    $file = file_save_data($data, 'public://druplicon-wonder-woman.png', FILE_EXISTS_REPLACE);
+    /** @var \Drupal\taxonomy\TermInterface $term_c */
     $term_c = $taxonomy_storage->create([
       'vid' => 'geolocation_demo_taxonomy',
       'name' => 'Class C',
-      'field_geolocation_demo_term_icon' => [
-        'target_id' => $file->id(),
-      ],
     ]);
+
+    $data = file_get_contents($icon_path . 'druplicon-wonder-woman.png');
+    $file = file_save_data($data, 'public://druplicon-wonder-woman.png', FILE_EXISTS_REPLACE);
+    if ($file) {
+      $term_c->set('field_geolocation_demo_term_icon', [
+        'target_id' => $file->id(),
+      ]);
+    }
+
     $term_c->save();
     $term_ids[] = $term_c->id();
 
@@ -86,15 +101,20 @@ function geolocation_demo_install() {
     /*
      * Created defined unique node term relationship.
      */
-    $data = file_get_contents($icon_path . 'druplicon-nick-fury.png');
-    $file = file_save_data($data, 'public://druplicon-nick-fury.png', FILE_EXISTS_REPLACE);
+    /** @var \Drupal\taxonomy\TermInterface $term_single */
     $term_single = $taxonomy_storage->create([
       'vid' => 'geolocation_demo_taxonomy',
       'name' => 'Class Single',
-      'field_geolocation_demo_term_icon' => [
-        'target_id' => $file->id(),
-      ],
     ]);
+
+    $data = file_get_contents($icon_path . 'druplicon-nick-fury.png');
+    $file = file_save_data($data, 'public://druplicon-nick-fury.png', FILE_EXISTS_REPLACE);
+    if ($file) {
+      $term_single->set('field_geolocation_demo_term_icon', [
+        'target_id' => $file->id(),
+      ]);
+    }
+
     $term_single->save();
 
     $node = $node_storage->create([
