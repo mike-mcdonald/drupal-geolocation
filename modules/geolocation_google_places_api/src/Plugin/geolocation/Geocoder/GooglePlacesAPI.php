@@ -201,8 +201,17 @@ class GooglePlacesAPI extends GeocoderBase {
     }
     $request_url = 'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=' . $address;
 
-    if (!empty($this->geolocationSettings->get('google_map_api_key'))) {
-      $request_url .= '&key=' . $this->geolocationSettings->get('google_map_api_key');
+    $google_key = '';
+
+    if (!empty($this->geolocationSettings->get('google_map_api_server_key'))) {
+      $google_key = $this->geolocationSettings->get('google_map_api_server_key');
+    }
+    elseif (!empty($this->geolocationSettings->get('google_map_api_key'))) {
+      $google_key = $this->geolocationSettings->get('google_map_api_key');
+    }
+
+    if (!empty($google_key)) {
+      $request_url .= '&key=' . $google_key;
     }
     if (!empty($this->configuration['component_restrictions']['country'])) {
       $request_url .= '&components=country:' . $this->configuration['component_restrictions']['country'];
@@ -229,8 +238,8 @@ class GooglePlacesAPI extends GeocoderBase {
     try {
       $details_url = 'https://maps.googleapis.com/maps/api/place/details/json?placeid=' . $result['predictions'][0]['place_id'];
 
-      if (!empty($this->geolocationSettings->get('google_map_api_key'))) {
-        $details_url .= '&key=' . $this->geolocationSettings->get('google_map_api_key');
+      if (!empty($google_key)) {
+        $details_url .= '&key=' . $google_key;
       }
       $details = Json::decode(\Drupal::httpClient()->request('GET', $details_url)->getBody());
 

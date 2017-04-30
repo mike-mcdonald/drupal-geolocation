@@ -70,6 +70,9 @@ geolocation.settings:
     google_map_api_key:
       type: string
       label: 'Google Maps API Key'
+    google_map_api_server_key:
+      type: string
+      label: 'Google Maps API Key'
     google_map_custom_url_parameters:
       type: mapping
       label: 'Additional Google Maps API parameters'

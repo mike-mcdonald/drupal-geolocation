@@ -30,6 +30,13 @@ class GeolocationSettings extends ConfigFormBase {
       '#description' => $this->t('Google requires users to use a valid API key. Using the <a href="https://console.developers.google.com/apis">Google API Manager</a>, you can enable the <em>Google Maps JavaScript API</em>. That will create (or reuse) a <em>Browser key</em> which you can paste here.'),
     ];
 
+    $form['google_map_api_server_key'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Google Maps API Server key'),
+      '#default_value' => $config->get('google_map_api_server_key'),
+      '#description' => $this->t('If you use a separate key for server-side operations, add it here. Leave empty to use the Google Maps API key as above.'),
+    ];
+
     $custom_parameters = $config->get('google_map_custom_url_parameters');
     $form['parameters'] = [
       '#type' => 'details',
@@ -151,6 +158,7 @@ class GeolocationSettings extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $config = $this->configFactory()->getEditable('geolocation.settings');
     $config->set('google_map_api_key', $form_state->getValue('google_map_api_key'));
+    $config->set('google_map_api_server_key', $form_state->getValue('google_map_api_server_key'));
 
     $parameters = $form_state->getValue('parameters');
     unset($parameters['libraries']['add']);
