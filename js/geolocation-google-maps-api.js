@@ -426,9 +426,10 @@
        * @param {GoogleMarker} item - Current marker.
        */
       function (index, item) {
-        item.setMap();
+        item.setMap(null);
       }
     );
+    map.mapMarkers = [];
   };
 
   /**
