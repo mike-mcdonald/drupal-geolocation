@@ -8,3 +8,4 @@ dependencies:
   - views
   - node
   - field
+  - image
