@@ -287,24 +287,30 @@ views.filter.geolocation_filter_proximity:
     proximity_lng:
       type: string
       label: 'Proximity Longitude'
-    proximity_argument:
-      type: string
-      label: 'Proximity Argument'
-    boundary_filter:
-      type: string
-      label: 'Boundary Filter'
-    entity_id_argument:
-      type: string
-      label: 'Proximity Entity ID argument'
     proximity_units:
       type: string
       label: 'Proximity Units'
+    proximity_argument:
+      type: string
+      label: 'Proximity Argument'
+    entity_id_argument:
+      type: string
+      label: 'Proximity Entity ID argument'
+    boundary_filter:
+      type: string
+      label: 'Boundary Filter'
     client_location:
       type: boolean
       label: 'Ask client for location first'
     value:
       type: views.filter_value.numeric
       label: 'Proximity Value'
+
+views.filter.group_item.geolocation_filter_proximity:
+  type: views_filter_group_item
+  mapping:
+    value:
+      type: views.filter_value.numeric
 
 views.sort.geolocation_sort_proximity:
   type: views_sort

@@ -341,7 +341,7 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
           }
         }
       }
-      else {
+      elseif (!$this->isAGroup()) {
         // Proximity source set to "expose ins & retrieve from exposed form".
         $this->value[$this->options['expose']['identifier'] . '-lat'] = $input[$this->options['expose']['identifier'] . '-lat'];
         $this->value[$this->options['expose']['identifier'] . '-lng'] = $input[$this->options['expose']['identifier'] . '-lng'];
