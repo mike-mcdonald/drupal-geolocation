@@ -12,10 +12,10 @@
  * @ingroup themeable
  */
 #}
-<span itemscope itemtype="http://schema.org/Place">
-    <span itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
-        <meta itemprop="latitude" content="{{ lat }}">
-        <meta itemprop="longitude" content="{{ lng }}">
+<span typeof="Place">
+    <span property="geo" typeof="GeoCoordinates">
+        <meta property="latitude" content="{{ lat }}">
+        <meta property="longitude" content="{{ lng }}">
     </span>
     <span class="geolocation-sexagesimal">{{ lat }}, {{ lng }}</span>
 </span>
