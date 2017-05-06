@@ -197,12 +197,17 @@ class CommonMap extends StylePluginBase {
       }
     }
 
+    $this->renderFields($this->view->result);
+
     /*
      * Add locations to output.
      */
     foreach ($this->view->result as $row_number => $row) {
       if (!empty($title_field)) {
-        if (!empty($this->view->field[$title_field])) {
+        if (!empty($this->rendered_fields[$row_number][$title_field])) {
+          $title_build = $this->rendered_fields[$row_number][$title_field];
+        }
+        elseif (!empty($this->view->field[$title_field])) {
           $title_build = $this->view->field[$title_field]->render($row);
         }
       }
