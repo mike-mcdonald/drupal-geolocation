@@ -202,13 +202,9 @@ class CommonMap extends StylePluginBase {
      */
     foreach ($this->view->result as $row_number => $row) {
       if (!empty($title_field)) {
-        $title_field_handler = $this->view->field[$title_field];
-        $title_build = [
-          '#theme' => $title_field_handler->themeFunctions(),
-          '#view' => $title_field_handler->view,
-          '#field' => $title_field_handler,
-          '#row' => $row,
-        ];
+        if (!empty($this->view->field[$title_field])) {
+          $title_build = $this->view->field[$title_field]->render($row);
+        }
       }
 
       if ($this->view->field[$geo_field] instanceof GeolocationField) {
