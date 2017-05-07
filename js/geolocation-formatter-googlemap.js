@@ -88,14 +88,18 @@
              * Add the locations to the map.
              */
             mapWrapper.find('.geolocation-common-map-locations .geolocation').each(function (index, location) {
+
+              /** @type {jQuery} */
               location = $(location);
               var position = new google.maps.LatLng(Number(location.data('lat')), Number(location.data('lng')));
 
               bounds.extend(position);
 
-              /**
-               * @type {GoogleMarkerSettings}
-               */
+              if (location.data('set-marker') === 'false') {
+                return;
+              }
+
+              /** @type {GoogleMarkerSettings} */
               var markerConfig = {
                 position: position,
                 map: map.googleMap,

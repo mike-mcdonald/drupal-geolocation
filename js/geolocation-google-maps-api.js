@@ -187,6 +187,13 @@
  * @property {GoogleInfoWindow} infoWindow
  */
 
+/**
+ * Callback when map fully loaded.
+ *
+ * @callback geolocationMapLoadedCallback
+ * @param {GeolocationMap} map - Google map.
+ */
+
 (function ($, _, Drupal, drupalSettings) {
   'use strict';
 
@@ -202,6 +209,8 @@
    * @namespace
    */
   Drupal.geolocation = Drupal.geolocation || {};
+
+  Drupal.geolocation.maps = Drupal.geolocation.maps || [];
 
   // Google Maps are loaded lazily. In some situations load_google() is called twice, which results in
   // "You have included the Google Maps API multiple times on this page. This may cause unexpected errors." errors.
@@ -342,10 +351,6 @@
       gestureHandling: map.settings.google_map_settings.gestureHandling
     });
 
-    if (!Drupal.geolocation.hasOwnProperty('maps')) {
-      Drupal.geolocation.maps = [];
-    }
-
     if (map.settings.google_map_settings.scrollwheel && map.settings.google_map_settings.preferScrollingToZooming) {
       map.googleMap.setOptions({scrollwheel: false});
       map.googleMap.addListener('click', function () {
@@ -354,6 +359,10 @@
     }
 
     Drupal.geolocation.maps.push(map);
+
+    google.maps.event.addListenerOnce(map.googleMap, 'tilesloaded', function () {
+      Drupal.geolocation.mapLoadedCallback(map, map.id);
+    });
 
     return map.googleMap;
   };
@@ -476,6 +485,50 @@
         circle.setMap(null);
       }
     }
+  };
+
+  /**
+   * Provides the callback that is called when map is fully loaded.
+   *
+   * @param {GeolocationMap} map - fully loaded map
+   * @param {string} mapId - Source ID.
+   */
+  Drupal.geolocation.mapLoadedCallback = function (map, mapId) {
+    Drupal.geolocation.mapLoadedCallbacks = Drupal.geolocation.mapLoadedCallbacks || [];
+
+    $.each(Drupal.geolocation.mapLoadedCallbacks, function (index, callbackContainer) {
+      if (callbackContainer.mapId === mapId) {
+        callbackContainer.callback(map);
+      }
+    });
+  };
+
+  /**
+   * Adds a callback that will be called when map is fully loaded.
+   *
+   * @param {geolocationMapLoadedCallback} callback - The callback
+   * @param {string} mapId - Map ID.
+   */
+  Drupal.geolocation.addMapLoadedCallback = function (callback, mapId) {
+    if (typeof mapId === 'undefined') {
+      return;
+    }
+    Drupal.geolocation.mapLoadedCallbacks = Drupal.geolocation.mapLoadedCallbacks || [];
+    Drupal.geolocation.mapLoadedCallbacks.push({callback: callback, mapId: mapId});
+  };
+
+  /**
+   * Remove a callback that will be called when map is fully loaded.
+   *
+   * @param {string} mapId - Identify the source
+   */
+  Drupal.geolocation.removeMapLoadedCallback = function (mapId) {
+    Drupal.geolocation.mapLoadedCallbacks = Drupal.geolocation.geocoder.resultCallbacks || [];
+    $.each(Drupal.geolocation.mapLoadedCallbacks, function (index, callback) {
+      if (callback.mapId === mapId) {
+        Drupal.geolocation.mapLoadedCallbacks.splice(index, 1);
+      }
+    });
   };
 
 })(jQuery, _, Drupal, drupalSettings);
