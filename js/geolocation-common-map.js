@@ -365,7 +365,7 @@
           var markerConfig = {
             position: position,
             map: geolocationMap.googleMap,
-            title: location.children('h2').text(),
+            title: location.children('h2').html(),
             infoWindowContent: location.html(),
             infoWindowSolitary: true
           };
@@ -411,7 +411,7 @@
           && commonMapSettings.contextPopupContent.enable
         ) {
 
-          /** jQuery */
+          /** @type {jQuery} */
           var contextContainer = jQuery('<div class="geolocation-context-popup"></div>');
           contextContainer.hide();
           contextContainer.appendTo(geolocationMap.container);
