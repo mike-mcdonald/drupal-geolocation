@@ -7,6 +7,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\geolocation\Plugin\views\field\GeolocationField;
 use Drupal\geolocation\GoogleMapsDisplayTrait;
 use Drupal\image\Entity\ImageStyle;
+use Drupal\Core\Url;
 
 /**
  * Allow to display several field items on a common map.
@@ -237,6 +238,7 @@ class CommonMap extends StylePluginBase {
         }
       }
 
+      $icon_url = NULL;
       if (!empty($icon_field)) {
         /** @var \Drupal\views\Plugin\views\field\Field $icon_field_handler */
         $icon_field_handler = $this->view->field[$icon_field];
@@ -245,25 +247,27 @@ class CommonMap extends StylePluginBase {
           if (!empty($image_items[0])) {
             /** @var \Drupal\image\Plugin\Field\FieldType\ImageItem $item */
             $item = $image_items[0]['rendered']['#item'];
-            /** @var \Drupal\image\Entity\ImageStyle $style */
-            $style = ImageStyle::load($image_items[0]['rendered']['#image_style']);
-            if (!empty($style)) {
-              $icon_url = $style->buildUrl($item->entity->getFileUri());
+            if (!empty($item->entity)) {
+              $file_uri = $item->entity->getFileUri();
+
+              /** @var \Drupal\image\Entity\ImageStyle $style */
+              $style = ImageStyle::load($image_items[0]['rendered']['#image_style']);
+              if (!empty($style)) {
+                $icon_url = $style->buildUrl($file_uri);
+              }
+              else {
+                $icon_url = file_create_url($file_uri);
+              }
             }
-            else {
-              $icon_url = file_create_url($item->entity->getFileUri());
-            }
-          }
-          else {
-            $icon_url = NULL;
           }
         }
       }
 
+      /** @var \Drupal\geolocation\Plugin\Field\FieldType\GeolocationItem $item */
       foreach ($geo_items as $delta => $item) {
         $position = [
-          'lat' => $item->lat,
-          'lng' => $item->lng,
+          'lat' => $item->get('lat')->getValue(),
+          'lng' => $item->get('lng')->getValue(),
         ];
 
         $location = [
@@ -275,6 +279,32 @@ class CommonMap extends StylePluginBase {
 
         if (!empty($icon_url)) {
           $location['#icon'] = $icon_url;
+        }
+        else {
+          if (
+            !empty($this->options['google_map_settings']['marker_icon_path'])
+            && !empty($this->rowTokens[$row_number])
+          ) {
+            $icon_token_uri = $this->viewsTokenReplace($this->options['google_map_settings']['marker_icon_path'], $this->rowTokens[$row_number]);
+            $icon_token_url = file_create_url($icon_token_uri);
+
+            if ($icon_token_url) {
+              $location['#icon'] = $icon_token_url;
+            }
+            else {
+              try {
+                $icon_token_url = Url::fromUri($icon_token_uri);
+                if ($icon_token_url) {
+                  $location['#icon'] = $icon_token_url->setAbsolute(TRUE)
+                    ->toString();
+                }
+              }
+              catch (\Exception $e) {
+                // User entered mal-formed URL, but that doesn't matter.
+                // We hereby skip it anyway.
+              }
+            }
+          }
         }
         if (!empty($location_id)) {
           $location['#location_id'] = $location_id;
