@@ -101,6 +101,7 @@
  * @property {Function} setMap
  * @property {Function} setIcon
  * @property {Function} setTitle
+ * @property {Function} setLabel
  * @property {Function} addListener
  */
 
@@ -302,6 +303,13 @@
    * @return {object} - The Google Map object.
    */
   Drupal.geolocation.addMap = function (map) {
+
+    if (typeof map.id === 'undefined') {
+      map.id = 'map' + Math.floor(Math.random() * 10000);
+    }
+
+    map.mapMarkers = map.mapMarkers || [];
+
     // Set the container size.
     map.container.css({
       height: map.settings.google_map_settings.height,
@@ -495,7 +503,6 @@
    */
   Drupal.geolocation.mapLoadedCallback = function (map, mapId) {
     Drupal.geolocation.mapLoadedCallbacks = Drupal.geolocation.mapLoadedCallbacks || [];
-
     $.each(Drupal.geolocation.mapLoadedCallbacks, function (index, callbackContainer) {
       if (callbackContainer.mapId === mapId) {
         callbackContainer.callback(map);

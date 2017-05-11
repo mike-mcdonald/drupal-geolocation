@@ -49,6 +49,8 @@
        * @param {GeolocationMap} map - Single map settings Object
        */
       function (mapId, map) {
+        map.id = mapId;
+
         // Get the map container.
         /** @type {jQuery} */
         var mapWrapper = $('#' + mapId, context).first();

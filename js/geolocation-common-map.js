@@ -126,6 +126,8 @@
          */
         var geolocationMap = {};
 
+        geolocationMap.id = mapId;
+
         /*
          * Check for map already created (i.e. after AJAX)
          */
