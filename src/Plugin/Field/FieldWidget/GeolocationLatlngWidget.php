@@ -25,6 +25,8 @@ class GeolocationLatlngWidget extends WidgetBase {
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
 
+    $element['#type'] = 'fieldset';
+
     $element['lat'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Latitude'),
