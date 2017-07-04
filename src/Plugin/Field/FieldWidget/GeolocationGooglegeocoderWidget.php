@@ -420,7 +420,7 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
 
     if ($settings['populate_address_field']) {
       $element['map_canvas']['#attached']['drupalSettings']['geolocation']['widgetSettings'][$canvas_id]['addressFieldTarget'] = $settings['target_address_field'];
-      $element['map_canvas']['#attached']['drupalSettings']['geolocation']['widgetSettings'][$canvas_id]['addressFieldExpliciteActions'] = $settings['explicite_actions_address_field'];
+      $element['map_canvas']['#attached']['drupalSettings']['geolocation']['widgetSettings'][$canvas_id]['addressFieldExpliciteActions'] = (bool) $settings['explicite_actions_address_field'];
     }
 
     if ($settings['allow_override_map_settings']) {
