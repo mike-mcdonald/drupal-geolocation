@@ -184,7 +184,7 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
 
       $element['explicite_actions_address_field'] = [
         '#type' => 'checkbox',
-        '#title' => $this->t('Use explicite push/locate buttons to interact with address field widget'),
+        '#title' => $this->t('Use explicit push/locate buttons to interact with address field widget'),
         '#default_value' => $settings['explicite_actions_address_field'],
         '#states' => [
           'visible' => [
