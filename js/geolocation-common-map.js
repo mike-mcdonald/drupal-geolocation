@@ -487,7 +487,7 @@
             imagePath = commonMapSettings.markerClusterer.imagePath;
           }
           else {
-            imagePath = '//cdn.rawgit.com/googlemaps/js-marker-clusterer/gh-pages/images';
+            imagePath = 'https://cdn.rawgit.com/googlemaps/js-marker-clusterer/gh-pages/images/m';
           }
 
           var markerClustererStyles = '';
