@@ -66,6 +66,7 @@ function geolocation_theme() {
         'clientlocation' => NULL,
         'locations' => NULL,
         'id' => NULL,
+        'view' => NULL,
       ],
     ],
     'geolocation_common_map_location' => [
@@ -80,4 +81,17 @@ function geolocation_theme() {
       ],
     ],
   ];
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function geolocation_theme_suggestions_geolocation_common_map_display(array $variables) {
+  $suggestions = [];
+
+  if (!empty($variables['view']) && $variables['view'] instanceof ViewExecutable) {
+    $suggestions = $variables['view']->buildThemeFunctions('geolocation_common_map_display');
+  }
+
+  return $suggestions;
 }

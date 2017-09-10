@@ -118,7 +118,8 @@ class CommonMap extends StylePluginBase {
     $map_id = $this->view->dom_id;
 
     $build = [
-      '#theme' => 'geolocation_common_map_display',
+      '#theme' => $this->view->buildThemeFunctions('geolocation_common_map_display'),
+      '#view' => $this->view,
       '#id' => $map_id,
       '#attached' => [
         'library' => [
@@ -136,6 +137,10 @@ class CommonMap extends StylePluginBase {
         ],
       ],
     ];
+
+    // Add cache dependency for the view.
+    $renderer = $this->getRenderer();
+    $renderer->addCacheableDependency($build, $this->view->storage);
 
     if (!empty($this->options['show_raw_locations'])) {
       $build['#attached']['drupalSettings']['geolocation']['commonMap'][$map_id]['showRawLocations'] = TRUE;
