@@ -115,10 +115,10 @@
         // Hide the graceful-fallback HTML list; map will propably work now.
         // Map-container is not hidden by default in case of graceful-fallback.
         if (typeof commonMapSettings.showRawLocations === 'undefined') {
-          mapWrapper.children('.geolocation-common-map-locations').hide();
+          mapWrapper.find('.geolocation-common-map-locations').hide();
         }
         else if (!commonMapSettings.showRawLocations) {
-          mapWrapper.children('.geolocation-common-map-locations').hide();
+          mapWrapper.find('.geolocation-common-map-locations').hide();
         }
 
         /**
@@ -134,7 +134,7 @@
         if (typeof Drupal.geolocation.maps !== 'undefined') {
           $.each(Drupal.geolocation.maps, function (index, map) {
             if (typeof map.container !== 'undefined') {
-              if (map.container.is(mapWrapper.children('.geolocation-common-map-container'))) {
+              if (map.container.is(mapWrapper.find('.geolocation-common-map-container'))) {
                 geolocationMap = map;
               }
             }
@@ -183,7 +183,7 @@
           geolocationMap.settings = {};
           geolocationMap.settings.google_map_settings = commonMapSettings.settings.google_map_settings;
 
-          geolocationMap.container = mapWrapper.children('.geolocation-common-map-container');
+          geolocationMap.container = mapWrapper.find('.geolocation-common-map-container').first();
           geolocationMap.container.show();
 
           if (
@@ -367,7 +367,7 @@
           var markerConfig = {
             position: position,
             map: geolocationMap.googleMap,
-            title: location.children('h2').html(),
+            title: location.children('.location-title').html(),
             infoWindowContent: location.html(),
             infoWindowSolitary: true
           };
