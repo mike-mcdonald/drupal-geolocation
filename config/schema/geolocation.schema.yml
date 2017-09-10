@@ -95,6 +95,9 @@ geolocation.settings:
           sequence:
             type: string
             label: 'Library name'
+    use_current_language:
+      type: boolean
+      label: 'Use site language for Google Map'
 
 views.style.maps_common:
   type: views_style

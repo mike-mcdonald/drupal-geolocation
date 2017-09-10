@@ -117,6 +117,13 @@ class GeolocationSettings extends ConfigFormBase {
       '#description' => $this->t('Attention: setting this option has major usage implications. See <a href=":google_client_id_link">Google Maps Authentication documentation</a>.', [':google_client_id_link' => 'https://developers.google.com/maps/documentation/javascript/get-api-key#client-id']),
     ];
 
+    $form['use_current_language'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t('Use current interface language in Google Maps'),
+      '#default_value' => $config->get('use_current_language') ? TRUE : FALSE,
+      '#description' => $this->t('If a supported language is set by Drupal, it will be handed over to Google Maps. Defaults to language parameter above if set. List of <a href=":google_languages_list">supported languages here</a>.', [':google_languages_list' => 'https://developers.google.com/maps/faq#languagesupport']),
+    );
+
     return parent::buildForm($form, $form_state);
   }
 
@@ -159,6 +166,8 @@ class GeolocationSettings extends ConfigFormBase {
     $config = $this->configFactory()->getEditable('geolocation.settings');
     $config->set('google_map_api_key', $form_state->getValue('google_map_api_key'));
     $config->set('google_map_api_server_key', $form_state->getValue('google_map_api_server_key'));
+
+    $config->set('use_current_language', $form_state->getValue('use_current_language'));
 
     $parameters = $form_state->getValue('parameters');
     unset($parameters['libraries']['add']);
