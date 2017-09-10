@@ -180,8 +180,10 @@ class GeolocationGoogleMapFormatter extends FormatterBase {
 
       $unique_id = uniqid("map-canvas-");
 
-      $single_map['#latitude'] = $items->get(0)->getValue()['lat'];
-      $single_map['#longitude'] = $items->get(0)->getValue()['lng'];
+      if ($single_center = $items->get(0)) {
+        $single_map['#latitude'] = $items->get(0)->getValue()['lat'];
+        $single_map['#longitude'] = $items->get(0)->getValue()['lng'];
+      }
       $single_map['#uniqueid'] = $unique_id;
       $single_map['#attached']['drupalSettings']['geolocation']['maps'][$unique_id] = [
         'settings' => $map_settings,
