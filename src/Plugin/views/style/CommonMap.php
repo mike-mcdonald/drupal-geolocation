@@ -256,7 +256,7 @@ class CommonMap extends StylePluginBase {
                 $icon_url = $style->buildUrl($file_uri);
               }
               else {
-                $icon_url = file_create_url($file_uri);
+                $icon_url = file_url_transform_relative(file_create_url($file_uri));
               }
             }
           }
