@@ -36,6 +36,7 @@
 
 /**
  * @property {function(CommonMapUpdateSettings)} GeolocationMap.updateDrupalView
+ * @property {Object} GeolocationMap.markerClusterer
  */
 
 (function ($, window, Drupal, drupalSettings) {
@@ -495,7 +496,7 @@
             markerClustererStyles = commonMapSettings.markerClusterer.styles;
           }
 
-          new MarkerClusterer(
+          geolocationMap.markerClusterer = new MarkerClusterer(
             geolocationMap.googleMap,
             geolocationMap.mapMarkers,
             {
