@@ -242,9 +242,11 @@ class GeolocationGooglegeocoderWidget extends WidgetBase implements ContainerFac
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $settings = $this->getGoogleMapsSettings($this->getSettings()) + $this->getSettings();
 
-    // Get the geolocation value for this element.
-    $lat = $items[$delta]->lat;
-    $lng = $items[$delta]->lng;
+    if (!$items->isEmpty()) {
+      // Get the geolocation value for this element.
+      $lat = $items[$delta]->lat;
+      $lng = $items[$delta]->lng;
+    }
 
     $default_field_values = [
       'lat' => '',
