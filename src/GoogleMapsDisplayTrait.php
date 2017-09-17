@@ -86,6 +86,9 @@ trait GoogleMapsDisplayTrait {
     if (!empty($parameters['client'])) {
       unset($parameters['key']);
     }
+    else {
+      unset($parameters['channel']);
+    }
 
     return $parameters;
   }

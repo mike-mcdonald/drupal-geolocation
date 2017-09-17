@@ -117,12 +117,19 @@ class GeolocationSettings extends ConfigFormBase {
       '#description' => $this->t('Attention: setting this option has major usage implications. See <a href=":google_client_id_link">Google Maps Authentication documentation</a>.', [':google_client_id_link' => 'https://developers.google.com/maps/documentation/javascript/get-api-key#client-id']),
     ];
 
-    $form['use_current_language'] = array(
+    $form['parameters']['channel'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t("Google Maps Channel ID - 'channel'"),
+      '#default_value' => empty($custom_parameters['channel']) ?: $custom_parameters['channel'],
+      '#description' => $this->t('Channel parameter will be used together with client ID to track usage of your application. See <a href=":google_channel_id_link">Google Maps Premium reports - Channels data </a>.', [':google_channel_id_link' => 'https://developers.google.com/maps/premium/reports/usage-reports#channels']),
+    ];
+
+    $form['use_current_language'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Use current interface language in Google Maps'),
       '#default_value' => $config->get('use_current_language') ? TRUE : FALSE,
       '#description' => $this->t('If a supported language is set by Drupal, it will be handed over to Google Maps. Defaults to language parameter above if set. List of <a href=":google_languages_list">supported languages here</a>.', [':google_languages_list' => 'https://developers.google.com/maps/faq#languagesupport']),
-    );
+    ];
 
     return parent::buildForm($form, $form_state);
   }

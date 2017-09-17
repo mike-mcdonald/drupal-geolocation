@@ -89,6 +89,9 @@ geolocation.settings:
         client:
           type: string
           label: 'Client ID'
+        channel:
+          type: string
+          label: 'Channel'
         libraries:
           type: sequence
           label: 'Libraries'
