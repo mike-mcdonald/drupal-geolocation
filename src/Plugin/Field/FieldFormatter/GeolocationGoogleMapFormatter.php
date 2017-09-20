@@ -10,7 +10,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\geolocation\GeolocationItemTokenTrait;
 
 /**
- * Plugin implementation of the 'geolocation_latlng' formatter.
+ * Plugin implementation of the 'geolocation_googlemap' formatter.
  *
  * @FieldFormatter(
  *   id = "geolocation_map",
