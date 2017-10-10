@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\geolocation\FunctionalJavascript;
 
-use Drupal\FunctionalJavascriptTests\JavascriptTestBase;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
@@ -13,7 +12,7 @@ use Drupal\Core\Entity\Entity\EntityFormDisplay;
  *
  * @group geolocation
  */
-class GeolocationTokenFormatterTest extends JavascriptTestBase {
+class GeolocationTokenFormatterTest extends GeolocationGoogleJavascriptTestBase {
 
   /**
    * {@inheritdoc}
@@ -80,7 +79,7 @@ class GeolocationTokenFormatterTest extends JavascriptTestBase {
    * Tests the token formatter.
    */
   public function testGeocoderTokenizedTestReplacement() {
-    $this->drupalGet('node/1');
+    $this->drupalGetFilterGoogleKey('node/1');
     $this->assertSession()->responseContains('<span class="geolocation-latlng">52, 47</span>');
 
     EntityViewDisplay::load('node.article.default')
@@ -93,7 +92,7 @@ class GeolocationTokenFormatterTest extends JavascriptTestBase {
       ])
       ->save();
 
-    $this->drupalGet('node/1');
+    $this->drupalGetFilterGoogleKey('node/1');
     $this->assertSession()->responseContains('<div class="testing">52/47</div>');
     $this->assertSession()->responseContains('<h1 class="testingtitle">My home</h1>');
   }

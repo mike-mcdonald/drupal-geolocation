@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\geolocation\FunctionalJavascript;
 
-use Drupal\FunctionalJavascriptTests\JavascriptTestBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
@@ -14,9 +13,7 @@ use Drupal\Core\Entity\Entity\EntityFormDisplay;
  *
  * @group geolocation
  */
-class GeolocationCommonMapAjaxJavascriptTest extends JavascriptTestBase {
-
-  use GeolocationGoogleTestTrait;
+class GeolocationCommonMapAjaxJavascriptTest extends GeolocationGoogleJavascriptTestBase {
 
   /**
    * {@inheritdoc}

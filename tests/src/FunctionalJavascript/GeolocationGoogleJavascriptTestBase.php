@@ -2,12 +2,13 @@
 
 namespace Drupal\Tests\geolocation\FunctionalJavascript;
 
+use Drupal\FunctionalJavascriptTests\JavascriptTestBase;
 use Zumba\GastonJS\Exception\JavascriptError;
 
 /**
  * Support tests using Google Maps API.
  */
-trait GeolocationGoogleTestTrait {
+abstract class GeolocationGoogleJavascriptTestBase extends JavascriptTestBase {
 
   /**
    * Filter the missing key Google Maps API error.
@@ -21,7 +22,7 @@ trait GeolocationGoogleTestTrait {
    * @throws \Zumba\GastonJS\Exception\JavascriptError
    */
   protected function drupalGetFilterGoogleKey($path) {
-    /* @var $this \Drupal\FunctionalJavascriptTests\JavascriptTestBase */
+
     try {
       $this->drupalGet($path);
       $this->getSession()->getDriver()->wait(1000, '1==2');
