@@ -118,7 +118,7 @@
     ._renderItem = function (ul, item) {
       return $('<li></li>')
         .attr('data-value', item.value)
-        .append('<div class="geolocation-geocoder-item ' + item.classes.join(' ') + '">' + item.label + '</div>')
+        .append('<div><div class="geolocation-geocoder-item ' + item.classes.join(' ') + '">' + item.label + '</div></div>')
         .appendTo(ul);
     };
 
