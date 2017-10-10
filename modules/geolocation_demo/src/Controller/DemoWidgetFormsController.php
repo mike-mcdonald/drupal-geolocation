@@ -90,11 +90,7 @@ class DemoWidgetFormsController extends ControllerBase {
     ] as $widget_id) {
       $widget = $this->pluginManagerFieldWidget->getInstance(array_merge_recursive($widget_settings, ['configuration' => ['type' => $widget_id]]));
 
-      $form[$widget_id] = [
-        '#type' => 'fieldset',
-        '#title' => $widget->getPluginDefinition()['label'],
-        'widget' => $widget->formElement($items, 0, [], $form, $form_state),
-      ];
+      $form[$widget_id] = $widget->formElement($items, 0, ['#title' => $widget->getPluginDefinition()['label']], $form, $form_state);
     }
 
     return $form;

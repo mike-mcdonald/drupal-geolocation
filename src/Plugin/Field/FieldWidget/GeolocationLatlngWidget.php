@@ -34,6 +34,7 @@ class GeolocationLatlngWidget extends WidgetBase {
       '#empty_value' => '',
       '#maxlength' => 255,
       '#required' => $this->fieldDefinition->isRequired(),
+      '#description_display' => 'after',
     ];
 
     $lat_example = $element['lat']['#default_value'] ?: '51.47879';
@@ -50,6 +51,7 @@ class GeolocationLatlngWidget extends WidgetBase {
       '#default_value' => (isset($items[$delta]->lng)) ? $items[$delta]->lng : NULL,
       '#maxlength' => 255,
       '#required' => $this->fieldDefinition->isRequired(),
+      '#description_display' => 'after',
     ];
 
     $lng_example = $element['lng']['#default_value'] ?: '-0.010677';
