@@ -1,0 +1,91 @@
+.ui-menu .ui-menu-item .geolocation-geocoder-item {
+  padding-left: 24px;
+  background: url('../icons/place.png') no-repeat left center;
+}
+
+.ui-menu .ui-menu-item .ui-state-active.geolocation-geocoder-item {
+  background-color: #007fff;
+}
+
+.ui-menu .ui-menu-item .geolocation-geocoder-item.bar {
+  background-image: url('../icons/bar.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.bike {
+  background-image: url('../icons/bike.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.bookmark {
+  background-image: url('../icons/bookmark.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.bus-station {
+  background-image: url('../icons/bus-station.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.crosshairs {
+  background-image: url('../icons/crosshairs.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.route,
+.ui-menu .ui-menu-item .geolocation-geocoder-item.directions {
+  background-image: url('../icons/directions.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.fence {
+  background-image: url('../icons/fence.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.guidepost {
+  background-image: url('../icons/guidepost.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.heart {
+  background-image: url('../icons/heart.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.establishment,
+.ui-menu .ui-menu-item .geolocation-geocoder-item.home {
+  background-image: url('../icons/home.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.hotel {
+  background-image: url('../icons/hotel.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.locate {
+  background-image: url('../icons/locate.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.other-1 {
+  background-image: url('../icons/other-1.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.other-2 {
+  background-image: url('../icons/other-2.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.partly_cloudy {
+  background-image: url('../icons/partly_cloudy.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.person {
+  background-image: url('../icons/person.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.place {
+  background-image: url('../icons/place.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.rate_review {
+  background-image: url('../icons/rate_review.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.search {
+  background-image: url('../icons/search.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.share {
+  background-image: url('../icons/share.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.star {
+  background-image: url('../icons/star.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.suitecase {
+  background-image: url('../icons/suitecase.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.point_of_interest,
+.ui-menu .ui-menu-item .geolocation-geocoder-item.terrain {
+  background-image: url('../icons/terrain.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.time {
+  background-image: url('../icons/time.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.traffic {
+  background-image: url('../icons/traffic.png');
+}
+.ui-menu .ui-menu-item .geolocation-geocoder-item.transit_station,
+.ui-menu .ui-menu-item .geolocation-geocoder-item.train-station {
+  background-image: url('../icons/train-station.png');
+}
