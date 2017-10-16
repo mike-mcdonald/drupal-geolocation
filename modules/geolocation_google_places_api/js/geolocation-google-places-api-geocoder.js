@@ -138,17 +138,19 @@
    */
   Drupal.behaviors.geolocationGeocoderGooglePlacesApi = {
     attach: function (context) {
+      var attribution_block = $('#geolocation-google-places-api-attribution');
+      if (attribution_block.length === 0) {
+        console.err("Geolocation Google Places API attribution block missing."); // eslint-disable-line no-console
+        return;
+      }
       if (typeof Drupal.geolocation.geocoder.googlePlacesAPI.autocompleteService === 'undefined') {
         if (typeof Drupal.geolocation.loadGoogle === 'function') {
           Drupal.geolocation.loadGoogle(function () {
             if (typeof Drupal.geolocation.geocoder.googlePlacesAPI.service === 'undefined') {
-              var attribution_block = $('#geolocation-google-places-api-attribution');
-              if (attribution_block.length === 1) {
-                Drupal.geolocation.geocoder.googlePlacesAPI.service = new google.maps.places.PlacesService(attribution_block.get(0));
-                Drupal.geolocation.geocoder.googlePlacesAPI.autocompleteService = new google.maps.places.AutocompleteService();
+              Drupal.geolocation.geocoder.googlePlacesAPI.service = new google.maps.places.PlacesService(attribution_block.get(0));
+              Drupal.geolocation.geocoder.googlePlacesAPI.autocompleteService = new google.maps.places.AutocompleteService();
 
-                Drupal.geolocation.geocoder.googlePlacesAPI.attach(context);
-              }
+              Drupal.geolocation.geocoder.googlePlacesAPI.attach(context);
             }
             else {
               Drupal.geolocation.geocoder.googlePlacesAPI.attach(context);
