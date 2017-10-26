@@ -374,19 +374,15 @@
                 if (addressField.length < 1) {
                   return;
                 }
-                var addressDetails = addressField.find('.details-wrapper').first();
-                if (addressDetails.length < 1) {
-                  return;
-                }
 
                 var addressData = {};
 
-                addressData.organization = addressDetails.find('.organization').val();
-                addressData.addressLine1 = addressDetails.find('.address-line1').val();
-                addressData.addressLine2 = addressDetails.find('.address-line2').val();
-                addressData.locality = addressDetails.find('.locality').val();
-                addressData.administrativeArea = addressDetails.find('.administrative-area').val();
-                addressData.postalCode = addressDetails.find('.postal-code').val();
+                addressData.organization = addressField.find('.organization').val();
+                addressData.addressLine1 = addressField.find('.address-line1').val();
+                addressData.addressLine2 = addressField.find('.address-line2').val();
+                addressData.locality = addressField.find('.locality').val();
+                addressData.administrativeArea = addressField.find('.administrative-area').val();
+                addressData.postalCode = addressField.find('.postal-code').val();
 
                 var search = {};
                 search.address = '';
@@ -599,8 +595,6 @@
       return;
     }
 
-    var addressDetails = addressField.find('.details-wrapper').first();
-
     var addressLine1 = '';
     var addressLine2 = '';
     var postalTown = '';
@@ -691,23 +685,14 @@
 
       $(document).ajaxComplete(function (event, xhr, settings) {
         // Update after AJAX replacement.
-        addressDetails = addressField.find('.details-wrapper').first();
-
-        if (addressDetails.length < 1) {
-          return;
-        }
-
-        if (
-          settings.extraData._drupal_ajax
-          && settings.extraData._triggering_element_name === targetField + '[0][address][country_code]'
-        ) {
+        if (settings.extraData._drupal_ajax && settings.extraData._triggering_element_name === targetField + '[0][address][country_code]') {
           // Populate the address fields, once they have been added to the DOM.
-          addressDetails.find('.organization').val(premise);
-          addressDetails.find('.address-line1').val(addressLine1);
-          addressDetails.find('.address-line2').val(addressLine2);
-          addressDetails.find('.locality').val(locality);
+          addressField.find('.organization').val(premise);
+          addressField.find('.address-line1').val(addressLine1);
+          addressField.find('.address-line2').val(addressLine2);
+          addressField.find('.locality').val(locality);
 
-          var administrativeAreaInput = addressDetails.find('.administrative-area');
+          var administrativeAreaInput = addressField.find('.administrative-area');
           if (administrativeAreaInput) {
             if (administrativeAreaInput.prop('tagName') === 'INPUT') {
               administrativeAreaInput.val(countryCode + '-' + administrativeArea);
@@ -716,22 +701,18 @@
               administrativeAreaInput.val(administrativeArea);
             }
           }
-          addressDetails.find('.postal-code').val(postalCode);
+          addressField.find('.postal-code').val(postalCode);
         }
       });
     }
     else {
-      if (addressDetails.length < 1) {
-        return;
-      }
-
       // Populate the address fields, once they have been added to the DOM.
-      addressDetails.find('.organization').val(premise);
-      addressDetails.find('.address-line1').val(addressLine1);
-      addressDetails.find('.address-line2').val(addressLine2);
-      addressDetails.find('.locality').val(locality);
+      addressField.find('.organization').val(premise);
+      addressField.find('.address-line1').val(addressLine1);
+      addressField.find('.address-line2').val(addressLine2);
+      addressField.find('.locality').val(locality);
 
-      var administrativeAreaInput = addressDetails.find('.administrative-area');
+      var administrativeAreaInput = addressField.find('.administrative-area');
       if (administrativeAreaInput) {
         if (administrativeAreaInput.prop('tagName') === 'INPUT') {
           administrativeAreaInput.val(countryCode + '-' + administrativeArea);
@@ -740,7 +721,7 @@
           administrativeAreaInput.val(administrativeArea);
         }
       }
-      addressDetails.find('.postal-code').val(postalCode);
+      addressField.find('.postal-code').val(postalCode);
     }
   };
 
