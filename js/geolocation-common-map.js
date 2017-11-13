@@ -113,13 +113,15 @@
           return;
         }
 
-        // Hide the graceful-fallback HTML list; map will propably work now.
-        // Map-container is not hidden by default in case of graceful-fallback.
-        if (typeof commonMapSettings.showRawLocations === 'undefined') {
-          mapWrapper.find('.geolocation-common-map-locations').hide();
-        }
-        else if (!commonMapSettings.showRawLocations) {
-          mapWrapper.find('.geolocation-common-map-locations').hide();
+
+        // If the display is configured to show the raw locations, we
+        // can now show the graceful-fallback HTML list. The list is
+        // hidden on page load so that in the default case where the
+        // raw locations are hidden, we don't see them 'flicker' as JS loads.
+        if (typeof commonMapSettings.showRawLocations !== 'undefined')
+          if (commonMapSettings.showRawLocations) {
+            mapWrapper.find('.geolocation-common-map-locations').show();
+          }
         }
 
         /**
