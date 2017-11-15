@@ -4,6 +4,10 @@
   display: none;
 }
 
+.geolocation-common-map-locations {
+  display: none;
+}
+
 .geolocation-context-popup {
   z-index: 1;
   position: absolute;
