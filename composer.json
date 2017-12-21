@@ -1,5 +1,5 @@
 {
-    "name": "drupal/geolocation",
+    "name": "pdx/geolocation",
     "description": "Provides a simple geolocation Drupal field type to store and display location data (lat, lng).",
     "type": "drupal-module",
     "license": "GPL-2.0+"

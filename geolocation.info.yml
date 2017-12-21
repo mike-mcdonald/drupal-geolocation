@@ -1,6 +1,6 @@
 core: 8.x
 type: module
-name: Geolocation
+name: Portland Geolocation
 description: 'Provides a simple geolocation field type to store and display location data (lat, lng).'
 package: Geolocation
 dependencies:
